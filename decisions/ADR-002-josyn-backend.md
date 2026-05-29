@@ -12,7 +12,7 @@ The current JOSYN platform PoC has four repos:
 | Repo | Role |
 |------|------|
 | `josyn-foundation` | Infrastructure primitives |
-| `josyn-system` | Per-session JAP protocol server + shared packages |
+| `josyn-jap` | Per-session JAP protocol server + shared packages |
 | `josyn-job-host` | Job executable runtime library |
 | `josyn-platform` | Architecture, decisions, cross-cutting docs |
 
@@ -41,11 +41,11 @@ session-orchestration layer.
 | Layer | Owns |
 |-------|------|
 | `josyn-backend` | Scheduling, trigger evaluation, session-store persistence, session GUID assignment, spawning JAPServer and job.exe |
-| `josyn-system` | The per-session JAP protocol server; receiving and fulfilling `GetRawArguments`, `PutRawResult`, `PutError` |
+| `josyn-jap` | The per-session JAP protocol server; receiving and fulfilling `GetRawArguments`, `PutRawResult`, `PutError` |
 | `josyn-job-host` | The runtime embedded in job executables; protocol client, argument deserialization, reflection dispatch |
 | `josyn-foundation` | Infrastructure primitives shared by all layers |
 
-`josyn-system` and `josyn-job-host` are **unaware of `josyn-backend`**.
+`josyn-jap` and `josyn-job-host` are **unaware of `josyn-backend`**.
 The session GUID is the only coupling — passed as a CLI argument at spawn time.
 
 ### The migration seam
@@ -75,13 +75,13 @@ migrated jobs use the new `SessionStarter`.
 
 ## Consequences
 
-- `josyn-system` is **no longer called "the backend"** in platform documentation.
-  The correct term for `josyn-system` is "the JAP session server" or "the per-session server".
+- `josyn-jap` is **no longer called "the backend"** in platform documentation.
+  The correct term for `josyn-jap` is "the JAP session server" or "the per-session server".
   "Backend" now refers exclusively to `josyn-backend`.
 - The platform vocabulary gains a new entry: **Backend** → `josyn-backend`
 - The platform now has five repos; `josyn-platform/README.md` reflects this
 - The runtime flow in `architecture/overview.md` is updated to show `josyn-backend`
   as the spawner of both `JAPServer.exe` and `job.exe`
 - `josyn-backend` depends only on `JOSYN.Foundation.ResultPattern` in the stub phase.
-  It will **never** take a NuGet dependency on `josyn-system`; the relationship is
+  It will **never** take a NuGet dependency on `josyn-jap`; the relationship is
   purely runtime (spawn) — not a code import

@@ -1,10 +1,10 @@
-# josyn-system
+# josyn-jap
 
 **Role:** Per-session JAP protocol server — handles a single job session from argument delivery
 to result/error collection. Contains the shared protocol contract, a shared logger, and the
 backend server executable.
 
-**Location:** `C:\Users\chris\OneDrive\DevGit\josyn-system`
+**Location:** `C:\Users\chris\OneDrive\DevGit\josyn-jap`
 **Version:** `1.0.0-preview01`
 
 ---
@@ -12,18 +12,18 @@ backend server executable.
 ## Structure
 
 ```
-josyn-system/
-├── josyn-system-shared/          ← NuGet libraries (two packages)
-│   ├── JOSYN.System.Shared.Contract/
-│   ├── JOSYN.System.Shared.Log/
-│   └── JOSYN.System.Shared.Log.Test/
-└── josyn-system-japserver/       ← Backend EXE
-    └── JOSYN.System.JAPServer/
+josyn-jap/
+├── josyn-jap-shared/             ← NuGet libraries (two packages)
+│   ├── JOSYN.Jap.Shared.Contract/
+│   ├── JOSYN.Jap.Shared.Log/
+│   └── JOSYN.Jap.Shared.Log.Test/
+└── josyn-jap-japserver/          ← Backend EXE
+    └── JOSYN.Jap.JAPServer/
 ```
 
 ---
 
-## JOSYN.System.Shared.Contract
+## JOSYN.Jap.Shared.Contract
 
 **Purpose:** Transport-agnostic definition of the JOSYN Application Protocol (JAP).
 Shared between JAPServer (implements it) and JobHost (calls it via JAPClient).
@@ -72,7 +72,7 @@ All three return `Result` / `Result<T>` — no exceptions cross the protocol bou
 
 ---
 
-## JOSYN.System.Shared.Log
+## JOSYN.Jap.Shared.Log
 
 **Purpose:** Process-local file logger. Used by both JAPServer and job executables (via JobHost).
 
@@ -120,18 +120,18 @@ Log entries include: timestamp, header, message, optional CallStack section, opt
 
 ---
 
-## JOSYN.System.JAPServer
+## JOSYN.Jap.JAPServer
 
 **Purpose:** Backend server executable. Listens on named pipes (JIP), receives JAP requests from job executables, dispatches to the `IJosynApplicationProtocol` implementation.
 
-**Dependencies:** `JOSYN.Foundation.JIP`, `JOSYN.Foundation.PropertyBag`, `JOSYN.Foundation.ResultPattern`, `JOSYN.System.Shared.Contract`, `JOSYN.System.Shared.Log`
+**Dependencies:** `JOSYN.Foundation.JIP`, `JOSYN.Foundation.PropertyBag`, `JOSYN.Foundation.ResultPattern`, `JOSYN.Jap.Shared.Contract`, `JOSYN.Jap.Shared.Log`
 
 **Type:** `net10.0` Console EXE
 
 ### CLI contract
 
 ```
-JOSYN.System.JAPServer.exe JOSYN-IPC <sessionGUID>
+JOSYN.Jap.JAPServer.exe JOSYN-IPC <sessionGUID>
 ```
 
 Exit codes:
@@ -184,8 +184,8 @@ _jipDispatcher.RegisterAll<IJosynApplicationProtocol>(jAPServer);
 ## Build & Package
 
 ```
-josyn-system-shared/.local-build/pack.cmd   ← packs Contract + Log to ../../local-packages/
-josyn-system-japserver/.local-build/build.cmd
+josyn-jap-shared/.local-build/pack.cmd      ← packs Contract + Log to ../../local-packages/
+josyn-jap-japserver/.local-build/build.cmd
 ```
 
 License: MIT | Company: HAEVG AG | Target: net10.0

@@ -16,18 +16,18 @@ JOSYN (Job System Next) is a platform for executing scheduled jobs as isolated e
 | Repo | Role | Namespace root |
 |------|------|----------------|
 | [`josyn-foundation`](../josyn-foundation) | Infrastructure primitives — Result pattern, serialization, IPC transport | `JOSYN.Foundation.*` |
-| [`josyn-system`](../josyn-system) | Per-session JAP server — JAPServer EXE, shared contracts, logging | `JOSYN.System.*` |
-| [`josyn-job-host`](../josyn-job-host) | Job execution runtime — library linked by each job executable | `JOSYN.System.JobHost` |
+| [`josyn-jap`](../josyn-jap) | Per-session JAP server — JAPServer EXE, shared contracts, logging | `JOSYN.Jap.*` |
+| [`josyn-job-host`](../josyn-job-host) | Job execution runtime — library linked by each job executable | `JOSYN.Jap.JobHost` |
 | [`josyn-backend`](../josyn-backend) | Scheduler and session-orchestration layer — triggers sessions, spawns processes | `JOSYN.Backend.*` |
 | **`josyn-platform`** *(this repo)* | Architecture, decisions, and cross-cutting documentation | — |
 
 ### Why `josyn-job-host` has no dedicated namespace layer
 
-Job executables are **decoupled consumers** of the JOSYN protocol, not internal components of the scheduling system. They link `josyn-job-host`, follow the protocol, and exit. This architectural separation is intentional and is reflected in the repo name (`josyn-job-host`, not `josyn-system-job-host`).
+Job executables are **decoupled consumers** of the JOSYN protocol, not internal components of the scheduling system. They link `josyn-job-host`, follow the protocol, and exit. This architectural separation is intentional and is reflected in the repo name (`josyn-job-host`, not `josyn-jap-job-host`).
 
-### Why `josyn-backend` is separate from `josyn-system`
+### Why `josyn-backend` is separate from `josyn-jap`
 
-`josyn-backend` owns the *when* and *what* of job execution (scheduling, session persistence, process spawning). `josyn-system` owns only the *how* of a single in-flight session (the JAP protocol server). They are coupled solely by the session GUID passed on the command line — there is no NuGet dependency between them. See [decisions/ADR-002-josyn-backend.md](decisions/ADR-002-josyn-backend.md).
+`josyn-backend` owns the *when* and *what* of job execution (scheduling, session persistence, process spawning). `josyn-jap` owns only the *how* of a single in-flight session (the JAP protocol server). They are coupled solely by the session GUID passed on the command line — there is no NuGet dependency between them. See [decisions/ADR-002-josyn-backend.md](decisions/ADR-002-josyn-backend.md).
 
 ---
 
@@ -37,7 +37,7 @@ Job executables are **decoupled consumers** of the JOSYN protocol, not internal 
 |------|--------------------------|
 | **Platform** | The entire JOSYN ecosystem — all five repos together |
 | **Backend** | The scheduler and session-orchestration layer (`josyn-backend`) |
-| **System** | The per-session JAP protocol server and shared packages (`josyn-system`) |
+| **JAP** | The per-session JAP protocol server and shared packages (`josyn-jap`) |
 | **Foundation** | Cross-cutting infrastructure primitives (`josyn-foundation`) |
 | **Job Host** | The runtime embedded in each job executable (`josyn-job-host`) |
 
@@ -53,7 +53,7 @@ See [architecture/naming-conventions.md](architecture/naming-conventions.md) for
 │                                                                          │
 │  ┌──────────────┐  spawns JAPServer.exe   ┌──────────────────────────┐  │
 │  │  josyn-      │─────────────────────────►  JAPServer               │  │
-│  │  backend     │  spawns job.exe          │  (josyn-system)          │  │
+│  │  backend     │  spawns job.exe          │  (josyn-jap)             │  │
 │  │              │──────────────────────┐  └──────────┬───────────────┘  │
 │  └──────────────┘                      │             │ IPC (Named Pipes) │
 │                                        │  ┌──────────▼───────────────┐  │
@@ -61,7 +61,7 @@ See [architecture/naming-conventions.md](architecture/naming-conventions.md) for
 │                                           │  (josyn-job-host)        │  │
 │                                           └──────────────────────────┘  │
 │                                                                          │
-│       josyn-system and josyn-job-host both depend on josyn-foundation   │
+│       josyn-jap and josyn-job-host both depend on josyn-foundation      │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 

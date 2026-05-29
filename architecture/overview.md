@@ -71,15 +71,15 @@ josyn-foundation (NuGet packages)
         ├── Transport:  PipesClient, PipesServer, PipesProtocol
         └── Convention: JipClient, JipServer, JipDispatcher, Request, Response
 
-josyn-system (NuGet packages + EXE)
-├── JOSYN.System.Shared.Contract          ← IJosynApplicationProtocol, ErrorReport
-├── JOSYN.System.Shared.Log               ← LocalLog (static, file-based, caller-aware)
-└── JOSYN.System.JAPServer (EXE)
+josyn-jap (NuGet packages + EXE)
+├── JOSYN.Jap.Shared.Contract          ← IJosynApplicationProtocol, ErrorReport
+├── JOSYN.Jap.Shared.Log               ← LocalLog (static, file-based, caller-aware)
+└── JOSYN.Jap.JAPServer (EXE)
         ├── Host.cs                       ← lifecycle, JipDispatcher wiring
         └── JAPServer.cs                  ← IJosynApplicationProtocol implementation
 
 josyn-job-host (NuGet library)
-└── JOSYN.System.JobHost
+└── JOSYN.Jap.JobHost
         ├── Core.cs                       ← ICore, entry point, error routing
         ├── JobInvoker.cs                 ← reflection dispatch
         ├── JAPClient.cs                  ← IJosynApplicationProtocol over Named Pipes
@@ -104,27 +104,27 @@ PropertyBag           JIP               SessionStarter  (stub — ResultPattern 
         ▲               ▲
         └───────┬────────┘
                 │
-        JOSYN.System.Shared.Contract    (+ ResultPattern)
-        JOSYN.System.Shared.Log         (+ ResultPattern)
+        JOSYN.Jap.Shared.Contract    (+ ResultPattern)
+        JOSYN.Jap.Shared.Log         (+ ResultPattern)
                 ▲
                 │
-        JOSYN.System.JAPServer          (+ JIP + PropertyBag + Contract + Log)
+        JOSYN.Jap.JAPServer          (+ JIP + PropertyBag + Contract + Log)
                 │
                 │  (protocol consumer — not a code dependency)
                 ▼
-        JOSYN.System.JobHost            (+ JIP + PropertyBag + Contract + Log)
+        JOSYN.Jap.JobHost            (+ JIP + PropertyBag + Contract + Log)
 ```
 
 ### Runtime (spawn) relationships — not code imports
 
 ```
-josyn-backend ──spawns──► JOSYN.System.JAPServer.exe  (JOSYN-IPC <guid>)
+josyn-backend ──spawns──► JOSYN.Jap.JAPServer.exe  (JOSYN-IPC <guid>)
 josyn-backend ──spawns──► job.exe                      (JOSYN-IPC <guid>)
 ```
 
-`josyn-system` and `josyn-job-host` are **architecturally symmetric**: both consume the same
+`josyn-jap` and `josyn-job-host` are **architecturally symmetric**: both consume the same
 foundation packages and speak the same protocol. They never reference each other.
-`josyn-backend` never takes a NuGet dependency on `josyn-system`; the coupling is the GUID.
+`josyn-backend` never takes a NuGet dependency on `josyn-jap`; the coupling is the GUID.
 
 ---
 
@@ -195,7 +195,7 @@ job.exe                          JAPServer
 
 ## Logging
 
-`LocalLog` (from `JOSYN.System.Shared.Log`) is a static, process-local file logger:
+`LocalLog` (from `JOSYN.Jap.Shared.Log`) is a static, process-local file logger:
 
 ```csharp
 LocalLog.LogDirectory = "...";         // set at startup

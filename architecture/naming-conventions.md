@@ -6,13 +6,13 @@
 |------|-------|-------|
 | **Platform** | The entire JOSYN ecosystem | Umbrella term — all repos, all layers |
 | **Backend** | The scheduler and session-orchestration layer | `josyn-backend` repo, `JOSYN.Backend.*` namespace |
-| **System** | The per-session JAP protocol server and shared packages | `josyn-system` repo, `JOSYN.System.*` namespace |
+| **JAP** | The per-session JAP protocol server and shared packages | `josyn-jap` repo, `JOSYN.Jap.*` namespace |
 | **Foundation** | Cross-cutting infrastructure primitives | `josyn-foundation` repo, `JOSYN.Foundation.*` namespace |
-| **Job Host** | The job execution runtime | `josyn-job-host` repo, `JOSYN.System.JobHost` namespace |
+| **Job Host** | The job execution runtime | `josyn-job-host` repo, `JOSYN.Jap.JobHost` namespace |
 
-> **Note:** "System" does **not** mean "backend" in this codebase. `josyn-system` is the per-session JAP server, not the scheduler. The scheduler role belongs exclusively to `josyn-backend`. See [../decisions/ADR-002-josyn-backend.md](../decisions/ADR-002-josyn-backend.md).
+> **Note:** "JAP" does **not** mean "backend" in this codebase. `josyn-jap` is the per-session JAP server, not the scheduler. The scheduler role belongs exclusively to `josyn-backend`. See [../decisions/ADR-002-josyn-backend.md](../decisions/ADR-002-josyn-backend.md).
 
-> **Decision:** "Platform" was chosen as the umbrella word because "system" already carries a specific architectural meaning (the JAP session server). See [../decisions/ADR-001-platform-naming.md](../decisions/ADR-001-platform-naming.md).
+> **Decision:** "Platform" was chosen as the umbrella word because "JAP" already carries a specific architectural meaning (the JAP session server). See [../decisions/ADR-001-platform-naming.md](../decisions/ADR-001-platform-naming.md).
 
 ---
 
@@ -20,7 +20,7 @@
 
 ```
 josyn-foundation        ← infrastructure primitives
-josyn-system            ← per-session JAP protocol server
+josyn-jap               ← per-session JAP protocol server
 josyn-job-host          ← job execution runtime  
 josyn-backend           ← scheduler and session-orchestration layer
 josyn-platform          ← this repo; architecture + decisions + docs
@@ -28,7 +28,7 @@ josyn-platform          ← this repo; architecture + decisions + docs
 
 Pattern: `josyn-<layer>` — all lowercase, hyphen-separated.
 
-The absence of "system" in `josyn-job-host` (despite the namespace containing `JOSYN.System.JobHost`) is **deliberate**: it signals that job executables are architectural outsiders — decoupled consumers of the protocol, not internal components of the scheduler.
+The absence of "jap" in `josyn-job-host` (despite the namespace containing `JOSYN.Jap.JobHost`) is **deliberate**: it signals that job executables are architectural outsiders — decoupled consumers of the protocol, not internal components of the scheduler.
 
 ---
 
@@ -41,7 +41,7 @@ JOSYN
 │   ├── PropertyBag                ← record serialization
 │   └── JIP                        ← named pipe transport
 │       └── Jip                    ← JIP convention layer
-├── System                         ← josyn-system + josyn-job-host
+├── Jap                            ← josyn-jap + josyn-job-host
 │   ├── Shared
 │   │   ├── Contract               ← IJosynApplicationProtocol, ErrorReport
 │   │   └── Log                    ← LocalLog
@@ -65,10 +65,10 @@ Assembly names match their namespace root exactly:
 | `JOSYN.Foundation.ResultPattern` | `JOSYN.Foundation.ResultPattern` | josyn-foundation |
 | `JOSYN.Foundation.PropertyBag` | `JOSYN.Foundation.PropertyBag` | josyn-foundation |
 | `JOSYN.Foundation.JIP` | `JOSYN.Foundation.JIP` / `JOSYN.Foundation.JIP.Jip` | josyn-foundation |
-| `JOSYN.System.Shared.Contract` | `JOSYN.System.Shared.Contract` | josyn-system |
-| `JOSYN.System.Shared.Log` | `JOSYN.System.Shared.Log` | josyn-system |
-| `JOSYN.System.JAPServer` | `JOSYN.System.JAPServer` | josyn-system |
-| `JOSYN.System.JobHost` | `JOSYN.System.JobHost` | josyn-job-host |
+| `JOSYN.Jap.Shared.Contract` | `JOSYN.Jap.Shared.Contract` | josyn-jap |
+| `JOSYN.Jap.Shared.Log` | `JOSYN.Jap.Shared.Log` | josyn-jap |
+| `JOSYN.Jap.JAPServer` | `JOSYN.Jap.JAPServer` | josyn-jap |
+| `JOSYN.Jap.JobHost` | `JOSYN.Jap.JobHost` | josyn-job-host |
 | `JOSYN.Backend.SessionStarter` | `JOSYN.Backend.SessionStarter` | josyn-backend |
 
 ---

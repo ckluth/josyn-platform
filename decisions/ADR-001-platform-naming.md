@@ -32,7 +32,7 @@ The vocabulary map:
 | Word | Scope | Repo |
 |------|-------|------|
 | **Platform** | The entire JOSYN ecosystem | `josyn-platform` (this repo) |
-| **System** | The orchestration backend only | `josyn-system` |
+| **JAP** | The per-session JAP protocol server and shared packages | `josyn-jap` |
 | **Foundation** | Cross-cutting infrastructure primitives | `josyn-foundation` |
 | **Job Host** | The job execution runtime | `josyn-job-host` |
 
@@ -44,8 +44,22 @@ platform CLI, etc.
 
 ## Consequences
 
-- No existing repos are renamed — zero blast radius
-- "Platform" is now the correct word when referring to all four repos together
-- `josyn-system` retains its name; "system" continues to mean the orchestration backend
+- No existing repos were renamed (at ADR-001 time) — zero blast radius
+- "Platform" is now the correct word when referring to all repos together
+- `josyn-jap` (formerly `josyn-system`) carries the JAP protocol server; "JAP" is its vocabulary word
 - Future cross-cutting packages or tools should live in `josyn-platform` or use `JOSYN.Platform.*` as their namespace root
 - Documentation of the whole platform lives in `josyn-platform`
+
+---
+
+## Amendment — 2026-05-29
+
+The word **"system"** (previously used for the JAP session server repo) has been retired.
+With "platform" established as the umbrella, "system" became ambiguous — it echoes the legacy
+`JobSystem.*` world and no longer names anything precisely.
+
+**`josyn-system` has been renamed to `josyn-jap`** and all `JOSYN.System.*` namespaces to
+`JOSYN.Jap.*`. The vocabulary entry **System** → **JAP** reflects this.
+
+GitHub remote: `ckluth/josyn-system` → `ckluth/josyn-jap`  
+Local folder: `josyn-system` → `josyn-jap`

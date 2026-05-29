@@ -17,7 +17,7 @@ legacy job backend and the JOSYN platform.
 - **Process spawning** — launching `JAPServer.exe` and `job.exe` with the shared session GUID
 - **Result collection** — reading session completion status from the session store
 
-`josyn-system` (JAPServer) and `josyn-job-host` (job executable runtime) are unaware of
+`josyn-jap` (JAPServer) and `josyn-job-host` (job executable runtime) are unaware of
 `josyn-backend`. The session GUID is the only coupling — handed by `josyn-backend` to both
 processes at spawn time via CLI argument.
 
@@ -128,7 +128,7 @@ When migrated, `josyn-backend` will contain the JOSYN-native replacements for al
 ```
 
 Runtime spawn relationships (not NuGet dependencies):
-- `josyn-backend` **spawns** `JOSYN.System.JAPServer` (from `josyn-system`)
+- `josyn-backend` **spawns** `JOSYN.Jap.JAPServer` (from `josyn-jap`)
 - `josyn-backend` **spawns** `job.exe` (from job repository)
 
 ---
