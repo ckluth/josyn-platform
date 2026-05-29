@@ -96,30 +96,33 @@ josyn-platform (this repo)
 ### Code (NuGet) dependencies
 
 ```
-JOSYN.Foundation.ResultPattern          (no dependencies)
-        ▲               ▲               ▲
-        │               │               │
-JOSYN.Foundation.     JOSYN.Foundation. JOSYN.Backend.
-PropertyBag           JIP               SessionStarter  (stub — ResultPattern only)
-        ▲               ▲
-        └───────┬────────┘
-                │
-        JOSYN.Jap.Shared.Contract    (+ ResultPattern)
-        JOSYN.Jap.Shared.Log         (+ ResultPattern)
-                ▲
-                │
-        JOSYN.Jap.JAPServer          (+ JIP + PropertyBag + Contract + Log)
-                │
-                │  (protocol consumer — not a code dependency)
-                ▼
-        JOSYN.Jap.JobHost            (+ JIP + PropertyBag + Contract + Log)
+       JOSYN.Foundation.ResultPattern (no dependencies)
+              ▲               ▲                    ▲
+              │               │                    │
+       JOSYN.Foundation.   JOSYN.Foundation.  JOSYN.Backend.
+       PropertyBag         JIP                SessionStarter  (stub — ResultPattern only)
+            ▲               ▲
+            └───────┬───────┘
+                    │
+JOSYN.Jap.Shared.Contract (+ ResultPattern)
+JOSYN.Jap.Shared.Log      (+ ResultPattern)
+        ▲                         ▲
+        │                         │
+JOSYN.Jap.JAPServer       JOSYN.Jap.JobHost
+(+ JIP + PropertyBag      (+ JIP + PropertyBag
+ + Contract + Log)         + Contract + Log)
+[protocol server]         [protocol client]
+        │                         │
+        └── IJosynApplication   ──┘
+            Protocol
+     (IPC at runtime — not a code dep.)
 ```
 
 ### Runtime (spawn) relationships — not code imports
 
 ```
-josyn-backend ──spawns──► JOSYN.Jap.JAPServer.exe  (JOSYN-IPC <guid>)
-josyn-backend ──spawns──► job.exe                      (JOSYN-IPC <guid>)
+josyn-backend ──spawns──► JOSYN.Jap.JAPServer.exe  (JOSYN-IPC <guid>) <- the JobSession-UID
+josyn-backend ──spawns──► job.exe                  (JOSYN-IPC <guid>)
 ```
 
 `josyn-jap` and `josyn-job-host` are **architecturally symmetric**: both consume the same
@@ -174,8 +177,8 @@ Supported property types: `string`, `char`, `bool`, `byte`/`sbyte`/`short`/`usho
 Three-tier error handling across the platform:
 
 ```
-job.exe                          JAPServer
-  │                                  │
+job.exe                           JAPServer
+  │                                   │
   ├─ IPC fails                        │
   │   └─ LocalLog.Error (local)       │
   │                                   │

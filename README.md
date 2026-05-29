@@ -38,8 +38,8 @@ Job executables are **decoupled consumers** of the JOSYN protocol, not internal 
 | **Platform** | The entire JOSYN ecosystem — all five repos together |
 | **Backend** | The scheduler and session-orchestration layer (`josyn-backend`) |
 | **JAP** | The per-session JAP protocol server and shared packages (`josyn-jap`) |
-| **Foundation** | Cross-cutting infrastructure primitives (`josyn-foundation`) |
 | **Job Host** | The runtime embedded in each job executable (`josyn-job-host`) |
+| **Foundation** | Cross-cutting infrastructure primitives (`josyn-foundation`) |
 
 See [architecture/naming-conventions.md](architecture/naming-conventions.md) for the full naming guide.
 

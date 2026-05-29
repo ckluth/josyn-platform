@@ -19,10 +19,10 @@ josyn-foundation-jip/              →  JOSYN.Foundation.JIP
 ### Dependency chain within foundation
 
 ```
-JOSYN.Foundation.ResultPattern   (no deps)
-         ▲                 ▲
-         │                 │
- PropertyBag              JIP
+ JOSYN.Foundation.ResultPattern (no deps)
+      ▲                 ▲
+      │                 │
+ PropertyBag           JIP
 ```
 
 ---
