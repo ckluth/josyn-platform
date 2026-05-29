@@ -18,7 +18,7 @@ JOSYN (Job System Next) is a platform for executing scheduled jobs as isolated e
 | [`josyn-foundation`](../josyn-foundation) | Infrastructure primitives — Result pattern, serialization, IPC transport | `JOSYN.Foundation.*` |
 | [`josyn-jap`](../josyn-jap) | Per-session JAP server — JAPServer EXE, shared contracts, logging | `JOSYN.Jap.*` |
 | [`josyn-job-host`](../josyn-job-host) | Job execution runtime — library linked by each job executable | `JOSYN.Jap.JobHost` |
-| [`josyn-backend`](../josyn-backend) | Scheduler and session-orchestration layer — triggers sessions, spawns processes | `JOSYN.Backend.*` |
+| [`josyn-backend`](../josyn-backend) | Scheduler and session-orchestration layer — triggers sessions, spawns JAPServer | `JOSYN.Backend.*` |
 | **`josyn-platform`** *(this repo)* | Architecture, decisions, and cross-cutting documentation | — |
 
 ### Why `josyn-job-host` has no dedicated namespace layer
@@ -27,7 +27,7 @@ Job executables are **decoupled consumers** of the JOSYN protocol, not internal 
 
 ### Why `josyn-backend` is separate from `josyn-jap`
 
-`josyn-backend` owns the *when* and *what* of job execution (scheduling, session persistence, process spawning). `josyn-jap` owns only the *how* of a single in-flight session (the JAP protocol server). They are coupled solely by the session GUID passed on the command line — there is no NuGet dependency between them. See [decisions/ADR-002-josyn-backend.md](decisions/ADR-002-josyn-backend.md).
+`josyn-backend` owns the *when* and *what* of job execution (scheduling, session persistence, JAPServer spawning). `josyn-jap` owns only the *how* of a single in-flight session (the JAP protocol server, including spawning the job executable). They are coupled solely by the session GUID passed on the command line — there is no NuGet dependency between them. See [decisions/ADR-002-josyn-backend.md](decisions/ADR-002-josyn-backend.md).
 
 ---
 
@@ -47,22 +47,22 @@ See [architecture/naming-conventions.md](architecture/naming-conventions.md) for
 
 ## Architecture at a glance
 
-```
-┌──────────────────────────────────────────────────────────────────────────┐
-│  JOSYN Platform                                                          │
-│                                                                          │
-│  ┌──────────────┐  spawns JAPServer.exe   ┌──────────────────────────┐  │
-│  │  josyn-      │─────────────────────────►  JAPServer               │  │
-│  │  backend     │  spawns job.exe          │  (josyn-jap)             │  │
-│  │              │──────────────────────┐  └──────────┬───────────────┘  │
-│  └──────────────┘                      │             │ IPC (Named Pipes) │
-│                                        │  ┌──────────▼───────────────┐  │
-│                                        └──►  job.exe                 │  │
-│                                           │  (josyn-job-host)        │  │
-│                                           └──────────────────────────┘  │
-│                                                                          │
-│       josyn-jap and josyn-job-host both depend on josyn-foundation      │
-└──────────────────────────────────────────────────────────────────────────┘
+```mermaid
+graph TD
+    B["josyn-backend<br/>Scheduler & Orchestrator"]
+
+    subgraph session["Per-Job Session"]
+        J["josyn-jap<br/>Per-Session JAP Server"]
+        H["josyn-job-host<br/>Job Execution Runtime"]
+    end
+
+    F["josyn-foundation<br/>Infrastructure Primitives"]
+
+    B -->|spawns| J
+    J <-->|IPC| H
+    B -->|NuGet| F
+    J -->|NuGet| F
+    H -->|NuGet| F
 ```
 
 Full architecture: [architecture/overview.md](architecture/overview.md)
