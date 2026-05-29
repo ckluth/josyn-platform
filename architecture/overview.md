@@ -5,35 +5,40 @@
 A job execution follows this sequence:
 
 ```
-Job Scheduler
+josyn-backend (SessionStarter)
     │
-    │  1. Spawns process:  job.exe JOSYN-IPC <sessionGUID>
+    │  1. Detect scheduled execution (TriggerAgent / Service / WorkflowAdapter)
+    │  2. Assign fresh session GUID; write session record to session store
+    │  3. Spawn: JAPServer.exe JOSYN-IPC <sessionGUID>
+    │  4. Spawn: job.exe       JOSYN-IPC <sessionGUID>
     ▼
 job.exe  ──► Core.Run(args)
     │
-    │  2. Parse sessionGUID from args
-    │  3. Connect to JAPServer via Named Pipes (session-isolated by GUID)
+    │  5. Parse sessionGUID from args
+    │  6. Connect to JAPServer via Named Pipes (session-isolated by GUID)
     ▼
 JAPClient  ──► IJosynApplicationProtocol
     │
-    │  4. GetRawArguments()  ◄─── JAPServer returns serialized INI/JSON
+    │  7. GetRawArguments()  ◄─── JAPServer returns serialized INI/JSON
     ▼
 JobInvoker
     │
-    │  5. Find [JobEntryPoint] method via reflection
-    │  6. PropertyBag.Deserialize(rawArguments, paramType)
-    │  7. Invoke method
+    │  8. Find [JobEntryPoint] method via reflection
+    │  9. PropertyBag.Deserialize(rawArguments, paramType)
+    │  10. Invoke method
     ▼
 [JobEntryPoint] method  (user-authored business logic)
     │
-    │  8. Returns result record (or void)
+    │  11. Returns result record (or void)
     ▼
 JobInvoker
     │
-    │  9. PropertyBag.Serialize(result, IniSerializer)
-    │  10. PutRawResult(serialized)  ──► JAPServer stores result
+    │  12. PropertyBag.Serialize(result, IniSerializer)
+    │  13. PutRawResult(serialized)  ──► JAPServer stores result
     ▼
 job.exe exits with code 0
+    │
+josyn-backend reads session completion from session store / exit codes
 ```
 
 ### Error paths
@@ -41,11 +46,11 @@ job.exe exits with code 0
 ```
 Any step fails
     │
-    ├─ IPC connection failed (step 3)
+    ├─ IPC connection failed (step 6)
     │       LocalLog.Error(...)
     │       exit -1
     │
-    └─ Job failed (steps 5–10)
+    └─ Job failed (steps 8–13)
             LocalLog.Error(...)
             PutError(ErrorReport)  ──► JAPServer.LocalLog.Error(causer, ...)
             exit -2
@@ -56,6 +61,9 @@ Any step fails
 ## Component Map
 
 ```
+josyn-backend (stub)
+└── JOSYN.Backend.SessionStarter      ← session lifecycle: GUID, session store, process spawning
+
 josyn-foundation (NuGet packages)
 ├── JOSYN.Foundation.ResultPattern        ← Result<T>, Error, CallerInfo
 ├── JOSYN.Foundation.PropertyBag          ← record serialization (INI / JSON)
@@ -85,12 +93,14 @@ josyn-platform (this repo)
 
 ## Dependency Chain
 
+### Code (NuGet) dependencies
+
 ```
 JOSYN.Foundation.ResultPattern          (no dependencies)
-        ▲               ▲
-        │               │
-JOSYN.Foundation.     JOSYN.Foundation.
-PropertyBag           JIP
+        ▲               ▲               ▲
+        │               │               │
+JOSYN.Foundation.     JOSYN.Foundation. JOSYN.Backend.
+PropertyBag           JIP               SessionStarter  (stub — ResultPattern only)
         ▲               ▲
         └───────┬────────┘
                 │
@@ -105,7 +115,16 @@ PropertyBag           JIP
         JOSYN.System.JobHost            (+ JIP + PropertyBag + Contract + Log)
 ```
 
-`josyn-job-host` and `josyn-system` are **architecturally symmetric**: both consume the same foundation packages and speak the same protocol. They never reference each other.
+### Runtime (spawn) relationships — not code imports
+
+```
+josyn-backend ──spawns──► JOSYN.System.JAPServer.exe  (JOSYN-IPC <guid>)
+josyn-backend ──spawns──► job.exe                      (JOSYN-IPC <guid>)
+```
+
+`josyn-system` and `josyn-job-host` are **architecturally symmetric**: both consume the same
+foundation packages and speak the same protocol. They never reference each other.
+`josyn-backend` never takes a NuGet dependency on `josyn-system`; the coupling is the GUID.
 
 ---
 

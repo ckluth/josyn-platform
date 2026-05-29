@@ -1,7 +1,8 @@
 # josyn-system
 
-**Role:** Orchestration backend — the scheduler-side of the JOSYN platform.
-Contains the shared protocol contract, a shared logger, and the backend server executable.
+**Role:** Per-session JAP protocol server — handles a single job session from argument delivery
+to result/error collection. Contains the shared protocol contract, a shared logger, and the
+backend server executable.
 
 **Location:** `C:\Users\chris\OneDrive\DevGit\josyn-system`
 **Version:** `1.0.0-preview01`

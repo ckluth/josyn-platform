@@ -5,11 +5,14 @@
 | Word | Scope | Usage |
 |------|-------|-------|
 | **Platform** | The entire JOSYN ecosystem | Umbrella term — all repos, all layers |
-| **System** | The orchestration/backend layer | `josyn-system` repo, `JOSYN.System.*` namespace |
+| **Backend** | The scheduler and session-orchestration layer | `josyn-backend` repo, `JOSYN.Backend.*` namespace |
+| **System** | The per-session JAP protocol server and shared packages | `josyn-system` repo, `JOSYN.System.*` namespace |
 | **Foundation** | Cross-cutting infrastructure primitives | `josyn-foundation` repo, `JOSYN.Foundation.*` namespace |
 | **Job Host** | The job execution runtime | `josyn-job-host` repo, `JOSYN.System.JobHost` namespace |
 
-> **Decision:** "Platform" was chosen as the umbrella word because "system" already carries a specific architectural meaning in this codebase (the orchestration backend). See [../decisions/ADR-001-platform-naming.md](../decisions/ADR-001-platform-naming.md).
+> **Note:** "System" does **not** mean "backend" in this codebase. `josyn-system` is the per-session JAP server, not the scheduler. The scheduler role belongs exclusively to `josyn-backend`. See [../decisions/ADR-002-josyn-backend.md](../decisions/ADR-002-josyn-backend.md).
+
+> **Decision:** "Platform" was chosen as the umbrella word because "system" already carries a specific architectural meaning (the JAP session server). See [../decisions/ADR-001-platform-naming.md](../decisions/ADR-001-platform-naming.md).
 
 ---
 
@@ -17,8 +20,9 @@
 
 ```
 josyn-foundation        ← infrastructure primitives
-josyn-system            ← orchestration backend
+josyn-system            ← per-session JAP protocol server
 josyn-job-host          ← job execution runtime  
+josyn-backend           ← scheduler and session-orchestration layer
 josyn-platform          ← this repo; architecture + decisions + docs
 ```
 
@@ -31,19 +35,21 @@ The absence of "system" in `josyn-job-host` (despite the namespace containing `J
 ## Namespace Conventions
 
 ```
-JOSYN                              ← root org
+JOSYN
 ├── Foundation                     ← josyn-foundation packages
 │   ├── ResultPattern              ← error-as-value primitives
 │   ├── PropertyBag                ← record serialization
 │   └── JIP                        ← named pipe transport
 │       └── Jip                    ← JIP convention layer
-└── System                         ← josyn-system + josyn-job-host
-    ├── Shared
-    │   ├── Contract               ← IJosynApplicationProtocol, ErrorReport
-    │   └── Log                    ← LocalLog
-    ├── JAPServer                  ← backend server EXE
-    └── JobHost                    ← job execution runtime library
-        └── Attributes             ← [JobEntryPoint], [BeforeJobEntryPoint], etc.
+├── System                         ← josyn-system + josyn-job-host
+│   ├── Shared
+│   │   ├── Contract               ← IJosynApplicationProtocol, ErrorReport
+│   │   └── Log                    ← LocalLog
+│   ├── JAPServer                  ← per-session JAP server EXE
+│   └── JobHost                    ← job execution runtime library
+│       └── Attributes             ← [JobEntryPoint], [BeforeJobEntryPoint], etc.
+└── Backend                        ← josyn-backend
+    └── SessionStarter             ← session lifecycle rendezvous (stub)
 ```
 
 Pattern: `JOSYN.<Layer>.<Component>[.<Subcomponent>]`
@@ -63,6 +69,7 @@ Assembly names match their namespace root exactly:
 | `JOSYN.System.Shared.Log` | `JOSYN.System.Shared.Log` | josyn-system |
 | `JOSYN.System.JAPServer` | `JOSYN.System.JAPServer` | josyn-system |
 | `JOSYN.System.JobHost` | `JOSYN.System.JobHost` | josyn-job-host |
+| `JOSYN.Backend.SessionStarter` | `JOSYN.Backend.SessionStarter` | josyn-backend |
 
 ---
 
