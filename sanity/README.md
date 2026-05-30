@@ -103,18 +103,10 @@ Multiple categories and multiple repos in one run.
 
 ---
 
-## Safety contract — READ-ONLY
+## Safety contract
 
-**A sanity check never modifies anything. This is an absolute rule, even with `/autopilot` active.**
-
-The agent executing a sanity check is permitted to:
-- ✅ Read any file in any repo
-- ✅ Run `dotnet test` to verify test state (produces no file changes in the repos)
-
-The agent is **never** permitted to:
-- ❌ Create, edit, or delete any file
-- ❌ Run any command with side effects beyond test execution
-- ❌ Fix violations — report only
+A sanity check is inspect-and-report. There is nothing to write.
+`dotnet test` is the only command with side effects (test execution produces no file changes in the repos).
 
 ---
 

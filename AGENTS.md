@@ -105,12 +105,7 @@ The five subject repos (`josyn-platform` itself is never a sanity-check target):
 
 ### Safety contract — READ-ONLY
 
-**A sanity check NEVER modifies anything. This is an absolute rule.**
-
-- Do **not** create, edit, or delete any file in any repo.
-- Do **not** run any command with side effects beyond `dotnet test` (test execution is permitted; it produces no file changes in the repos).
-- Do **not** attempt to fix violations found — report only.
-- This contract holds even when `/autopilot` is active.
+A sanity check is inspect-and-report. There is nothing to write — no fixes, no edits, no file creation. `dotnet test` is the only command with side effects (test execution produces no file changes in the repos).
 
 ### Execution steps
 
