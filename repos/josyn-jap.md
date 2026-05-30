@@ -189,3 +189,22 @@ josyn-jap-japserver/.local-build/build.cmd
 ```
 
 License: MIT | Company: HAEVG AG | Target: net10.0
+
+---
+
+## Sanity Notes
+
+### Structural specifics
+- **Multi-subdirectory repo**: `josyn-jap-shared/` (two NuGet packages) and `josyn-jap-japserver/` (EXE). Each subdirectory has its own `.local-build/` scripts and is evaluated independently.
+- `JOSYN.Jap.Shared.Contract` and `JOSYN.Jap.Shared.Log` are NuGet libraries — must have `GenerateDocumentationFile`, NuGet metadata, `icon.png`.
+- `JOSYN.Jap.JAPServer` is a Console EXE — must **not** have `GenerateDocumentationFile` or NuGet metadata.
+
+### Dependency constraints
+- Shared packages (`Contract`, `Log`) may only reference `JOSYN.Foundation.ResultPattern`. Any reference to `PropertyBag`, `JIP`, or any `josyn-jap` package is a violation.
+- JAPServer may reference: `JOSYN.Foundation.JIP`, `JOSYN.Foundation.PropertyBag`, `JOSYN.Foundation.ResultPattern`, `JOSYN.Jap.Shared.Contract`, `JOSYN.Jap.Shared.Log`.
+
+### Known exceptions (not violations)
+- `JAPServer.cs` uses `sealed class` (not `static`) — correct; it has instance state implementing `IJosynApplicationProtocol`.
+- `GetRawArguments()` returns hardcoded fake INI data — known PoC limitation, not a violation in the current phase.
+- Demo session key in `launchSettings.json` — PoC convenience, not a violation.
+

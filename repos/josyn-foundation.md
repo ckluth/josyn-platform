@@ -235,3 +235,18 @@ Each sub-package lives in its own sub-directory with its own `.slnx`, `nuget.con
 ```
 
 License: MIT | Company: HAEVG AG | Target: net10.0
+
+---
+
+## Sanity Notes
+
+### Absolute constraints
+- **Zero outbound NuGet dependencies.** Any `<PackageReference>` in any josyn-foundation project is a violation.
+- Internal dep chain is fixed: `ResultPattern` has zero deps; `PropertyBag` → `ResultPattern`; `JIP` → `ResultPattern`.
+
+### Structural specifics
+- This is a **multi-package repo**: each of the three packages lives in its own subdirectory with its own `.slnx`, `nuget.config`, and `.local-build/` scripts. Each subdirectory is evaluated independently.
+
+### Known exceptions (not violations)
+- `JOSYN.Foundation.ResultPattern` keeps its `README.md` one level above the `.csproj` — legacy layout, intentional.
+

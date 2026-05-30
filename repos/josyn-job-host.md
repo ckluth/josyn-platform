@@ -214,3 +214,22 @@ The scheduler spawns the executable with `JOSYN-IPC <sessionGUID>` as args.
 ```
 
 License: MIT | Company: HAEVG AG | Target: net10.0
+
+---
+
+## Sanity Notes
+
+### Known exceptions (not violations)
+- `JOSYN.JobHost` uses a **two-segment namespace** — intentional architectural decision (ADR-001). Not a naming violation.
+- `JAPClient` is `internal sealed class` — correct; it has instance state and implements `IJosynApplicationProtocol`. The `internal` access modifier is intentional.
+- `JobInvoker` is `internal static class` — correct; job authors never use it directly.
+- Placeholder attributes (`BeforeJobEntryPoint`, `JobArguments`, `JobResult`, `ParallelExecutionAllowed`) carry `<remarks>Not yet implemented</remarks>` — correct state, not a violation.
+- `JOSYN.MyDemoJob` is a reference job executable — not a NuGet package. Must not have NuGet metadata or `GenerateDocumentationFile`.
+
+### Test baseline
+- Minimum 7 NUnit tests in `JobInvokerTests`. A lower count is a violation (tests removed without replacement).
+
+### Dependency constraints
+- Permitted references: `JOSYN.Foundation.JIP`, `JOSYN.Foundation.PropertyBag`, `JOSYN.Foundation.ResultPattern`, `JOSYN.Jap.Shared.Contract`, `JOSYN.Jap.Shared.Log`.
+- `JOSYN.Jap.JAPServer` is **never** a dependency — it is a runtime peer, not a library.
+

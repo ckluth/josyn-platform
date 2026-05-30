@@ -76,3 +76,25 @@ Each sub-package follows the same layout as `josyn-foundation`:
 ```
 
 License: MIT | Company: HAEVG AG | Target: net10.0
+
+---
+
+## Sanity Notes
+
+### Current state — empty (expected)
+- No packages exist yet — this is the correct initial state, not a violation.
+- An empty repo with only scaffolding (`.local-build/`, `nuget.config`, `Directory.Build.props`) is fully compliant.
+
+### Admission criteria (for any new package)
+Before any new package is added, verify it meets **all three** criteria:
+1. Reusable across ≥ 2 josyn repos.
+2. Carries no JOSYN domain knowledge — no sessions, no jobs, no IPC, no scheduling.
+3. Could live in any C# project, not just JOSYN.
+
+A package that fails any criterion must stay in the consuming repo instead.
+
+### Dependency constraints
+- Permitted references: **nothing** (preferred), or `JOSYN.Foundation.ResultPattern` only.
+- `JOSYN.Foundation.PropertyBag`, `JOSYN.Foundation.JIP`, and any package from `josyn-jap`, `josyn-job-host`, or `josyn-backend` are **forbidden**.
+- `josyn-foundation` must **never** reference `josyn-commons` — this would invert the dependency hierarchy.
+

@@ -141,3 +141,20 @@ Runtime spawn relationships (not NuGet dependencies):
 ```
 
 License: MIT | Company: HAEVG AG | Target: net10.0
+
+---
+
+## Sanity Notes
+
+### Current state — stub (expected)
+- All methods in `SessionStarter` return `new Error("Noch nicht implementiert.")` — this is the correct PoC stub state, not a violation.
+- No test project exists yet — known gap in the current PoC phase, not a violation.
+- The planned components (`TriggerAgent`, `Scheduling`, `SessionStore`, etc.) do not exist yet — expected.
+
+### Dependency constraints
+- **Only** `JOSYN.Foundation.ResultPattern` is permitted as a NuGet dependency. Any reference to `josyn-jap`, `josyn-job-host`, or other foundation packages is a violation.
+- Runtime spawning of `JAPServer.exe` and `job.exe` is correct — these are **not** NuGet dependencies.
+
+### Structural note
+- `josyn-backend` is a single-package repo (stub). Directory structure is simpler than multi-package repos.
+
