@@ -52,7 +52,7 @@ platform CLI, etc.
 
 ---
 
-## Amendment — 2026-05-30
+## Amendment — 2026-05-30 (supersedes earlier 2026-05-30 amendment)
 
 The `JOSYN.System` → `JOSYN.Jap` rename raised a follow-on question: should `josyn-job-host`
 receive a namespace that reflects its architectural decoupling — i.e., one that does *not*
@@ -62,14 +62,33 @@ Three options were considered:
 
 | Option | Namespace | Rejected because |
 |--------|-----------|-----------------|
-| A | `JOSYN.Jap.JobHost` | — **chosen** |
+| A | `JOSYN.Jap.JobHost` | See below — **superseded** |
 | B | `JOSYN.Frontend.JobHost` | Introduces "Frontend" as a 6th vocabulary word with weak semantic entitlement; the existing five-word vocabulary is deliberately tight |
-| C | `JOSYN.JobHost` | Breaks the universal `JOSYN.<Layer>.<Component>` three-segment pattern; creates a permanent structural exception that invites confusion |
+| C | `JOSYN.JobHost` | — **chosen** |
 
-**`JOSYN.Jap.JobHost` is kept.** The decoupling signal belongs to the repo name
-(`josyn-job-host`, not `josyn-jap-job-host`). The namespace follows the three-segment
-pattern using the closest architectural layer. The rationale is documented in the root
-`README.md` section *"Why `josyn-job-host` has no dedicated namespace layer"*.
+An earlier revision of this ADR chose Option A and rejected Option C on the grounds that
+it breaks the universal three-segment `JOSYN.<Layer>.<Component>` pattern. That reasoning
+was correct for platform-internal packages — but missed a critical distinction:
+
+> **`JOSYN.JobHost` is a consumer-facing API, not a platform-internal package.**
+
+Its primary audience is *job authors* who have no knowledge of and no interest in the
+"Jap" protocol layer. They link the package, add `[JobEntryPoint]`, call `Core.Run(args)`,
+and exit. Exposing "Jap" in every `using` statement, every namespace declaration, and
+every attribute reference leaks an internal architectural concept into a public-facing
+developer experience.
+
+The repo name `josyn-job-host` (not `josyn-jap-job-host`) already makes this distinction
+at the repo boundary. The namespace and package ID follow the same logic.
+
+**Decision: `JOSYN.JobHost` is the package ID and namespace root.**
+
+This establishes a documented rule: packages whose primary audience is *external consumers
+outside the JOSYN platform* **omit the `<Layer>` segment** and use the two-segment form
+`JOSYN.<Component>`. `JOSYN.JobHost` is the canonical and currently only example.
+All platform-internal packages continue to follow `JOSYN.<Layer>.<Component>` without exception.
+
+The rule is recorded in `architecture/naming-conventions.md` under *Repository Names*.
 
 ---
 

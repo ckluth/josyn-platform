@@ -17,13 +17,13 @@ JOSYN (Job System Next) is a platform for executing scheduled jobs as isolated e
 |------|------|----------------|
 | [`josyn-foundation`](../josyn-foundation) | Infrastructure primitives — Result pattern, serialization, IPC transport | `JOSYN.Foundation.*` |
 | [`josyn-jap`](../josyn-jap) | Per-session JAP server — JAPServer EXE, shared contracts, logging | `JOSYN.Jap.*` |
-| [`josyn-job-host`](../josyn-job-host) | Job execution runtime — library linked by each job executable | `JOSYN.Jap.JobHost` |
+| [`josyn-job-host`](../josyn-job-host) | Job execution runtime — library linked by each job executable | `JOSYN.JobHost` |
 | [`josyn-backend`](../josyn-backend) | Scheduler and session-orchestration layer — triggers sessions, spawns JAPServer | `JOSYN.Backend.*` |
 | **`josyn-platform`** *(this repo)* | Architecture, decisions, and cross-cutting documentation | — |
 
-### Why `josyn-job-host` has no dedicated namespace layer
+### Why `josyn-job-host` uses a two-segment namespace
 
-Job executables are **decoupled consumers** of the JOSYN protocol, not internal components of the scheduling system. They link `josyn-job-host`, follow the protocol, and exit. This architectural separation is intentional and is reflected in the repo name (`josyn-job-host`, not `josyn-jap-job-host`).
+Job executables are **decoupled consumers** of the JOSYN protocol, not internal components of the scheduling system. They link `josyn-job-host`, follow the protocol, and exit. This architectural separation is intentional: the repo name (`josyn-job-host`, not `josyn-jap-job-host`) signals it at the repo boundary, and `JOSYN.JobHost` (two-segment, no "Jap") signals it at the API surface — hiding the internal protocol layer from job authors. See [decisions/ADR-001-platform-naming.md](decisions/ADR-001-platform-naming.md).
 
 ### Why `josyn-backend` is separate from `josyn-jap`
 

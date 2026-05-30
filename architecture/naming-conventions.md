@@ -8,7 +8,7 @@
 | **Backend** | The scheduler and session-orchestration layer | `josyn-backend` repo, `JOSYN.Backend.*` namespace |
 | **JAP** | The per-session JAP protocol server and shared packages | `josyn-jap` repo, `JOSYN.Jap.*` namespace |
 | **Foundation** | Cross-cutting infrastructure primitives | `josyn-foundation` repo, `JOSYN.Foundation.*` namespace |
-| **Job Host** | The job execution runtime | `josyn-job-host` repo, `JOSYN.Jap.JobHost` namespace |
+| **Job Host** | The job execution runtime | `josyn-job-host` repo, `JOSYN.JobHost` namespace |
 
 > **Note:** "JAP" does **not** mean "backend" in this codebase. `josyn-jap` is the per-session JAP server, not the scheduler. The scheduler role belongs exclusively to `josyn-backend`. See [../decisions/ADR-002-josyn-backend.md](../decisions/ADR-002-josyn-backend.md).
 
@@ -28,7 +28,10 @@ josyn-platform          ← this repo; architecture + decisions + docs
 
 Pattern: `josyn-<layer>` — all lowercase, hyphen-separated.
 
-The absence of "jap" in `josyn-job-host` (despite the namespace containing `JOSYN.Jap.JobHost`) is **deliberate**: it signals that job executables are architectural outsiders — decoupled consumers of the protocol, not internal components of the scheduler.
+The absence of "jap" in `josyn-job-host` (despite the `JOSYN.Jap.*` layer packages it depends on) is **deliberate**: it signals that job executables are architectural outsiders — decoupled consumers of the protocol, not internal components of the scheduler. This reasoning is extended to the namespace: `JOSYN.JobHost` (not `JOSYN.Jap.JobHost`) hides the internal "Jap" protocol layer from the developer who just wants to author a job.
+
+> **Intentional naming exception — documented rule:**  
+> A package whose primary audience is *external job authors* (consumers outside the JOSYN platform) **omits the `<Layer>` segment** and uses the two-segment form `JOSYN.<Component>`. `JOSYN.JobHost` is the canonical and currently only example. All platform-internal packages follow the three-segment `JOSYN.<Layer>.<Component>` pattern without exception. See [../decisions/ADR-001-platform-naming.md](../decisions/ADR-001-platform-naming.md).
 
 ---
 
@@ -41,18 +44,19 @@ JOSYN
 │   ├── PropertyBag                ← record serialization
 │   └── JIP                        ← named pipe transport
 │       └── Jip                    ← JIP convention layer
-├── Jap                            ← josyn-jap + josyn-job-host
+├── Jap                            ← josyn-jap (platform-internal)
 │   ├── Shared
 │   │   ├── Contract               ← IJosynApplicationProtocol, ErrorReport
 │   │   └── Log                    ← LocalLog
-│   ├── JAPServer                  ← per-session JAP server EXE
-│   └── JobHost                    ← job execution runtime library
-│       └── Attributes             ← [JobEntryPoint], [BeforeJobEntryPoint], etc.
+│   └── JAPServer                  ← per-session JAP server EXE
+├── JobHost                        ← josyn-job-host (consumer-facing API — see note below)
+│   └── Attributes                 ← [JobEntryPoint], [BeforeJobEntryPoint], etc.
 └── Backend                        ← josyn-backend
     └── SessionStarter             ← session lifecycle rendezvous (stub)
 ```
 
-Pattern: `JOSYN.<Layer>.<Component>[.<Subcomponent>]`
+Pattern: `JOSYN.<Layer>.<Component>[.<Subcomponent>]` — with one intentional exception:  
+`JOSYN.JobHost` uses the two-segment form because it is a **consumer-facing API** (see the rule under *Repository Names* above).
 
 ---
 
@@ -68,7 +72,7 @@ Assembly names match their namespace root exactly:
 | `JOSYN.Jap.Shared.Contract` | `JOSYN.Jap.Shared.Contract` | josyn-jap |
 | `JOSYN.Jap.Shared.Log` | `JOSYN.Jap.Shared.Log` | josyn-jap |
 | `JOSYN.Jap.JAPServer` | `JOSYN.Jap.JAPServer` | josyn-jap |
-| `JOSYN.Jap.JobHost` | `JOSYN.Jap.JobHost` | josyn-job-host |
+| `JOSYN.JobHost` | `JOSYN.JobHost` | josyn-job-host |
 | `JOSYN.Backend.SessionStarter` | `JOSYN.Backend.SessionStarter` | josyn-backend |
 
 ---

@@ -5,7 +5,7 @@ When a job process starts, it calls `Core.Run(args)` and the library handles all
 protocol communication, argument deserialization, reflection dispatch, and result routing.
 
 **Location:** `C:\Users\chris\OneDrive\DevGit\josyn-job-host`
-**Namespace:** `JOSYN.Jap.JobHost`
+**Namespace:** `JOSYN.JobHost`
 **Version:** `1.0.0-preview01`
 
 ---
@@ -25,7 +25,7 @@ The repo name (`josyn-job-host`, no "system") reflects this.
 
 ```
 josyn-job-host/
-├── JOSYN.Jap.JobHost/
+├── JOSYN.JobHost/
 │   ├── Core.cs                              ← ICore — main entry point
 │   ├── JobInvoker.cs                        ← reflection-based dispatch (internal)
 │   ├── JAPClient.cs                         ← IJosynApplicationProtocol over Named Pipes
@@ -38,7 +38,7 @@ josyn-job-host/
 │       ├── JobArgumentsAttribute.cs         ← marks argument type (placeholder)
 │       ├── JobResultAttribute.cs            ← marks result type (placeholder)
 │       └── ParallelExecutionAllowedAttribute.cs  ← parallel flag (placeholder)
-├── JOSYN.Jap.JobHost.Test/
+├── JOSYN.JobHost.Test/
 │   ├── JobInvokerTests.cs                   ← 7 tests
 │   └── JobInvokerTestSupport.cs             ← fakes, stubs, stub records
 └── JOSYN.MyDemoJob/                         ← reference job executable
@@ -145,7 +145,7 @@ All placeholder attributes carry `<remarks>Not yet implemented</remarks>` in the
 
 ```csharp
 // 1. Create a net10.0 Console App
-// 2. Reference JOSYN.Jap.JobHost NuGet package
+// 2. Reference JOSYN.JobHost NuGet package
 // 3. Program.cs:
 private static async Task<int> Main(string[] args) => await Core.Run(args);
 
@@ -209,7 +209,7 @@ The scheduler spawns the executable with `JOSYN-IPC <sessionGUID>` as args.
 ## Build & Package
 
 ```
-.local-build/pack.cmd    ← packs JOSYN.Jap.JobHost to ../../local-packages/
+.local-build/pack.cmd    ← packs JOSYN.JobHost to ../../local-packages/
 .local-build/test.cmd    ← dotnet test
 ```
 

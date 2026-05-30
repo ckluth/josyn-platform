@@ -79,7 +79,7 @@ josyn-jap (NuGet packages + EXE)
         └── JAPServer.cs                  ← IJosynApplicationProtocol implementation
 
 josyn-job-host (NuGet library)
-└── JOSYN.Jap.JobHost
+└── JOSYN.JobHost
         ├── Core.cs                       ← ICore, entry point, error routing
         ├── JobInvoker.cs                 ← reflection dispatch
         ├── JAPClient.cs                  ← IJosynApplicationProtocol over Named Pipes
@@ -108,7 +108,7 @@ JOSYN.Jap.Shared.Contract (+ ResultPattern)
 JOSYN.Jap.Shared.Log      (+ ResultPattern)
         ▲                         ▲
         │                         │
-JOSYN.Jap.JAPServer       JOSYN.Jap.JobHost
+JOSYN.Jap.JAPServer       JOSYN.JobHost
 (+ JIP + PropertyBag      (+ JIP + PropertyBag
  + Contract + Log)         + Contract + Log)
 [protocol server]         [protocol client]
