@@ -32,7 +32,7 @@ josyn-foundation   — bedrock; stable forever; referenced by all, references no
 josyn-commons      — utility satellite; open for growth; referenced by all except foundation
 josyn-jap          — per-session protocol server
 josyn-job-host     — job execution runtime
-josyn-backend      — scheduler and session orchestrator
+josyn-backend      — scheduler and session orchestrator; tip of an iceberg...
 josyn-platform     — this repo; documentation, decisions, architecture
 ```
 
@@ -79,6 +79,20 @@ Commons may grow; foundation may not follow.
 
 When a helper in commons proves foundational, it does not move automatically.
 That is an architectural decision, documented in an ADR, made deliberately.
+
+---
+
+## Backend is its own world
+
+`josyn-backend` is listed in one line above. Do not let that mislead you.
+
+Its public role — scheduler, session orchestrator, runtime supervisor — is the narrow contract it exposes to the rest of the platform. Everything beneath that contract is backend territory: scheduling strategies, retry logic, concurrency models, lifecycle state machines, session store, persistence contracts, observability hooks, execution infrastructure...
+
+The backend is designed to evolve independently. Internals may deepen. Subsystems may emerge. That growth is acceptable — and expected — as long as it stays inside the boundary and does not widen the contract.
+
+Do not promote backend internals into shared abstractions without an explicit architectural decision. What lives in the backend, stays in the backend, until the boundary itself is deliberately changed.
+
+Purely internal backend decisions belong in backend-local documentation. Only decisions that affect the contract, the dependency graph, or other repos belong in a platform ADR.
 
 ---
 
