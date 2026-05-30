@@ -52,6 +52,27 @@ platform CLI, etc.
 
 ---
 
+## Amendment — 2026-05-30
+
+The `JOSYN.System` → `JOSYN.Jap` rename raised a follow-on question: should `josyn-job-host`
+receive a namespace that reflects its architectural decoupling — i.e., one that does *not*
+contain "Jap"?
+
+Three options were considered:
+
+| Option | Namespace | Rejected because |
+|--------|-----------|-----------------|
+| A | `JOSYN.Jap.JobHost` | — **chosen** |
+| B | `JOSYN.Frontend.JobHost` | Introduces "Frontend" as a 6th vocabulary word with weak semantic entitlement; the existing five-word vocabulary is deliberately tight |
+| C | `JOSYN.JobHost` | Breaks the universal `JOSYN.<Layer>.<Component>` three-segment pattern; creates a permanent structural exception that invites confusion |
+
+**`JOSYN.Jap.JobHost` is kept.** The decoupling signal belongs to the repo name
+(`josyn-job-host`, not `josyn-jap-job-host`). The namespace follows the three-segment
+pattern using the closest architectural layer. The rationale is documented in the root
+`README.md` section *"Why `josyn-job-host` has no dedicated namespace layer"*.
+
+---
+
 ## Amendment — 2026-05-29
 
 The word **"system"** (previously used for the JAP session server repo) has been retired.

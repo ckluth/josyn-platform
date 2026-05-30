@@ -97,8 +97,8 @@ josyn-platform (this repo)
 
 ```
        JOSYN.Foundation.ResultPattern (no dependencies)
-              ▲               ▲                    ▲
-              │               │                    │
+            ▲               ▲                    ▲
+            │               │                    │
        JOSYN.Foundation.   JOSYN.Foundation.  JOSYN.Backend.
        PropertyBag         JIP                SessionStarter  (stub — ResultPattern only)
             ▲               ▲
