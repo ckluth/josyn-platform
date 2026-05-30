@@ -103,6 +103,19 @@ The five subject repos (`josyn-platform` itself is never a sanity-check target):
 | `architecture` | `sanity/architecture.md` | Dependency chain integrity, forbidden references |
 | `standards` | `sanity/standards.md` | Naming, project file conventions, directory structure |
 
+### Confirmation gate
+
+Before executing any `run sanity-check` command, the agent **must**:
+
+1. Explicitly paraphrase the intended run — which repos, which categories, and whether the cost
+   table indicates a 🐢 long run.
+2. Ask: *"Really run this now?"* and wait for explicit confirmation.
+3. If the expected runtime includes any 🐢 category across multiple repos, also suggest:
+   *"This is a long runner — consider `/autopilot` so it runs unattended."*
+
+**Exception:** If autopilot is already active, skip steps 1–3 and proceed directly. Autopilot is
+the deliberate opt-in to unattended execution; confirmation would contradict it.
+
 ### Safety contract — READ-ONLY
 
 A sanity check makes exactly one write: `sanity/last-result.md` in this repo is overwritten with the

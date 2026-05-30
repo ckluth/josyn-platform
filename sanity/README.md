@@ -150,6 +150,22 @@ findings at the end of every run. No other files are created, edited, or deleted
 
 ---
 
+## Confirmation gate
+
+Before executing any `run sanity-check` command, the agent must:
+
+1. **Paraphrase** the intended run — which repos, which categories, and whether the cost table
+   indicates a 🐢 long runner.
+2. **Ask for confirmation:** *"Really run this now?"* — wait for an explicit yes before proceeding.
+3. If any 🐢 category is involved across more than one repo, also **suggest autopilot:**
+   *"This is a long runner — consider `/autopilot` so it runs unattended without further interruptions."*
+
+**Exception:** if autopilot is already active, skip confirmation entirely and proceed.
+Autopilot is the deliberate opt-in to unattended execution; asking for permission inside it would
+contradict its purpose.
+
+---
+
 ## Running unattended (nap mode)
 
 To run a full sanity check without any permission interruptions:
