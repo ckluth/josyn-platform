@@ -103,6 +103,35 @@ Multiple categories and multiple repos in one run.
 
 ---
 
+## Safety contract — READ-ONLY
+
+**A sanity check never modifies anything. This is an absolute rule, even with `/autopilot` active.**
+
+The agent executing a sanity check is permitted to:
+- ✅ Read any file in any repo
+- ✅ Run `dotnet test` to verify test state (produces no file changes in the repos)
+
+The agent is **never** permitted to:
+- ❌ Create, edit, or delete any file
+- ❌ Run any command with side effects beyond test execution
+- ❌ Fix violations — report only
+
+---
+
+## Running unattended (nap mode)
+
+To run a full sanity check without any permission interruptions:
+
+```
+/autopilot
+run sanity-check --profile full
+```
+
+`/autopilot` auto-approves all agent actions. The safety contract above guarantees no writes occur.
+To exit autopilot after the check: `/autopilot` again (it toggles).
+
+---
+
 ## How an agent executes a sanity check
 
 1. **Read `../AGENTS.md`** — orientation, repo paths, and the full execution protocol.

@@ -103,6 +103,15 @@ The five subject repos (`josyn-platform` itself is never a sanity-check target):
 | `architecture` | `sanity/architecture.md` | Dependency chain integrity, forbidden references |
 | `standards` | `sanity/standards.md` | Naming, project file conventions, directory structure |
 
+### Safety contract — READ-ONLY
+
+**A sanity check NEVER modifies anything. This is an absolute rule.**
+
+- Do **not** create, edit, or delete any file in any repo.
+- Do **not** run any command with side effects beyond `dotnet test` (test execution is permitted; it produces no file changes in the repos).
+- Do **not** attempt to fix violations found — report only.
+- This contract holds even when `/autopilot` is active.
+
 ### Execution steps
 
 1. Read this file (done).
