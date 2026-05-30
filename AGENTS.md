@@ -122,3 +122,15 @@ that one result file.
 4. Collect all findings.
 5. Overwrite `sanity/last-result.md` with the structured report (see `sanity/README.md` for format).
    Confirm clean areas — silence is not a pass.
+
+### Fixing violations
+
+```
+fix violations [--repo <repo-name>] [--check <category>]
+```
+
+Source of truth is always `sanity/last-result.md`. Fix one repo/category pair at a time,
+verify with a targeted re-run, commit before moving to the next.
+Full strategy: `sanity/README.md` → *Fixing violations* section.
+
+⚠️ Fixing is a write operation — do not use `/autopilot`. Stop and ask before refactoring `principles` violations.

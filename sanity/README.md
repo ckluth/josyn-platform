@@ -207,7 +207,55 @@ josyn-backend / tests
 
 ---
 
-## Keeping criteria current
+## Fixing violations
+
+### Command
+
+```
+fix violations [--repo <repo-name>] [--check <category>]
+```
+
+Both flags are optional. Omitting means all violations in `sanity/last-result.md`.
+Combine with `--repo` and `--check` to scope the fix session to a single area.
+
+### Source of truth
+
+Always fix from `sanity/last-result.md`. Never fix from memory or from a previous run.
+If the result file is stale, run a fresh sanity check first.
+
+### Workflow — one repo/category pair at a time
+
+1. **Load violations** — read `sanity/last-result.md`, filter by requested scope.
+2. **Load context** — read the relevant `sanity/<category>.md` criteria file and `repos/<repo>.md` Sanity Notes.
+3. **Check for known exceptions** — if a violation is documented as expected state in Sanity Notes, skip it. Do not fix expected state.
+4. **Fix** — apply the minimal change that resolves the violation in the target repo.
+5. **Verify** — re-run `run sanity-check --check <category> --repo <repo>` immediately after fixing.
+   The fix is done only when the check reports ✅ for that area.
+6. **Commit** — one commit per verified repo/category pair. Do not batch fixes across categories.
+7. Repeat for the next violation.
+
+### Priority order
+
+Fix in this order to avoid compounding issues:
+
+| Priority | Category | Reason |
+|----------|----------|--------|
+| 1st | `architecture` | Broken dependency edges can prevent builds |
+| 2nd | `standards` | Missing scaffolding and wrong project config affects all other checks |
+| 3rd | `docs` | Mechanical — low risk, high clarity gain |
+| 4th | `tests` | Requires judgment — discuss missing coverage before writing |
+| 5th | `principles` | Highest reasoning required — never bulk-fix without human review |
+
+### Safety
+
+Fixing is a **write operation**. Do not use `/autopilot` for a fix session.
+Every change must be reviewed by the human before committing.
+
+`principles` violations in particular must be discussed before fixing — a refactor
+that looks mechanical (e.g. "make this class static") may have non-obvious consequences.
+Stop and ask when in doubt.
+
+---
 
 The criteria files in this folder are the **single source of truth** for what "correct" means.
 When a platform rule changes:
