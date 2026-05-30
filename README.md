@@ -11,7 +11,7 @@ JOSYN (Job System Next) is a platform for executing scheduled jobs as isolated e
 
 ---
 
-## The Five Repos
+## The Six Repos
 
 | Repo | Role | Namespace root |
 |------|------|----------------|
@@ -19,6 +19,7 @@ JOSYN (Job System Next) is a platform for executing scheduled jobs as isolated e
 | [`josyn-jap`](../josyn-jap) | Per-session JAP server — JAPServer EXE, shared contracts, logging | `JOSYN.Jap.*` |
 | [`josyn-job-host`](../josyn-job-host) | Job execution runtime — library linked by each job executable | `JOSYN.JobHost` |
 | [`josyn-backend`](../josyn-backend) | Scheduler and session-orchestration layer — triggers sessions, spawns JAPServer | `JOSYN.Backend.*` |
+| [`josyn-commons`](../josyn-commons) | Generic utility helpers — domain-agnostic, open for growth, never referenced by foundation | `JOSYN.Commons.*` |
 | **`josyn-platform`** *(this repo)* | Architecture, decisions, and cross-cutting documentation | — |
 
 ### Why `josyn-job-host` uses a two-segment namespace
@@ -35,11 +36,12 @@ Job executables are **decoupled consumers** of the JOSYN protocol, not internal 
 
 | Word | Meaning in this codebase |
 |------|--------------------------|
-| **Platform** | The entire JOSYN ecosystem — all five repos together |
+| **Platform** | The entire JOSYN ecosystem — all six repos together |
 | **Backend** | The scheduler and session-orchestration layer (`josyn-backend`) |
 | **JAP** | The per-session JAP protocol server and shared packages (`josyn-jap`) |
 | **Job Host** | The runtime embedded in each job executable (`josyn-job-host`) |
 | **Foundation** | Cross-cutting infrastructure primitives (`josyn-foundation`) |
+| **Commons** | Generic utility helpers — domain-agnostic toolbox, open for growth (`josyn-commons`) |
 
 See [architecture/naming-conventions.md](architecture/naming-conventions.md) for the full naming guide.
 
@@ -58,11 +60,18 @@ graph TD
 
     F["josyn-foundation<br/>Infrastructure Primitives"]
 
+    subgraph satellite["⬡ Utility Satellite"]
+        C["josyn-commons<br/>Generic Utilities<br/>(may use ResultPattern) ⟶"]
+    end
+
     B -->|spawns| J
     J <-->|IPC| H
     B -->|NuGet| F
     J -->|NuGet| F
     H -->|NuGet| F
+    B -.->|NuGet| C
+    J -.->|NuGet| C
+    H -.->|NuGet| C
 ```
 
 Full architecture: [architecture/overview.md](architecture/overview.md)

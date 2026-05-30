@@ -85,6 +85,9 @@ josyn-job-host (NuGet library)
         ├── JAPClient.cs                  ← IJosynApplicationProtocol over Named Pipes
         └── Attributes/                   ← [JobEntryPoint], [BeforeJobEntryPoint], etc.
 
+josyn-commons (NuGet packages) — utility satellite; never referenced by josyn-foundation
+└── JOSYN.Commons.*                       ← packages added as helpers accumulate (TBD)
+
 josyn-platform (this repo)
 └── architecture, decisions, documentation
 ```
@@ -116,6 +119,18 @@ JOSYN.Jap.JAPServer       JOSYN.JobHost
         └── IJosynApplication   ──┘
             Protocol
      (IPC at runtime — not a code dep.)
+```
+
+```
+── Utility Satellite ──────────────────────────────────────────────────
+  JOSYN.Commons.*  (no deps, or ResultPattern only)
+          ▲                   ▲                   ▲
+          │                   │                   │
+  JOSYN.Backend.*     JOSYN.Jap.*         JOSYN.JobHost
+  (when needed)       (when needed)       (when needed)
+
+  ✗  JOSYN.Foundation.* never references JOSYN.Commons.*
+───────────────────────────────────────────────────────────────────────
 ```
 
 ### Runtime (spawn) relationships — not code imports

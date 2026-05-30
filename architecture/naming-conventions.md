@@ -9,6 +9,7 @@
 | **JAP** | The per-session JAP protocol server and shared packages | `josyn-jap` repo, `JOSYN.Jap.*` namespace |
 | **Foundation** | Cross-cutting infrastructure primitives | `josyn-foundation` repo, `JOSYN.Foundation.*` namespace |
 | **Job Host** | The job execution runtime | `josyn-job-host` repo, `JOSYN.JobHost` namespace |
+| **Commons** | Generic utility helpers — domain-agnostic, open for growth | `josyn-commons` repo, `JOSYN.Commons.*` namespace |
 
 > **Note:** "JAP" does **not** mean "backend" in this codebase. `josyn-jap` is the per-session JAP server, not the scheduler. The scheduler role belongs exclusively to `josyn-backend`. See [../decisions/ADR-002-josyn-backend.md](../decisions/ADR-002-josyn-backend.md).
 
@@ -23,6 +24,7 @@ josyn-foundation        ← infrastructure primitives
 josyn-jap               ← per-session JAP protocol server
 josyn-job-host          ← job execution runtime  
 josyn-backend           ← scheduler and session-orchestration layer
+josyn-commons           ← generic utility helpers — domain-agnostic, open for growth
 josyn-platform          ← this repo; architecture + decisions + docs
 ```
 
@@ -51,8 +53,10 @@ JOSYN
 │   └── JAPServer                  ← per-session JAP server EXE
 ├── JobHost                        ← josyn-job-host (consumer-facing API — see note below)
 │   └── Attributes                 ← [JobEntryPoint], [BeforeJobEntryPoint], etc.
-└── Backend                        ← josyn-backend
-    └── SessionStarter             ← session lifecycle rendezvous (stub)
+├── Backend                        ← josyn-backend
+│   └── SessionStarter             ← session lifecycle rendezvous (stub)
+└── Commons                        ← josyn-commons (utility satellite — never referenced by Foundation)
+    └── ...                        ← packages added as helpers accumulate
 ```
 
 Pattern: `JOSYN.<Layer>.<Component>[.<Subcomponent>]` — with one intentional exception:  
@@ -74,6 +78,7 @@ Assembly names match their namespace root exactly:
 | `JOSYN.Jap.JAPServer` | `JOSYN.Jap.JAPServer` | josyn-jap |
 | `JOSYN.JobHost` | `JOSYN.JobHost` | josyn-job-host |
 | `JOSYN.Backend.SessionStarter` | `JOSYN.Backend.SessionStarter` | josyn-backend |
+| *(TBD)* | `JOSYN.Commons.*` | josyn-commons |
 
 ---
 
