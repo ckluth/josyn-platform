@@ -86,8 +86,8 @@ public interface ILocalLog
 {
     static abstract string LogDirectory { get; set; }
     static abstract bool EnableConsoleOutput { get; set; }
-    static abstract void Error(string message, ...);
-    static abstract void Info(string message, ...);
+    static abstract void WriteError(string message, ...);
+    static abstract void WriteInfo(string message, ...);
 }
 
 // Implementation
@@ -96,12 +96,12 @@ public static class LocalLog : ILocalLog
     public static string LogDirectory { get; set; }           // set at startup
     public static bool EnableConsoleOutput { get; set; }      // true in DEBUG builds
 
-    public static void Error(string message, ...);
-    public static void Error(Result result);                   // overload for Result
-    public static void Error(string causer, string message);  // writes to subdirectory
+    public static void WriteError(string message, ...);
+    public static void WriteError(Result result);                   // overload for Result
+    public static void WriteError(string causer, string message);  // writes to subdirectory
 
-    public static void Info(string message);
-    public static void Info(string causer, string message);
+    public static void WriteInfo(string message);
+    public static void WriteInfo(string causer, string message);
 }
 ```
 
@@ -110,8 +110,8 @@ public static class LocalLog : ILocalLog
 ```
 <LogDirectory>/
 ├── <causer>/
-│   └── <yyyy-MM-dd>.log     ← causer-specific log (from Error(causer, message))
-└── <yyyy-MM-dd>.log         ← process-level log (from Error(message))
+│   └── <yyyy-MM-dd>.log     ← causer-specific log (from WriteError(causer, message))
+└── <yyyy-MM-dd>.log         ← process-level log (from WriteError(message))
 ```
 
 Log entries include: timestamp, header, message, optional CallStack section, optional Exception section.
