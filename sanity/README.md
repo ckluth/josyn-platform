@@ -20,6 +20,9 @@ Five orthogonal categories, each with its own criteria file:
 Per-repo specifics (known exceptions, baseline expectations, repo-specific constraints) are in
 `../repos/<repo-name>.md` under the `## Sanity Notes` section of each file.
 
+The meta-quality of the criteria themselves is tracked in [`criteria-review.md`](criteria-review.md) —
+a living document to be revisited periodically by the platform maintainer.
+
 ---
 
 ## Cost overview
