@@ -65,10 +65,19 @@ No content is duplicated here. Read the canonical source when a topic requires d
 ### Command surface
 
 ```
-run sanity-check [--check <category>] [--repo <repo-name>]
+run sanity-check [--profile <name>] [--check <category>] [--repo <repo-name>]
 ```
 
-Both flags are optional and repeatable. Omitting a flag means **all** of that axis.
+All flags are optional and repeatable. `--profile` and `--check` can be combined (union of categories).
+Omitting both `--profile` and `--check` means all categories. Omitting `--repo` means all repos.
+
+### Profiles
+
+| Profile | Expands to | Cost |
+|---------|-----------|------|
+| `--profile quick` | `architecture` + `standards` | ⚡ fast |
+| `--profile code` | `principles` + `docs` | 🐢 slow |
+| `--profile full` | all 5 categories | 🐢 slowest |
 
 ```
 run sanity-check                                          # all checks, all repos

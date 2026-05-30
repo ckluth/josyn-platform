@@ -22,13 +22,47 @@ Per-repo specifics (known exceptions, baseline expectations, repo-specific const
 
 ---
 
+## Cost overview
+
+Not all checks are equal in effort. Use this table to choose the right scope:
+
+| Category | 1 repo | n repos | all repos |
+|----------|--------|---------|-----------|
+| `architecture` | ⚡ quick | ⚡ quick | ⏱ takes a while |
+| `standards` | ⚡ quick | ⏱ takes a while | ⏱ takes a while |
+| `docs` | ⏱ takes a while | ⏱ takes a while | 🐢 long runner |
+| `tests` | ⏱ takes a while | 🐢 long runner | 🐢 long runner |
+| `principles` | 🐢 long runner | 🐢 long runner | 🐢 long runner |
+
+---
+
+## Profiles
+
+Named shortcuts for common category combinations:
+
+| Profile | Expands to | When to use |
+|---------|-----------|-------------|
+| `--profile quick` | `--check architecture --check standards` | After any structural change — rename, move, new project |
+| `--profile code` | `--check principles --check docs` | After a coding session — did the code stay clean? |
+| `--profile full` | all 5 categories | Scheduled review, before a release, full platform sanity |
+
+Profiles can be combined with `--repo` to scope them to a subset of repos:
+```
+run sanity-check --profile quick --repo josyn-backend
+run sanity-check --profile code --repo josyn-foundation --repo josyn-jap
+```
+
+---
+
 ## Command surface
 
 ```
-run sanity-check [--check <category>] [--repo <repo-name>]
+run sanity-check [--profile <name>] [--check <category>] [--repo <repo-name>]
 ```
 
-Both flags are **optional** and **repeatable**. Omitting a flag means *all* of that axis.
+`--profile`, `--check`, and `--repo` are all **optional** and **repeatable**.
+`--profile` and `--check` can be combined — the union of categories is used.
+Omitting both `--profile` and `--check` means *all* categories.
 
 ### Examples
 
