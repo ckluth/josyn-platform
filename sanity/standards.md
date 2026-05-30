@@ -103,7 +103,6 @@ See `architecture/naming-conventions.md` for the full vocabulary map, namespace 
 | Assembly name differs from namespace root | ❌ violation |
 | C# file name differs from type name | ❌ violation |
 | Interface file not prefixed with `I` | ❌ violation |
-| Generic variant not suffixed with `.generic.cs` | ❌ violation |
 | Error messages not in German | ❌ violation |
 | XML comments or session files not in English | ❌ violation |
 

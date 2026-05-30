@@ -127,7 +127,6 @@ Implementations reference their contract via `/// <inheritdoc cref="IXxx.Member"
 - C# files: PascalCase, one type per file, filename = type name
 - Attributes: `<Name>Attribute.cs`
 - Interfaces: `I<Name>.cs`
-- Generic variants: `<Name>.generic.cs` (e.g. `Result.generic.cs`)
 
 ---
 
