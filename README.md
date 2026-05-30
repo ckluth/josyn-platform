@@ -94,4 +94,4 @@ Coding standards: [architecture/coding-standards.md](architecture/coding-standar
 
 All repos at version `1.0.0-preview01` — active PoC phase. `josyn-backend` is a compilable stub.
 
-See [decisions/](decisions/) for architectural decision records.
+See `decisions/` for architectural decision records.
