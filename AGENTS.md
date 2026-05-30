@@ -37,7 +37,43 @@ implement against the rules defined here.
 
 ---
 
-## 3. Agent Behavior
+## 3. Self-Sufficiency — Tradeoff and Governance Risk
+
+This repo is deliberately self-sufficient: every instruction an agent needs lives here.
+No external configuration, no company-wide shared instruction repo, no session cache.
+A fresh clone on a bare machine is the assumed and supported starting point.
+
+**The price of this design:**
+
+1. **Knowledge stays private.** The coding principles, sanity criteria, and architectural
+   decisions documented here benefit only JOSYN. Other company projects do not inherit them.
+
+2. **Collision risk.** If the company introduces shared agent instructions at the org level
+   (e.g., an org-wide `AGENTS.md` or a globally applied `copilot-instructions` repo), those
+   instructions and the JOSYN-local ones will coexist in the same agent session. There is no
+   defined precedence. JOSYN's rules are deliberately divergent from typical enterprise C#
+   (no DI containers, no OOP-by-default, no thrown exceptions) — a silent override in either
+   direction would go unnoticed and produce wrong behaviour.
+
+**Current mitigation (Option C):**
+
+JOSYN-local instructions take precedence over any company-wide or session-level defaults
+for any agent operating within this repo. If a conflict is detected between a local rule
+and an externally sourced instruction, the local rule wins and the conflict should be flagged.
+
+**Long-term change path (Option B):**
+
+The universally applicable parts of this instruction set — Result pattern discipline,
+static-first design, immutability-by-default, test naming conventions, sanity check method —
+are good enough to benefit other projects. The right long-term move is to extract those into
+a shared company-level instruction repo and have JOSYN extend it with its platform-specific
+additions. This restores the knowledge-sharing benefit while keeping the specialised rules
+local. It is a deliberate project, not a note — undertake it when the company scales up its
+agent infrastructure.
+
+---
+
+## 4. Agent Behavior
 
 - Stay sceptical — do not be a pleaser.
 - Always explain your plan before running anything.
@@ -46,7 +82,7 @@ implement against the rules defined here.
 
 ---
 
-## 4. Knowledge Map
+## 5. Knowledge Map
 
 No content is duplicated here. Read the canonical source when a topic requires detail.
 
@@ -60,7 +96,7 @@ No content is duplicated here. Read the canonical source when a topic requires d
 
 ---
 
-## 5. Sanity Check Protocol
+## 6. Sanity Check Protocol
 
 ### Command surface
 
