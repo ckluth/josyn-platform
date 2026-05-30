@@ -103,10 +103,47 @@ Multiple categories and multiple repos in one run.
 
 ---
 
+## Output file
+
+Every run overwrites `sanity/last-result.md`. No history is kept — only the last run.
+
+### Format
+
+```markdown
+# Sanity Check — Last Result
+
+**Run:** <timestamp>
+**Command:** `run sanity-check <flags as issued>`
+**Repos:** <repos checked>
+**Categories:** <categories checked>
+
+---
+
+## Summary
+
+| Repo | docs | tests | principles | architecture | standards |
+|------|------|-------|-----------|-------------|-----------|
+| josyn-foundation | ✅ | ✅ | ✅ | ✅ | ✅ |
+| ...              | ...  | ...   | ...        | ...          | ...       |
+
+---
+
+## <repo-name>
+
+### <category>
+  ✅ ...
+  ❌ <file path> — <reason>
+  ⚠️ ...
+```
+
+The summary table gives a one-glance overview. The detail section below it lists every finding.
+
+---
+
 ## Safety contract
 
-A sanity check is inspect-and-report. There is nothing to write.
-`dotnet test` is the only command with side effects (test execution produces no file changes in the repos).
+A sanity check makes exactly one write: `sanity/last-result.md` in this repo is overwritten with the
+findings at the end of every run. No other files are created, edited, or deleted anywhere.
 
 ---
 

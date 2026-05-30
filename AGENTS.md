@@ -105,7 +105,10 @@ The five subject repos (`josyn-platform` itself is never a sanity-check target):
 
 ### Safety contract — READ-ONLY
 
-A sanity check is inspect-and-report. There is nothing to write — no fixes, no edits, no file creation. `dotnet test` is the only command with side effects (test execution produces no file changes in the repos).
+A sanity check makes exactly one write: `sanity/last-result.md` in this repo is overwritten with the
+findings at the end of every run. No other files are created, edited, or deleted — not in this repo,
+not in any subject repo. `dotnet test` is the only command with side effects beyond reading and writing
+that one result file.
 
 ### Execution steps
 
@@ -116,5 +119,6 @@ A sanity check is inspect-and-report. There is nothing to write — no fixes, no
    - Before `standards` or `docs`: also read `architecture/naming-conventions.md`.
 3. For each requested **repo**: open the repo at its relative path and apply all loaded criteria.
    Per-repo detail (assemblies, packages, current state) is in `repos/<repo-name>.md`.
-4. Report findings **per repo, then per category**. List every violation explicitly.
+4. Collect all findings.
+5. Overwrite `sanity/last-result.md` with the structured report (see `sanity/README.md` for format).
    Confirm clean areas — silence is not a pass.
