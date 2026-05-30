@@ -30,8 +30,8 @@ The layers are:
 ```
 josyn-foundation   — bedrock; stable forever; referenced by all, references nothing
 josyn-commons      — utility satellite; open for growth; referenced by all except foundation
-josyn-jap          — per-session protocol server; the man-in-the-middle; the game-changer!
-josyn-job-host     — job execution runtime: the job-developer's world...
+josyn-jap          — the protocol backbone; grows deliberately; existing members never break
+josyn-job-host     — open for evolution; the job developer's only door into the platform
 josyn-backend      — scheduler, session orchestrator, runtime owner; tip of an iceberg...
 josyn-platform     — this repo; documentation, decisions, architecture
 ```
@@ -82,6 +82,56 @@ That is an architectural decision, documented in an ADR, made deliberately.
 
 ---
 
+## JAP is the protocol backbone
+
+`josyn-jap` is the application protocol layer every job execution flows through.
+It sits on the JIP transport — which lives in foundation and is truly bedrock —
+and defines the high-level conversation between the scheduler world and the job world.
+
+That conversation is not frozen. Every new capability that job-host gains must have
+a voice in the protocol — JAP grows upward from the needs of the job world.
+
+That growth is healthy and necessary. But it must be deliberate:
+
+- New members on `IJosynApplicationProtocol` require coordination with `josyn-job-host`,
+  which implements the client side of every member.
+- Existing members must never change semantics — they are active contracts in every
+  running session.
+- Changes to JAP's shared packages (`Jap.Shared.*`) ripple to both `JAPServer` and
+  `JobHost` simultaneously. Review both sides before committing.
+
+The transport below all of this — the named pipes, the wire format, the session GUID
+convention — is JIP's territory, defined in foundation. That does not move.
+Everything JAP adds above it can grow.
+
+---
+
+## Job Host is the job developer's gateway
+
+`josyn-job-host` is the platform's handshake with the world outside.
+Job developers link it, follow the protocol, and write business logic.
+That is all they should need to do.
+
+Job Host is designed to evolve — more features, more relief for the job developer's daily work, more support
+to get things done, and more room for the person in front of the keyboard — to focus on the problem they actually came to solve.
+
+This evolution is healthy and expected. But every addition is a commitment to every job developer
+who links it.
+
+Two rules govern that evolution:
+
+1. **Stay lean.** Job developers should encounter only what they need.
+   No JAP concepts should leak into the consumer-facing surface.
+   No abstractions that serve the platform's convenience at the expense of the consumer's clarity.
+
+2. **No YAGNI.** Add only for a concrete reason. Remove only with deliberate migration
+   and deprecation — removals are expensive for a library that job authors bind to.
+
+The `[JobEntryPoint]` attribute and `Core.Run(args)` are the entire surface most job authors
+will ever see. Protect their simplicity.
+
+---
+
 ## Backend is its own world
 
 `josyn-backend` is listed in one line above. Do not let that mislead you.
@@ -93,6 +143,26 @@ The backend is designed to evolve independently. Internals may deepen. Subsystem
 Do not promote backend internals into shared abstractions without an explicit architectural decision. What lives in the backend, stays in the backend, until the boundary itself is deliberately changed.
 
 Purely internal backend decisions belong in backend-local documentation. Only decisions that affect the contract, the dependency graph, or other repos belong in a platform ADR.
+
+---
+
+## Two stability philosophies
+
+Foundation stands apart — it has no philosophy, only permanence.
+Everything below it falls into one of two modes.
+
+The **grows deliberately** layers — `jap` and `job-host` — are expected to expand,
+but only additively and only with coordination. JAP's application protocol acquires
+new members as the platform matures; Job Host's consumer API grows as job developer
+needs become clear. In both cases: additions are decisions, existing members are
+commitments, and every change ripples to at least one other repo.
+
+The **open-for-evolution** layers — `backend` and `commons` — are expected to grow and
+deepen more freely. Commons accumulates domain-agnostic helpers; backend's internals
+may expand significantly behind its narrow contract. Growth is healthy — as long as it
+earns its place and stays inside the boundary.
+
+Knowing which mode a layer operates in tells you how much care a change deserves.
 
 ---
 
@@ -166,6 +236,8 @@ Good architecture is not a destination. It is a discipline.
 Every commit is either an investment or a withdrawal. Most are small. The balance
 compounds — in both directions.
 
-Keep the graph clean. Keep the vocabulary precise. Keep the contracts honest.
+- **Keep the graph clean.** 
+- **Keep the vocabulary precise.**
+- **Keep the contracts honest.**
 
 That is the work.
