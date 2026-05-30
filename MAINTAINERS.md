@@ -30,9 +30,9 @@ The layers are:
 ```
 josyn-foundation   — bedrock; stable forever; referenced by all, references nothing
 josyn-commons      — utility satellite; open for growth; referenced by all except foundation
-josyn-jap          — per-session protocol server
-josyn-job-host     — job execution runtime
-josyn-backend      — scheduler and session orchestrator; tip of an iceberg...
+josyn-jap          — per-session protocol server; the man-in-the-middle; the game-changer!
+josyn-job-host     — job execution runtime: the job-developer's world...
+josyn-backend      — scheduler, session orchestrator, runtime owner; tip of an iceberg...
 josyn-platform     — this repo; documentation, decisions, architecture
 ```
 
