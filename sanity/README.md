@@ -178,3 +178,15 @@ When a platform rule changes:
 1. Update the relevant criteria file here.
 2. Update `../architecture/coding-standards.md` or `../architecture/naming-conventions.md` if the rule originates there.
 3. The change takes effect for all future sanity runs immediately — no other configuration needed.
+
+---
+
+## Scope boundary — josyn-platform is not a subject
+
+The sanity check covers the five subject repos only. `josyn-platform` itself — its own markdown files,
+criteria files, and documentation — is never evaluated by a sanity run.
+
+This is a deliberate blind spot. The platform repo is the *owner* of the check, not a subject of it.
+Consistency and quality of the platform's own files is a human responsibility, maintained through
+normal code review when the repo is changed.
+
