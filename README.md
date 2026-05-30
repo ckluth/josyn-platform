@@ -15,11 +15,11 @@ JOSYN (Job System Next) is a platform for executing scheduled jobs as isolated e
 
 | Repo | Role | Namespace root |
 |------|------|----------------|
-| [`josyn-foundation`](../josyn-foundation) | Infrastructure primitives — Result pattern, serialization, IPC transport | `JOSYN.Foundation.*` |
-| [`josyn-jap`](../josyn-jap) | Per-session JAP server — JAPServer EXE, shared contracts, logging | `JOSYN.Jap.*` |
-| [`josyn-job-host`](../josyn-job-host) | Job execution runtime — library linked by each job executable | `JOSYN.JobHost` |
-| [`josyn-backend`](../josyn-backend) | Scheduler and session-orchestration layer — triggers sessions, spawns JAPServer | `JOSYN.Backend.*` |
-| [`josyn-commons`](../josyn-commons) | Generic utility helpers — domain-agnostic, open for growth, never referenced by foundation | `JOSYN.Commons.*` |
+| [`josyn-foundation`](../josyn-foundation/README.md) | Infrastructure primitives — Result pattern, serialization, IPC transport | `JOSYN.Foundation.*` |
+| [`josyn-jap`](../josyn-jap/README.md) | Per-session JAP server — JAPServer EXE, shared contracts, logging | `JOSYN.Jap.*` |
+| [`josyn-job-host`](../josyn-job-host/README.md) | Job execution runtime — library linked by each job executable | `JOSYN.JobHost` |
+| [`josyn-backend`](../josyn-backend/README.md) | Scheduler and session-orchestration layer — triggers sessions, spawns JAPServer | `JOSYN.Backend.*` |
+| [`josyn-commons`](../josyn-commons/README.md) | Generic utility helpers — domain-agnostic, open for growth, never referenced by foundation | `JOSYN.Commons.*` |
 | **`josyn-platform`** *(this repo)* | Architecture, decisions, and cross-cutting documentation | — |
 
 ### Why `josyn-job-host` uses a two-segment namespace
