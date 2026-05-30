@@ -120,6 +120,32 @@ No reflection-based wiring (except the deliberately designed `[JobEntryPoint]` d
 
 A type should expose only what is needed. Internal types stay internal.
 
+### 8. Strict access modifiers
+
+Be as strict as possible. Expose only what must be exposed.
+Prefer `internal` over `public` wherever the wider API surface is not required.
+
+---
+
+## Agent Application Guide
+
+### Apply automatically — without being asked
+
+- When proposing a new type: start with `static class` and state why if choosing something else.
+- When reviewing existing code: flag instance types that have no state and could be `static`.
+- When writing XML docs: put them on the interface, not the implementation.
+- When a failure path exists: return `Result.Error(...)` or `return ex;` — never `throw`.
+- When propagating a failure upward: use `Result.Propagate(inner)` — never re-wrap.
+- When choosing an access modifier: default to `internal`; escalate to `public` only when the member is part of the intended public API.
+
+### Never do
+
+- Add OOP abstraction layers "just in case" future flexibility is needed.
+- Reach for dependency injection when a static call or a delegate parameter suffices.
+- Create mutable state when an immutable data pipeline would work.
+- Write defensive `try/catch` blocks outside the lowest-layer boundary.
+- Use `public` where `internal` is sufficient.
+
 ---
 
 ## Code Style
