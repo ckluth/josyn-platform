@@ -11,11 +11,11 @@ Five orthogonal categories, each with its own criteria file:
 
 | Category | File | What it covers |
 |----------|------|----------------|
-| `docs` | `docs.md` | XML documentation comments and markdown documentation currency |
-| `tests` | `tests.md` | Unit test existence, naming, structure, coverage, and passing state |
-| `principles` | `principles.md` | Functional-first C# coding rules — Result pattern, static-first, immutability, no-throw |
-| `architecture` | `architecture.md` | NuGet dependency chain integrity and forbidden cross-repo references |
-| `standards` | `standards.md` | Project file conventions, naming rules, and directory structure |
+| `docs` | `criteria/docs.md` | XML documentation comments and markdown documentation currency |
+| `tests` | `criteria/tests.md` | Unit test existence, naming, structure, coverage, and passing state |
+| `principles` | `criteria/principles.md` | Functional-first C# coding rules — Result pattern, static-first, immutability, no-throw |
+| `architecture` | `criteria/architecture.md` | NuGet dependency chain integrity and forbidden cross-repo references |
+| `standards` | `criteria/standards.md` | Project file conventions, naming rules, and directory structure |
 
 Per-repo specifics (known exceptions, baseline expectations, repo-specific constraints) are in
 `../repos/<repo-name>.md` under the `## Sanity Notes` section of each file.
@@ -183,7 +183,7 @@ To exit autopilot after the check: `/autopilot` again (it toggles).
 ## How an agent executes a sanity check
 
 1. **Read `../AGENTS.md`** — orientation, repo paths, and the full execution protocol.
-2. **Load criteria** — for each requested category, read the corresponding `<category>.md` file in this folder.
+2. **Load criteria** — for each requested category, read the corresponding `criteria/<category>.md` file in the `criteria/` subfolder.
    Some categories require additional context files (listed in AGENTS.md execution steps).
 3. **Load per-repo notes** — for each requested repo, read `../repos/<repo-name>.md`,
    specifically the `## Sanity Notes` section, to understand known exceptions and repo-specific expectations.
@@ -245,7 +245,7 @@ If the result file is stale, run a fresh sanity check first.
 ### Workflow — one repo/category pair at a time
 
 1. **Load violations** — read `sanity/last-result.md`, filter by requested scope.
-2. **Load context** — read the relevant `sanity/<category>.md` criteria file and `repos/<repo>.md` Sanity Notes.
+2. **Load context** — read the relevant `sanity/criteria/<category>.md` criteria file and `repos/<repo>.md` Sanity Notes.
 3. **Check for known exceptions** — if a violation is documented as expected state in Sanity Notes, skip it. Do not fix expected state.
 4. **Fix** — apply the minimal change that resolves the violation in the target repo.
 5. **Verify** — re-run `run sanity-check --check <category> --repo <repo>` immediately after fixing.
@@ -276,7 +276,7 @@ Stop and ask when in doubt.
 
 ---
 
-The criteria files in this folder are the **single source of truth** for what "correct" means.
+The criteria files in `criteria/` are the **single source of truth** for what "correct" means.
 When a platform rule changes:
 
 1. Update the relevant criteria file here.

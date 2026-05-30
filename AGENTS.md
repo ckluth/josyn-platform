@@ -133,11 +133,11 @@ The five subject repos (`josyn-platform` itself is never a sanity-check target):
 
 | Category | Criteria file | Scope |
 |----------|--------------|-------|
-| `docs` | `sanity/docs.md` | XML comments, markdown documentation currency |
-| `tests` | `sanity/tests.md` | Unit test existence, coverage, passing state |
-| `principles` | `sanity/principles.md` | Result pattern, static-first, immutability, no-throw |
-| `architecture` | `sanity/architecture.md` | Dependency chain integrity, forbidden references |
-| `standards` | `sanity/standards.md` | Naming, project file conventions, directory structure |
+| `docs` | `sanity/criteria/docs.md` | XML comments, markdown documentation currency |
+| `tests` | `sanity/criteria/tests.md` | Unit test existence, coverage, passing state |
+| `principles` | `sanity/criteria/principles.md` | Result pattern, static-first, immutability, no-throw |
+| `architecture` | `sanity/criteria/architecture.md` | Dependency chain integrity, forbidden references |
+| `standards` | `sanity/criteria/standards.md` | Naming, project file conventions, directory structure |
 
 ### Confirmation gate
 
@@ -162,7 +162,7 @@ that one result file.
 ### Execution steps
 
 1. Read this file (done).
-2. For each requested **category**: read `sanity/<category>.md` to load the criteria.
+2. For each requested **category**: read `sanity/criteria/<category>.md` to load the criteria.
    - Before `principles`: also read `architecture/coding-standards.md`.
    - Before `architecture`: also read `architecture/overview.md`.
    - Before `standards` or `docs`: also read `architecture/naming-conventions.md`.
