@@ -32,6 +32,23 @@ Job executables are **decoupled consumers** of the JOSYN protocol, not internal 
 
 ---
 
+## Beyond the Platform — `josyn-sandbox`
+
+`josyn-sandbox` is a consumer repository that sits outside the platform's dependency graph.
+It may reference any platform repo — as a pure consumer. The platform never references it back.
+
+Its purposes are:
+
+- **Demonstration** — running and showing the living system end-to-end
+- **Exploration** — first contact with new features and concepts before they earn a place in the platform
+- **Experimental integration** — rough, non-regression-protected tests of the full runtime flow
+
+Errors and experiments here carry no consequences for the platform.
+`josyn-sandbox` is not a platform component. It is not maintained to platform standards.
+It is the maintainer's playground.
+
+---
+
 ## Vocabulary
 
 | Word | Meaning in this codebase |

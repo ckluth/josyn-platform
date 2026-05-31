@@ -36,6 +36,12 @@ josyn-backend      — scheduler, session orchestrator, runtime owner; tip of an
 josyn-platform     — this repo; documentation, decisions, architecture
 ```
 
+One repository stands outside this graph entirely:
+
+```
+josyn-sandbox      — consumer; references the platform freely; the platform does not know it exists
+```
+
 These relationships are not suggestions. They are contracts.
 
 A dependency that runs in the wrong direction does not announce itself.
@@ -143,6 +149,19 @@ The backend is designed to evolve independently. Internals may deepen. Subsystem
 Do not promote backend internals into shared abstractions without an explicit architectural decision. What lives in the backend, stays in the backend, until the boundary itself is deliberately changed.
 
 Purely internal backend decisions belong in backend-local documentation. Only decisions that affect the contract, the dependency graph, or other repos belong in a platform ADR.
+
+---
+
+## Sandbox is not the platform
+
+`josyn-sandbox` is a consumer repository. It may reference any platform repo it needs.
+The platform never references it back — not in NuGet, not via project references, not through any convention or discovery mechanism.
+
+This is the one rule that defines its place: **the platform does not know josyn-sandbox exists.**
+
+Because of this, sandbox carries none of the platform's obligations. It is not maintained to platform standards. Its code may be rough, experimental, or incomplete. That is not a deficiency — it is the point. It is the maintainer's space to demonstrate the living system, run exploratory integration scenarios, and develop new concepts before they earn a place in the real architecture.
+
+When something in sandbox matures into a real feature, it moves — rewritten and reviewed — into the appropriate platform repo. The sandbox is not a permanent home.
 
 ---
 
