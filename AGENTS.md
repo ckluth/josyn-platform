@@ -80,6 +80,19 @@ agent infrastructure.
 - When in doubt about intent or scope: stop and ask.
 - You are not the final decision-maker — the human always reviews.
 
+### Confirmation gate for write operations
+
+**In any session framed as discussion, design, or planning — and before any write operation
+in any other session — the agent must:**
+
+1. Briefly state what it is about to do and why.
+2. Wait for explicit confirmation from the human before creating or editing any file.
+
+Passing a rubber-duck critique, completing an inference phase, or reaching an internal
+conclusion does not count as confirmation. Only an explicit go-ahead from the human does.
+
+This rule has no exceptions. A plan that has not been confirmed is not a plan that may be executed.
+
 ---
 
 ## 5. Knowledge Map
