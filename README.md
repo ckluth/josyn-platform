@@ -1,7 +1,8 @@
 # JOSYN Platform
 
 > **This repo is the authoritative architectural reference for the entire JOSYN platform.**
-> Start here before working in any other repo.
+> Start here before working in any other repo.\
+> No code to find in this place, just documentation: architecture, decisions, and cross-cutting concepts that apply to all repos.
 
 ---
 
@@ -112,3 +113,9 @@ Coding standards: [architecture/coding-standards.md](architecture/coding-standar
 All repos at version `1.0.0-preview01` — active PoC phase. `josyn-backend` is a compilable stub.
 
 See `decisions/` for architectural decision records.
+
+---
+
+## For maintainers
+
+[MAINTAINERS.md](MAINTAINERS.md) is the constitutional reference for everyone who works in this platform — the dependency philosophy, stability contracts, and what it means to maintain JOSYN over time. Read it once before making significant decisions.
