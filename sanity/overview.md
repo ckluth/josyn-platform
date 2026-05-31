@@ -3,7 +3,7 @@
 | Repo | docs | tests | principles | architecture | standards | Last checked |
 |------|------|-------|-----------|-------------|-----------|-------------|
 | josyn-foundation | ✅ | ✅ | ✅ | ✅ | ✅ | 2026-05-31T12:10 UTC |
-| josyn-jap | — | — | — | — | — | never |
+| josyn-jap | — | — | — | ✅ | ✅ | 2026-05-31T12:49 UTC |
 | josyn-job-host | — | — | — | — | — | never |
 | josyn-backend | — | — | — | — | — | never |
 | josyn-commons | — | — | — | — | — | never |
@@ -11,3 +11,5 @@
 ---
 
 ## josyn-foundation — All violations resolved (2026-05-31)
+
+## josyn-jap — All violations resolved (2026-05-31)
