@@ -29,6 +29,8 @@ Additional required properties:
 | `<Copyright>` | `Copyright © 2026 HAEVG AG` |
 | `<Company>` | `HAEVG` |
 | `<Authors>` | `HAEVG SWE` |
+| `<Version>` | Present — a concrete version number |
+| `<PackageId>` | Matches `<AssemblyName>` exactly |
 | `<PackageReadmeFile>` | `README.md` (declared once) |
 | `<PackageIcon>` | `icon.png` |
 | `icon.png` | Co-located with the `.csproj` |

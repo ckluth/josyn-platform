@@ -67,3 +67,10 @@ Evaluate each item for every type and method in scope.
 |--------|---------|
 | Method mutates a field AND returns a value, with no `<remarks>` documenting the side effect | ❌ violation |
 | Side-effecting code pushed to the call graph edges | ✅ pass |
+
+### 8. Async correctness
+
+| Signal | Verdict |
+|--------|---------|
+| `async void` method (outside event handler) | ❌ violation |
+| `.Result` property or `.GetAwaiter().GetResult()` call on a `Task` | ❌ violation |

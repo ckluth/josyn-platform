@@ -56,6 +56,8 @@
 | S11 | `<GenerateDocumentationFile>true</GenerateDocumentationFile>` | 🟢 | Without this, XML warnings are silenced, documentation is missing from the package, and the `docs` check has no baseline. |
 | S12 | `<PackageLicenseExpression>MIT</PackageLicenseExpression>` | 🟢 | Missing license is a compliance issue for any published package. |
 | S13 | `<Copyright>`, `<Company>`, `<Authors>` | 🟢 | Complete metadata is required — even for internal packages, incomplete metadata signals an unfinished deliverable. |
+| N4 | `<Version>` present | 🟢 | Absent → every `dotnet pack` silently overwrites version `1.0.0.0` on the local feed. Classic copy-paste omission that makes version tracking impossible. |
+| N5 | `<PackageId>` matches `<AssemblyName>` | 🟢 | Copy-paste trap: `AssemblyName` updated, `PackageId` forgotten (or vice versa). Package published under the wrong name — consumers reference a name that doesn't exist. |
 | S15 | `<PackageReadmeFile>README.md</PackageReadmeFile>` + file present | 🟢 | If declared but absent, `dotnet pack` fails. If absent and not declared, NuGet consumers see no description. |
 | S16 | `<PackageIcon>icon.png</PackageIcon>` + file present | 🟢 | Visual identity is a required deliverable for all packages. |
 | S18 | `icon.png` co-located with `.csproj` | 🟢 | Required for `dotnet pack` to succeed when `<PackageIcon>` is declared. S16 and S18 are a pair. |
@@ -178,6 +180,8 @@
 | P11 | Reflection-based wiring outside the designated `[JobEntryPoint]` dispatch | 🟢 | Reflection-based magic is exactly what the platform explicitly forbids. The exception is tightly scoped and documented. |
 | P13 | `public` member where `internal` would suffice | 🟢 | Minimal surface area is directly enforceable. An oversized public API locks future changes. |
 | P14 | Method mutates state AND returns a result without documenting the side effect | 🟡 | **Scoped:** flag methods that mutate a field AND return a value, where no `<remarks>` documents the side effect. `out`/`ref` parameters are a secondary signal. |
+| N1 | `async void` method outside event handlers | 🟢 | A third silent exception path that bypasses both P4 and P5. Exceptions in `async void` are unhandled and crash the host process — they never reach the Result machinery. |
+| N2 | `.Result` property or `.GetAwaiter().GetResult()` call on a `Task` | 🟢 | Sync-over-async causes deadlocks under thread pool pressure — especially dangerous in the scheduler and IPC layer. Zero legitimate uses in this codebase. |
 
 ---
 
@@ -185,7 +189,7 @@
 
 | Rating | Count | Notes |
 |--------|-------|-------|
-| 🟢 Indispensable | 77 | Keep exactly as written |
+| 🟢 Indispensable | 81 | Keep exactly as written |
 | 🟡 Discussable | 11 | See scoping notes below; agent applies judgment within defined scope |
 | 🔴 Not really necessary | 0 | All 🔴 items resolved in 2026-05-31 review |
 | ⛔ Bare mistake | 0 | No criterion is actively wrong — the set is clean in structure |
@@ -213,4 +217,4 @@
 | Date | Reviewer | Changes made |
 |------|----------|--------------|
 | 2026-05-30 | Initial draft | First complete pass over all criteria |
-| 2026-05-31 | Criteria review session | Resolved all 🔴 and 🟡 items: 10 upgraded to 🟢 (S6, S7, S13, S16, S18, S21, S27, T7, T11, P8), 10 dropped (S3, S4, S8, S9, S14, S17, S24, S36, S37, P12), 4 scoped (A8, D15, P9, P14). Net: 77🟢, 11🟡, 0🔴 |
+| 2026-05-31 | Criteria review session | Resolved all 🔴 and 🟡 items: 10 upgraded to 🟢, 10 dropped, 4 scoped. Added 4 missing checks (N1 `async void`, N2 sync-over-async, N4 `<Version>`, N5 `<PackageId>`). Net: 81🟢, 11🟡, 0🔴 |
