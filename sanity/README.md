@@ -271,7 +271,7 @@ occur outside the two state files in this repo.
 
 ## How an agent executes a sanity check
 
-1. **Read `../AGENTS.md`** — orientation, repo paths, and the full execution protocol.
+1. **Read `../AGENTS.md`** — orientation and repo paths. Read this file for the full execution protocol.
 2. **Run the inference phase** — smart (trigger-table) or deep (diff analysis) before loading
    criteria or opening subject repos. Produce the proposed run scope.
 3. **Present the confirmation gate** — state what will run and wait for approval.
