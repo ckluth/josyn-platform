@@ -179,13 +179,18 @@ If neither `--check` nor `--profile` is given, run all five categories across al
 
 **After** the inference phase (or immediately for `--force`), the agent **must**:
 
-1. Explicitly state what will run — repos, categories, cost estimate, and which repos (if any)
-   were skipped as current.
-2. Ask: *"Really run this now?"* and wait for explicit confirmation.
-3. If any 🐢 category is involved across multiple repos, also suggest:
+1. **For `--force` runs:** perform a quick change scan (git log + git status, no category inference)
+   for each target repo. Include the result per repo in the gate message:
+   - Repos with changes since last check: list the count of changed files.
+   - Repos with **no** changes since last check: flag with ⚠️.
+   - Repos with `Last checked: never`: no flag (no baseline to compare against).
+2. Explicitly state what will run — repos, categories, cost estimate, and which repos (if any)
+   were skipped as current (smart/deep mode) or flagged as unchanged (force mode).
+3. Ask: *"Really run this now?"* and wait for explicit confirmation.
+4. If any 🐢 category is involved across multiple repos, also suggest:
    *"This is a long runner — consider `/autopilot` so it runs unattended."*
 
-**Exception:** If autopilot is already active, skip steps 1–3 and proceed directly.
+**Exception:** If autopilot is already active, skip steps 1–4 and proceed directly.
 
 ### Safety contract
 

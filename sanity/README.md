@@ -240,12 +240,16 @@ No other files are created, edited, or deleted anywhere.
 
 **After** the inference phase (or immediately for `--force`), the agent must:
 
-1. **State what will run** — repos, categories, cost estimate, and which repos (if any) were
-   skipped as current.
-2. **Ask for confirmation:** *"Really run this now?"* — wait for an explicit yes before proceeding.
-3. If any 🐢 category is involved across more than one repo, also **suggest autopilot:**
+1. **For `--force` runs:** perform a quick change scan (git log + git status, no category inference)
+   for each target repo. Include the result per repo in the gate message:
+   - Repos with changes: list the count of changed files.
+   - Repos with **no** changes since last check: flag with ⚠️.
+   - Repos with `Last checked: never`: no flag (no baseline to compare against).
+2. **State what will run** — repos, categories, cost estimate, and which repos (if any) were
+   skipped as current (smart/deep mode) or flagged as unchanged (force mode).
+3. **Ask for confirmation:** *"Really run this now?"* — wait for an explicit yes before proceeding.
+4. If any 🐢 category is involved across more than one repo, also **suggest autopilot:**
    *"This is a long runner — consider `/autopilot` so it runs unattended without further interruptions."*
-4. If `--deep` was given, note upfront: *"Deep analysis will read diffs before proposing a run."*
 
 **Exception:** if autopilot is already active, skip confirmation entirely and proceed.
 
