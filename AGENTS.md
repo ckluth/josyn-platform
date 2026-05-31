@@ -228,6 +228,9 @@ fix violations [--repo <repo-name>] [--check <category>]
 Source of truth is always `sanity/current-state/<repo>.md` for the target repo.
 Never fix from `sanity/overview.md` (summary only) or from memory.
 Fix one repo/category pair at a time, verify with a targeted re-run, commit before moving to the next.
+
+**Interaction rule:** Fixing is always step-by-step and interactive. For each violation, propose the exact change and wait for explicit confirmation before executing. Never batch fixes without asking.
+
 Full strategy: `sanity/README.md` → *Fixing violations* section.
 
 ⚠️ Fixing is a write operation — do not use `/autopilot`. Stop and ask before refactoring `principles` violations.

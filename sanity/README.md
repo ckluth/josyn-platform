@@ -340,12 +340,24 @@ Always fix from `sanity/current-state/<repo>.md` for the target repo.
 Never fix from `sanity/overview.md` (summary only) or from memory.
 If the state file is stale, run a fresh sanity check first.
 
+### Interaction rule — propose before every fix
+
+Fixing is always **step-by-step and interactive**. For each violation in the current-state file:
+
+1. **Propose** — describe exactly what will be changed (file, line, before/after). Wait for explicit confirmation.
+2. **Execute** — apply the fix only after the human confirms.
+3. Move to the next violation and repeat.
+
+Never batch multiple fixes before asking. Never apply a fix speculatively. Even if two violations look identical, each one gets its own proposal-and-confirm cycle.
+
+This rule applies regardless of how many violations are in scope and cannot be overridden by `/autopilot` or any other flag.
+
 ### Workflow — one repo/category pair at a time
 
-1. **Load violations** — read `sanity/last-result.md`, filter by requested scope.
+1. **Load violations** — read `sanity/current-state/<repo>.md`, filter by requested scope.
 2. **Load context** — read the relevant `sanity/criteria/<category>.md` criteria file and `repos/<repo>.md` Sanity Notes.
 3. **Check for known exceptions** — if a violation is documented as expected state in Sanity Notes, skip it. Do not fix expected state.
-4. **Fix** — apply the minimal change that resolves the violation in the target repo.
+4. **For each violation — propose, confirm, execute** — apply the interaction rule above.
 5. **Verify** — re-run `run sanity-check --check <category> --repo <repo>` immediately after fixing.
    The fix is done only when the check reports ✅ for that area.
 6. **Commit** — one commit per verified repo/category pair. Do not batch fixes across categories.
