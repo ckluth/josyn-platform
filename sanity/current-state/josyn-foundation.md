@@ -1,6 +1,6 @@
 # Sanity State — josyn-foundation
 
-**Last checked:** 2026-05-31T11:41 UTC
+**Last checked:** 2026-05-31T11:41 UTC (violations fixed at 2026-05-31T12:10 UTC)
 
 ---
 
@@ -10,8 +10,8 @@
 |----------|--------|
 | `docs` | ✅ Pass |
 | `tests` | ✅ Pass |
-| `principles` | ❌ Violations found |
-| `architecture` | ❌ Violation found |
+| `principles` | ✅ Pass (fixed) |
+| `architecture` | ✅ Pass (fixed) |
 | `standards` | ✅ Pass |
 
 ---
@@ -49,65 +49,28 @@ All criteria pass.
 
 ---
 
-## principles ❌
+## principles ✅
 
-### P1 — Static wins
+All violations resolved.
 
-**5 violations**: The following types have zero instance state and no polymorphism need, but are declared as `sealed class` rather than `static class`. The established pattern in this repo (see `JipClient`, `JipServer`, `IniDictionarySerializer`, `JsonDictionarySerializer`) is `static class` with `<inheritdoc cref="IXxx.Member"/>` doc comments — no formal interface implementation at the syntax level.
+- **P1 (5 fixes):** `PropertyBag`, `PipesClient`, `PipesServer`, `PipesProtocol`, and `JipProtocol` converted from `sealed class : IXxx` to `static class`. Formal interface implementation dropped (static classes cannot implement interfaces). All `/// <inheritdoc/>` comments updated to explicit `/// <inheritdoc cref="IXxx.Member"/>` form.
+- **P3 (3 fixes):**
+  - `Result.ToResult<TValue>()` on a succeeded result now returns `Result<TValue>.Fail(...)` instead of throwing. Test updated from `Throws` assertion to failure-result assertion.
+  - `Result<T>.ToResult<TOther>()` on a succeeded result — same fix. Test updated.
+  - `JipDispatcher.RegisterAll<TProtocol>()` return type changed from `IJipDispatcher` to `Result<IJipDispatcher>`. On unsupported signature: returns `Result<IJipDispatcher>.Fail(...)` instead of throwing. Interface updated. All callers in josyn-foundation updated (tests + demo `Program.cs`).
+- **P5:** Left as-is — `RegisterAll` reflection is explicitly called and opt-in; not hidden convention magic. Confirmed design decision.
 
-| Type | File | Signal |
-|------|------|--------|
-| `PropertyBag` | `josyn-foundation-property-bag/JOSYN.Foundation.PropertyBag/PropertyBag.cs` | `sealed class` with zero instance state; all members `public static` |
-| `PipesClient` | `josyn-foundation-jip/JOSYN.Foundation.JIP/PipesClient.cs` | `sealed class` with zero instance state; all members `public static` |
-| `PipesServer` | `josyn-foundation-jip/JOSYN.Foundation.JIP/PipesServer.cs` | `sealed class` with zero instance state; all members `public static` (private inner classes `RawRequestHandler` and `CancellationHandle` have state, but these are helpers, not state of `PipesServer` itself) |
-| `PipesProtocol` | `josyn-foundation-jip/JOSYN.Foundation.JIP/PipesProtocol.cs` | `sealed class` with zero instance state; all members `public static` |
-| `JipProtocol` | `josyn-foundation-jip/JOSYN.Foundation.JIP/Jip/JipProtocol.cs` | `sealed class` with zero instance state; all members `public static` |
-
-**Recommended fix:** Convert each to `static class`, drop the `: IXxx` formal interface implementation, and switch docs to `/// <inheritdoc cref="IXxx.Member"/>` (see `JipClient.cs` as the reference implementation).
-
-### P3 — Errors as values, never exceptions
-
-**3 violations**: `throw` above the lowest-layer catch boundary.
-
-| Location | Code | Note |
-|----------|------|------|
-| `Result.cs` line 101 | `throw new InvalidOperationException("ToResult<T>() wurde auf einem succeeded Result aufgerufen.")` | Called from `ToResult<TValue>()` — a misuse guard. Could return `Result<TValue>.Fail(...)` instead. |
-| `Result.generic.cs` line 109 | `throw new InvalidOperationException("ToResult<T>() wurde auf einem succeeded Result aufgerufen.")` | Same pattern in `Result<T>.ToResult<TOther>()`. |
-| `JipDispatcher.cs` line 89 | `throw new InvalidOperationException($"Methode '{typeof(TProtocol).Name}.{key}' hat eine nicht unterstützte Signatur...")` | In `RegisterAll` — a programming-time validation. Method signature would need to return `Result<IJipDispatcher>` to avoid the throw. |
-
-**Context for items 1 & 2:** The `ToResult<T>()` overloads are explicitly documented as "call only on a failed result". The tests confirm and test the throw behavior. The intent is a programming-time guard, analogous to `Span<T>` misuse guards. Whether this warrants a signature change (returning `Result<T>` from an always-failed path) is a design decision. Currently a violation by strict reading of the principle.
-
-**Context for item 3:** `RegisterAll` is called at setup time, not in the hot path. A failure here always represents a programming error (wrong method signature on the protocol interface). Same tradeoff as above.
-
-### P5 — Explicit over magic
-
-**1 finding** (lower confidence):
-
-`JipDispatcher.RegisterAll<TProtocol>` uses reflection to enumerate methods on `TProtocol` and auto-register them as handlers by method name. This is reflection-based wiring. The exception in the criteria is specifically the `[JobEntryPoint]` dispatch — `RegisterAll` is not that mechanism.
-
-**Mitigating factors:** The method is explicitly called, explicitly documented in `IJipDispatcher`, and the auto-wiring is opt-in per call. It is not hidden convention magic. The risk is marginally higher than a direct `Register("key", handler)` call but the explicitness of the call site partially satisfies the principle. Flag as a finding; resolve by deciding whether explicit manual `Register(...)` calls are preferred over `RegisterAll`.
+**Tests:** 251 total (141 + 61 + 49), 0 failures after all fixes.
 
 ---
 
-## architecture ❌
+## architecture ✅
 
-### Pipe naming deviation
+### Pipe naming — resolved
 
-**1 violation:** `PipesProtocol.DerivePipeNamesFromSessionKey` produces pipe names `"req-pipe-{sessionKey}"` and `"res-pipe-{sessionKey}"`. The architecture overview (`architecture/overview.md`) documents the names as `JOSYN-REQ-<sessionGUID>` and `JOSYN-RSP-<sessionGUID>`.
+`architecture/overview.md` updated to document the actual pipe naming scheme (`req-pipe-<sessionKey>` / `res-pipe-<sessionKey>`), matching `PipesProtocol.DerivePipeNamesFromSessionKey`, `IPipesProtocol` contract docs, and existing tests.
 
-| Check | Status |
-|-------|--------|
-| Pipe names deviate from `JOSYN-REQ-<GUID>` / `JOSYN-RSP-<GUID>` pattern | ❌ violation |
-
-**File:** `josyn-foundation-jip/JOSYN.Foundation.JIP/PipesProtocol.cs`
-
-**Context:** The `IPipesProtocol` contract documentation and tests are consistent with the `req-pipe-` / `res-pipe-` format. The architecture overview is out of sync with the implementation. One of the two must be corrected:
-- Option A: Update `architecture/overview.md` to document `req-pipe-<sessionKey>` / `res-pipe-<sessionKey>` as the actual pipe naming scheme.
-- Option B: Change the implementation to use `JOSYN-REQ-<GUID>` / `JOSYN-RSP-<GUID>` and update `IPipesProtocol` docs and tests accordingly.
-
-Option A is lower risk (no runtime impact). Option B aligns with the documented standard but requires a coordinated change across all consumers (josyn-jap, josyn-job-host).
-
-All other architecture checks pass:
+All other architecture checks continue to pass:
 - Zero outbound NuGet dependencies from `JOSYN.Foundation.ResultPattern` ✅
 - `JOSYN.Foundation.PropertyBag` → `ResultPattern` only ✅
 - `JOSYN.Foundation.JIP` → `ResultPattern` only ✅

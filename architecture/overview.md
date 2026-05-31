@@ -149,8 +149,8 @@ foundation packages and speak the same protocol. They never reference each other
 ## IPC Protocol (JIP — JOSYN Inter-Process)
 
 Communication uses **two unidirectional named pipes** per session:
-- `JOSYN-REQ-<sessionGUID>` — client writes, server reads
-- `JOSYN-RSP-<sessionGUID>` — server writes, client reads
+- `req-pipe-<sessionKey>` — client writes, server reads
+- `res-pipe-<sessionKey>` — server writes, client reads
 
 Wire format: **length-prefixed binary** (int32 LE + UTF-8 bytes).
 
