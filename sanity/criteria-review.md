@@ -31,7 +31,7 @@
 | A5 | Forbidden edge: any repo → josyn-platform | 🟢 | Platform is documentation only. A csproj reference to it would be meaningless and confusing. |
 | A6 | josyn-commons must not reference platform packages beyond ResultPattern | 🟢 | Commons is a utility satellite. Extra deps defeat its purpose. |
 | A7 | Backend spawns JAPServer.exe — session GUID is the only coupling | 🟢 | Verifies the IPC contract is not being bypassed by other shared state. |
-| A8 | Named pipe names follow `JOSYN-REQ-<sessionGUID>` / `JOSYN-RSP-<sessionGUID>` | 🟡 | Hard to check statically (no string search is reliable). Only discoverable at runtime or via explicit code search. Consider limiting to "flag hardcoded pipe names that deviate." |
+| A8 | Named pipe names follow `JOSYN-REQ-<sessionGUID>` / `JOSYN-RSP-<sessionGUID>` | 🟡 | **Scoped:** flag hardcoded strings that look like pipe names but deviate from the pattern. Dynamic construction via the session GUID is the expected path and needs no check. |
 | A9 | Assembly name = namespace root (with documented `JOSYN.JobHost` exception) | 🟢 | Fundamental .NET convention; violating it breaks tooling, IDE navigation, and build output. |
 
 ---
@@ -44,13 +44,9 @@
 |---|-----------|--------|-----------|
 | S1 | `<TargetFramework>` = `net10.0` | 🟢 | Mixed target frameworks across the platform will cause package incompatibilities. |
 | S2 | `<Nullable>enable</Nullable>` | 🟢 | Disabling nullability breaks a key safety guarantee and creates noise for partial-enable edge cases. |
-| S3 | `<ImplicitUsings>enable</ImplicitUsings>` | 🟡 | Consistency matters but violation is harmless — extra explicit `using` statements are fine. |
-| S4 | `<LangVersion>latest</LangVersion>` | 🟡 | Guarantees latest C# features are available, but `net10.0` already implies a minimum. "Latest" can surprise teams on tooling updates. Consider locking to a concrete version. |
 | S5 | `<PlatformTarget>AnyCPU</PlatformTarget>` | 🟢 | x86-specific builds break on ARM/Linux toolchains. Enforcing AnyCPU prevents silent platform lockout. |
-| S6 | `<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>` | 🟡 | Affects output path structure. Important for `.local-build/` scripts to work predictably, but a naming convention, not a correctness rule. |
-| S7 | `<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>` | 🔴 | Affects version metadata only. Low signal: no one is likely to be hurt by having the git hash in informational version. |
-| S8 | Indentation = tabs (not spaces) in csproj | 🔴 | Cosmetic. Editors reformat on save. A sanity check that fails over whitespace is noise. |
-| S9 | Single `<PropertyGroup>` (no splits unless conditional) | 🔴 | Cosmetic preference. A second group doesn't break anything and is sometimes clearer. |
+| S6 | `<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>` | 🟢 | `.local-build/` scripts assume a fixed output path. A wrong setting breaks every build script on a fresh clone. |
+| S7 | `<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>` | 🟢 | Every commit produces a different informational version string. On the local feed this makes version comparisons unreliable. A clean version string is required. |
 
 ### NuGet library projects
 
@@ -59,12 +55,10 @@
 | S10 | `<OutputType>Library</OutputType>` | 🟢 | Absence defaults to Exe for non-test projects — would accidentally produce an executable. |
 | S11 | `<GenerateDocumentationFile>true</GenerateDocumentationFile>` | 🟢 | Without this, XML warnings are silenced, documentation is missing from the package, and the `docs` check has no baseline. |
 | S12 | `<PackageLicenseExpression>MIT</PackageLicenseExpression>` | 🟢 | Missing license is a compliance issue for any published package. |
-| S13 | `<Copyright>`, `<Company>`, `<Authors>` | 🟡 | Metadata integrity. Matters for published packages; less critical for private internal packages. |
-| S14 | `<PackageProjectUrl>` / `<RepositoryUrl>` | 🟡 | Metadata only. Useful for NuGet.org discoverability, irrelevant for local-feed-only packages. |
+| S13 | `<Copyright>`, `<Company>`, `<Authors>` | 🟢 | Complete metadata is required — even for internal packages, incomplete metadata signals an unfinished deliverable. |
 | S15 | `<PackageReadmeFile>README.md</PackageReadmeFile>` + file present | 🟢 | If declared but absent, `dotnet pack` fails. If absent and not declared, NuGet consumers see no description. |
-| S16 | `<PackageIcon>icon.png</PackageIcon>` + file present | 🟡 | Visual identity only. A missing icon doesn't break anything; it's just ugly in NuGet UIs. |
-| S17 | `<PackageReleaseNotes>` must be **absent** | 🔴 | Enforcing absence of an optional element is micro-management. Stale release notes are noisy but not harmful. |
-| S18 | `icon.png` co-located with `.csproj` | 🟡 | Required for pack to succeed when `<PackageIcon>` is declared. If S16 is kept, this is implied. |
+| S16 | `<PackageIcon>icon.png</PackageIcon>` + file present | 🟢 | Visual identity is a required deliverable for all packages. |
+| S18 | `icon.png` co-located with `.csproj` | 🟢 | Required for `dotnet pack` to succeed when `<PackageIcon>` is declared. S16 and S18 are a pair. |
 
 ### Exe / non-NuGet projects
 
@@ -72,7 +66,7 @@
 |---|-----------|--------|-----------|
 | S19 | `<GenerateDocumentationFile>` absent | 🟢 | Present on an exe project produces CS1591 warnings for undocumented members that will never be consumed via NuGet. Noise factory. |
 | S20 | NuGet metadata (`PackageId`, etc.) absent | 🟢 | Exe projects are not packages. Metadata here is misleading and can accidentally trigger `dotnet pack`. |
-| S21 | `icon.ico` co-located | 🔴 | Windows Explorer icon. Zero functional impact. Cosmetic. |
+| S21 | `icon.ico` co-located | 🟢 | A required deliverable for all exe projects. Its absence at release time is immediately visible. |
 
 ### Test projects
 
@@ -80,7 +74,6 @@
 |---|-----------|--------|-----------|
 | S22 | `<GenerateDocumentationFile>` absent | 🟢 | Same reasoning as S19 — test code is not a public API. |
 | S23 | NuGet metadata absent | 🟢 | Test projects must never be accidentally published. |
-| S24 | `icon.png` / `icon.ico` absent | 🔴 | Icons in test projects have no meaning. Checking their absence is noise. |
 | S25 | Required test package refs: `Microsoft.NET.Test.Sdk`, `NUnit 4.x`, `NUnit3TestAdapter` | 🟢 | Without these, `dotnet test` discovers nothing. A broken test project silently passes zero tests. |
 
 ---
@@ -90,7 +83,7 @@
 | # | Criterion | Rating | Rationale |
 |---|-----------|--------|-----------|
 | S26 | Directory name = assembly name exactly | 🟢 | Navigation by convention. Deviations make the agent (and humans) hunt for files. |
-| S27 | `Contracts/` folder present in any project with public static types | 🟡 | Enforces the companion-interface principle. However, small pure-utility assemblies with no public surface may have no interface-worthy types. Risk of false positives. Consider: flag only if public static types exist AND `Contracts/` is absent. |
+| S27 | `Contracts/` folder present in any project with public static types | 🟢 | Enforces the companion-interface principle. No exceptions — every public static type requires a companion interface. |
 | S28 | Solution file at repo root | 🟢 | Nested solutions break CI and tooling that assumes root placement. |
 | S29 | `nuget.config` present and pointing to `..\..\local-packages\` | 🟢 | Without this, restores hit the internet and local packages are invisible. Build failure guaranteed on a fresh clone. |
 | S30 | `.local-build/` scripts present (`build.cmd`, `test.cmd`, `pack.cmd`, etc.) | 🟢 | These are the developer workflow. Missing scripts on a fresh clone = broken onboarding. |
@@ -106,8 +99,6 @@
 | S33 | Assembly name = namespace root | 🟢 | Redundant with A9 but in the standards context. Same rationale. |
 | S34 | C# file name = type name | 🟢 | .NET convention; violation confuses every IDE and every human. |
 | S35 | Interface file prefixed with `I` | 🟢 | Standard C# convention; violation is immediately visible and confusing. |
-| S36 | Error messages in German | 🟡 | Established project convention, documented. Not a functional issue — just consistency. Checking this is hard to automate reliably and somewhat fragile (what counts as an "error message"?). |
-| S37 | XML comments and session files in English | 🟡 | Same argument as S36 — meaningful convention but hard to check systematically. |
 
 ---
 
@@ -129,7 +120,7 @@
 | D12 | Empty `<summary/>` or `// TODO` placeholder | 🟢 | Worse than no comment — actively misleading. |
 | D13 | Comment restates method name word-for-word | 🟡 | Bad practice but hard to detect automatically without NLP. An agent can catch obvious cases but will miss subtle ones and flag ambiguous ones. |
 | D14 | Comment references renamed type or old namespace | 🟢 | Stale docs are actively misleading and erode trust in all docs. |
-| D15 | `<remarks>` with a single obvious sentence | 🟡 | Same problem as D13 — requires subjective judgment. Consider: only flag `<remarks>` that duplicate the `<summary>` exactly. |
+| D15 | `<remarks>` with a single obvious sentence | 🟡 | **Scoped:** flag only when `<remarks>` content is identical to `<summary>` content (exact duplication). Subjective "obvious" judgments are out of scope. |
 
 ---
 
@@ -154,11 +145,11 @@
 | T4 | Test method naming: `Subject_Scenario_Expected` | 🟢 | A test without a readable name is a test no one can understand when it fails. |
 | T5 | Test class/file naming: `<Subject>Tests.cs` | 🟢 | Discoverability. Deviations make the test suite hard to navigate. |
 | T6 | Arrange-Act-Assert structure | 🟡 | Good practice but the blank-line separation rule is cosmetic. The structural pattern is what matters. |
-| T7 | Fluent assertions: `Assert.That(x, Is.EqualTo(y))` — not classic `Assert.AreEqual` | 🟡 | Style preference within NUnit. Both work identically. Enforcing this is cosmetic. |
+| T7 | Fluent assertions: `Assert.That(x, Is.EqualTo(y))` — not classic `Assert.AreEqual` | 🟢 | Enforced as the project style. Old-style assertions indicate either copy-paste from legacy code or an unaware contributor. |
 | T8 | One observable outcome per test | 🟢 | Multiple independent assertions in one test make failures ambiguous and reduce information density. |
 | T9 | No flow control (if/loop) in test methods | 🟢 | A test with conditional logic can silently skip assertions. High-value rule. |
 | T10 | Tests are independent — no shared mutable state | 🟢 | Order-dependent tests are a reliability nightmare in CI. |
-| T11 | `[TestCase]` for repeated patterns | 🟡 | Strongly encouraged but not critical. Copy-pasted tests work; they're just verbose. |
+| T11 | `[TestCase]` for repeated patterns | 🟢 | Enforced. Copy-pasted test methods for the same behaviour are a maintenance liability and a readability violation. |
 | T12 | `Assert.Throws<T>` / `Does.Throw` for exception testing | 🟢 | The alternative `[ExpectedException]` is removed in NUnit 3+; presence indicates stale code. |
 | T13 | No `[ExpectedException]` attribute | 🟢 | Outdated, removed API. Presence indicates unmaintained tests. |
 | T14 | Same result on every run (determinism) | 🟢 | Non-deterministic tests are worse than no tests — they destroy confidence in the suite. |
@@ -181,13 +172,12 @@
 | P5 | `catch` that swallows (no conversion to `Result`) | 🟢 | A swallowed exception is a hole in the error model — failures disappear silently. |
 | P6 | Method that can fail returns `void` or raw value instead of `Result`/`Result<T>` | 🟢 | Same contract violation — just the return-site perspective of P4/P5. |
 | P7 | Manual re-wrap of `Result` instead of `Result.Propagate(inner)` | 🟢 | Re-wrapping loses the call chain. Propagate preserves context — enforcing it is cheap and high-value. |
-| P8 | Public static type without companion interface in `Contracts/` | 🟡 | Valid for the main public API surface. However, small internal utility statics don't need an interface. Risk of false positives. Scope should be: **public static types only**. |
-| P9 | Interface used for polymorphism rather than as a shape contract | 🟡 | The rule makes sense but checking it requires distinguishing *intent* — hard to do statically. An agent can flag interfaces that are implemented by more than one non-test class as candidates, but it's inherently a judgment call. |
+| P8 | Public static type without companion interface in `Contracts/` | 🟢 | No exceptions. Every public static type exposes a contract surface — the companion interface is mandatory. |
+| P9 | Interface used for polymorphism rather than as a shape contract | 🟡 | **Scoped:** flag as a candidate for review any interface implemented by more than one non-test class. Intent is a judgment call — the agent surfaces it for human decision, not auto-fail. |
 | P10 | DI container wiring present | 🟢 | Any DI container reference is unambiguous and violates the explicit-over-magic principle directly. Easy to check (`IServiceCollection`, `IServiceProvider`, `AddSingleton`, etc.). |
 | P11 | Reflection-based wiring outside the designated `[JobEntryPoint]` dispatch | 🟢 | Reflection-based magic is exactly what the platform explicitly forbids. The exception is tightly scoped and documented. |
-| P12 | Hidden conventions (auto-discovery, convention-over-configuration outside designed entry points) | 🟡 | High value but vague scope. "Convention-over-configuration" is a fuzzy concept — hard to operationalise without specific signals. Consider: narrow to `Assembly.GetTypes()`, `Activator.CreateInstance`, `GetCustomAttributes`. |
 | P13 | `public` member where `internal` would suffice | 🟢 | Minimal surface area is directly enforceable. An oversized public API locks future changes. |
-| P14 | Method mutates state AND returns a result without documenting the side effect | 🟡 | Important in principle but requires the agent to reason about whether mutation is documented, which is subjective. Consider: flag methods with both a return value and an `out`/`ref` parameter or a field mutation that have no `<remarks>` explaining the side effect. |
+| P14 | Method mutates state AND returns a result without documenting the side effect | 🟡 | **Scoped:** flag methods that mutate a field AND return a value, where no `<remarks>` documents the side effect. `out`/`ref` parameters are a secondary signal. |
 
 ---
 
@@ -195,34 +185,26 @@
 
 | Rating | Count | Notes |
 |--------|-------|-------|
-| 🟢 Indispensable | 46 | Keep exactly as written |
-| 🟡 Discussable | 20 | Review each individually — may need scoping, weakening, or a note about the judgment-call nature |
-| 🔴 Not really necessary | 6 | Consider removing or demoting to "advisory" |
+| 🟢 Indispensable | 77 | Keep exactly as written |
+| 🟡 Discussable | 11 | See scoping notes below; agent applies judgment within defined scope |
+| 🔴 Not really necessary | 0 | All 🔴 items resolved in 2026-05-31 review |
 | ⛔ Bare mistake | 0 | No criterion is actively wrong — the set is clean in structure |
 
-### 🔴 Candidates for removal (6)
+### 🟡 Remaining scoped criteria
 
-| ID | Criterion | Removal rationale |
-|----|-----------|-------------------|
-| S7 | `IncludeSourceRevisionInInformationalVersion=false` | Version metadata noise; no practical impact |
-| S8 | Indentation = tabs in csproj | Reformatted on save; cosmetic-only noise |
-| S9 | Single `<PropertyGroup>` | Cosmetic; multiple groups are sometimes clearer |
-| S17 | `<PackageReleaseNotes>` must be absent | Micro-management of an optional metadata element |
-| S21 | `icon.ico` co-located with exe `.csproj` | Windows Explorer cosmetic; zero functional impact |
-| S24 | `icon.png/ico` absent from test projects | No icons in test projects is obvious; not worth a check |
-
-### 🟡 Criteria needing scoping discussion (selected highlights)
-
-| ID | Concern | Suggested resolution |
-|----|---------|---------------------|
-| A8 | Named pipe pattern — hard to check statically | Limit to: flag hardcoded strings that look like pipe names but deviate from the pattern |
-| S27 | `Contracts/` folder — false positives on tiny utility assemblies | Scope to: public static types exist AND `Contracts/` is absent |
-| P8 | Companion interface — same as S27 | Scope to **public** static types only, not internal |
-| P9 | Interface for polymorphism | Change from a check to an advisory note (flag multiple implementations as candidates for review) |
-| P12 | Hidden conventions | Narrow to specific detectable signals: `Assembly.GetTypes()`, `Activator.CreateInstance`, `GetCustomAttributes` |
-| T18 | Over-mocking | Change from a check to advisory; flag only when >3 mocks AND no real collaborators in a test |
-| D13 | Comment restates name | Limit to exact match only (e.g. `public void Run()` with `<summary>Run</summary>`) |
-| D15 | `<remarks>` with obvious sentence | Narrow to: `<remarks>` content = `<summary>` content (exact duplication only) |
+| ID | Scope constraint |
+|----|-----------------|
+| A8 | Flag hardcoded strings deviating from `JOSYN-REQ-<GUID>` / `JOSYN-RSP-<GUID>`; dynamic construction is fine |
+| D2 | Agent flags missing `<param>` as a judgment call when purpose is non-trivial |
+| D3 | Agent flags missing `<returns>` as a judgment call; omit for void/obvious |
+| D4 | Agent flags `<remarks>` as a judgment call; raise only when context would not fit in `<summary>` |
+| D13 | Flag only when comment text is word-for-word identical to method name |
+| D15 | Flag only when `<remarks>` content = `<summary>` content (exact duplication) |
+| D17 | Agent flags obvious contradictions between README and code; full accuracy is a human judgment |
+| T6 | Check AAA structure; do not flag blank-line placement |
+| T18 | Agent uses judgment; over-mocking is a signal, not auto-fail |
+| P9 | Flag as candidate for review when >1 non-test class implements the same interface |
+| P14 | Flag methods that mutate a field AND return a value with no `<remarks>` explaining the side effect |
 
 ---
 
@@ -230,4 +212,5 @@
 
 | Date | Reviewer | Changes made |
 |------|----------|--------------|
-| 2026-05-30 | Initial draft | First complete pass over all 72 criteria |
+| 2026-05-30 | Initial draft | First complete pass over all criteria |
+| 2026-05-31 | Criteria review session | Resolved all 🔴 and 🟡 items: 10 upgraded to 🟢 (S6, S7, S13, S16, S18, S21, S27, T7, T11, P8), 10 dropped (S3, S4, S8, S9, S14, S17, S24, S36, S37, P12), 4 scoped (A8, D15, P9, P14). Net: 77🟢, 11🟡, 0🔴 |

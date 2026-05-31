@@ -52,8 +52,9 @@ For each repo, inspect all `.csproj` `<PackageReference>` entries:
 |-------|---------|
 | josyn-jap and josyn-job-host both consume the same foundation packages | ✅ expected |
 | josyn-backend spawns JAPServer.exe — no NuGet dep, coupling is session GUID only | ✅ expected |
-| Named pipe names follow `JOSYN-REQ-<sessionGUID>` / `JOSYN-RSP-<sessionGUID>` pattern | ✅ expected |
-| Any deviation from the above | ❌ violation |
+| Named pipe names constructed dynamically from the session GUID | ✅ expected |
+| Hardcoded pipe name string deviating from `JOSYN-REQ-<GUID>` / `JOSYN-RSP-<GUID>` pattern | ❌ violation |
+| Any other deviation from the structural rules above | ❌ violation |
 
 ### Runtime coupling check
 

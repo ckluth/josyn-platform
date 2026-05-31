@@ -59,7 +59,7 @@ For each file in scope, flag any of the following as a violation:
 | Empty `<summary/>` or `// TODO` placeholder | ❌ violation |
 | Comment restates the method name word-for-word | ❌ violation |
 | Comment references a renamed type or old namespace | ❌ violation |
-| `<remarks>` with a single obvious sentence | ❌ violation |
+| `<remarks>` content is identical to `<summary>` content (exact duplication) | ❌ violation |
 | Implementation duplicates interface doc text instead of using `<inheritdoc/>` | ❌ violation |
 | `<exception>` tag present anywhere | ❌ violation |
 | NuGet project missing `<GenerateDocumentationFile>true</GenerateDocumentationFile>` | ❌ violation |

@@ -42,7 +42,7 @@ Evaluate each item for every type and method in scope.
 | Signal | Verdict |
 |--------|---------|
 | Public static type without a companion interface in `Contracts/` | ❌ violation |
-| Interface used to enable polymorphism rather than as a shape contract | ❌ violation |
+| Interface implemented by more than one non-test class | ⚠️ candidate — review whether intent is polymorphism vs. shape contract |
 | Implementation duplicates interface doc instead of using `<inheritdoc/>` | ❌ violation |
 | `static abstract` members on companion interface match the static class surface | ✅ pass |
 
@@ -52,7 +52,6 @@ Evaluate each item for every type and method in scope.
 |--------|---------|
 | DI container wiring present | ❌ violation |
 | Reflection-based wiring not part of the deliberately designed `[JobEntryPoint]` dispatch | ❌ violation |
-| Hidden conventions (auto-discovery, convention-over-configuration outside designed entry points) | ❌ violation |
 
 ### 6. Minimal surface area / strict access modifiers
 
@@ -66,5 +65,5 @@ Evaluate each item for every type and method in scope.
 
 | Signal | Verdict |
 |--------|---------|
-| Method mutates state AND returns a result without documenting the side effect | ❌ violation |
+| Method mutates a field AND returns a value, with no `<remarks>` documenting the side effect | ❌ violation |
 | Side-effecting code pushed to the call graph edges | ✅ pass |

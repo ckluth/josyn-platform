@@ -13,13 +13,9 @@
 |----------|---------------|
 | `<TargetFramework>` | `net10.0` |
 | `<Nullable>` | `enable` |
-| `<ImplicitUsings>` | `enable` |
-| `<LangVersion>` | `latest` |
 | `<PlatformTarget>` | `AnyCPU` |
 | `<AppendTargetFrameworkToOutputPath>` | `false` |
 | `<IncludeSourceRevisionInInformationalVersion>` | `false` |
-| Indentation style | **tabs** (not spaces) |
-| `<PropertyGroup>` count | Single group — no split groups unless a conditional is required |
 
 ### NuGet library projects (Template 1)
 
@@ -33,10 +29,8 @@ Additional required properties:
 | `<Copyright>` | `Copyright © 2026 HAEVG AG` |
 | `<Company>` | `HAEVG` |
 | `<Authors>` | `HAEVG SWE` |
-| `<PackageProjectUrl>` / `<RepositoryUrl>` | `https://github.com/ckluth/JOSYN` |
 | `<PackageReadmeFile>` | `README.md` (declared once) |
 | `<PackageIcon>` | `icon.png` |
-| `<PackageReleaseNotes>` | **Absent** — omit entirely |
 | `icon.png` | Co-located with the `.csproj` |
 | `README.md` | Co-located with the `.csproj` *(exception: ResultPattern keeps README one level up — legacy layout)* |
 
@@ -54,7 +48,6 @@ Additional required properties:
 |----------|------|
 | `<GenerateDocumentationFile>` | **Absent** |
 | NuGet metadata | **Absent** |
-| `icon.png` / `icon.ico` | **Absent** |
 | Required package refs | `Microsoft.NET.Test.Sdk`, `NUnit 4.x`, `NUnit3TestAdapter` |
 
 ---
@@ -103,8 +96,6 @@ See `architecture/naming-conventions.md` for the full vocabulary map, namespace 
 | Assembly name differs from namespace root | ❌ violation |
 | C# file name differs from type name | ❌ violation |
 | Interface file not prefixed with `I` | ❌ violation |
-| Error messages not in German | ❌ violation |
-| XML comments or session files not in English | ❌ violation |
 
 ---
 
