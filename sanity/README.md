@@ -61,38 +61,60 @@ run sanity-check --profile code --repo josyn-foundation --repo josyn-jap
 
 ```
 run sanity-check [--profile <name>] [--check <category>] [--repo <repo-name>]
+run sanity-check --deep [--profile <name>] [--check <category>] [--repo <repo-name>]
+run sanity-check --force [--profile <name>] [--check <category>] [--repo <repo-name>]
 ```
 
 `--profile`, `--check`, and `--repo` are all **optional** and **repeatable**.
-`--profile` and `--check` can be combined — the union of categories is used.
-Omitting both `--profile` and `--check` means *all* categories.
+`--profile` and `--check` can be combined — the union of categories is used as the filter.
+Omitting `--repo` means all repos.
+
+| Flag | Behaviour |
+|------|-----------|
+| *(none)* | **Smart default** — trigger-table inference; proposes only what has changed |
+| `--deep` | **Deep smart** — full diff analysis, semantic inference; warns about extra cost |
+| `--force` | **Forced** — no inference; runs exactly what is specified |
+
+`--deep` and `--force` cannot be combined — rejected with a clear error message.
 
 ### Examples
 
 ```
 run sanity-check
 ```
-Full check — all five categories across all five repos. Use this for a periodic platform-wide review.
+Smart default — infers what changed since the last check across all repos. Proposes only the
+relevant repos and categories. If nothing has changed, reports that everything is up to date.
 
 ```
 run sanity-check --repo josyn-foundation
 ```
-All categories, one repo. Use after changes to `josyn-foundation`.
+Smart, scoped to one repo. Infers which categories need re-running based on its changes.
 
 ```
 run sanity-check --check principles
 ```
-One category, all repos. Use to verify a platform-wide rule has been applied consistently.
+Smart, `principles` only. Considers all repos — but only proposes a `principles` run for those
+where source code changes have been detected (intersection of inferred + requested).
 
 ```
-run sanity-check --check docs --repo josyn-jap
+run sanity-check --deep --repo josyn-jap
 ```
-Focused check — one category, one repo. Use during a grooming pass on a specific area.
+Deep analysis of `josyn-jap`. Reads actual diffs to determine which categories to run.
+
+```
+run sanity-check --force
+```
+Full forced run — all five categories across all five repos. No inference, no filtering.
+
+```
+run sanity-check --force --check docs --repo josyn-foundation
+```
+Forced `docs` check on `josyn-foundation`. Skips inference, runs exactly this scope.
 
 ```
 run sanity-check --check docs --check tests --repo josyn-foundation --repo josyn-jap
 ```
-Multiple categories and multiple repos in one run.
+Smart, two categories, two repos. Only runs where changes match either `docs` or `tests`.
 
 ### Valid repo names
 
@@ -106,63 +128,126 @@ Multiple categories and multiple repos in one run.
 
 ---
 
-## Output file
+## Smart inference
 
-Every run overwrites `sanity/last-result.md`. No history is kept — only the last run.
+Before loading any criteria or opening subject repos, the agent runs a **preflight inference phase**
+to determine what actually needs to be checked.
 
-### Format
+### Smart default (no `--force`, no `--deep`)
 
-```markdown
-# Sanity Check — Last Result
+1. For each repo in scope: read `sanity/current-state/<repo>.md` — extract the `**Last checked:**`
+   timestamp.
+   - If `never`: skip inference for this repo; propose a full check (filtered by any
+     `--check`/`--profile` intersection in effect).
+2. Collect changed file paths in the subject repo since that timestamp:
+   - `git log --since=<timestamp> --name-only --pretty=format:` for committed changes
+   - `git status --short` for staged, unstaged, untracked, deleted, and renamed files
+3. Apply the trigger table in `sanity/triggers.md` to derive which categories need re-checking.
+4. If `--check` or `--profile` flags were given, **intersect** the derived categories with the
+   requested ones — only run categories that appear in both sets.
+5. If no changes are detected in a repo → skip it; note it as current in the proposal.
+6. If all repos are current → report that everything is up to date; no run is needed.
 
-**Run:** <timestamp>
-**Command:** `run sanity-check <flags as issued>`
-**Repos:** <repos checked>
-**Categories:** <categories checked>
+### Deep inference (`--deep`)
+
+Identical to steps 1–2 above, then:
+
+3. Read the actual diffs (`git diff` and `git diff --staged`) for each changed file.
+4. Reason semantically about the nature of each change — new public API, deleted tests,
+   added `throw`, changed project reference, etc. — to derive categories.
+5. Apply `--check`/`--profile` intersection as above.
+6. At the confirmation gate, note: *"Deep analysis read N diffs before this proposal."*
+
+### Force execution (`--force`)
+
+No inference phase. Omitting `--check`/`--profile`/`--repo` means run all five categories
+across all five repos.
 
 ---
+
+## State files
+
+Every run writes to two locations — both within `josyn-platform`, never in subject repos:
+
+- `sanity/current-state/<repo>.md` — one file per checked repo, overwritten with findings
+- `sanity/overview.md` — aggregated dashboard, regenerated from all five state files at end of run
+
+`sanity/last-result.md` is retired. It contains a redirect notice only.
+
+### Per-repo state file format
+
+```markdown
+# Sanity State — <repo-name>
+
+**Last checked:** 2026-05-31T12:00:00Z
 
 ## Summary
 
-| Repo | docs | tests | principles | architecture | standards |
-|------|------|-------|-----------|-------------|-----------|
-| josyn-foundation | ✅ | ✅ | ✅ | ✅ | ✅ |
-| ...              | ...  | ...   | ...        | ...          | ...       |
+| Category | Status |
+|----------|--------|
+| docs | ✅ |
+| tests | ✅ |
+| principles | ❌ 2 violations |
+| architecture | ✅ |
+| standards | ✅ |
 
 ---
 
-## <repo-name>
+## docs
+  ✅ All XML comments present and correct.
 
-### <category>
-  ✅ ...
+## principles
   ❌ <file path> — <reason>
-  ⚠️ ...
 ```
 
-The summary table gives a one-glance overview. The detail section below it lists every finding.
+### Overview file format
+
+```markdown
+# Sanity Check — Platform Overview
+
+**Generated:** 2026-05-31T12:00:00Z
+
+| Repo | docs | tests | principles | architecture | standards | Last checked |
+|------|------|-------|-----------|-------------|-----------|-------------|
+| josyn-foundation | ✅ | ✅ | ❌ | ✅ | ✅ | 2026-05-31T12:00:00Z |
+```
+
+### Skipped-as-current repos
+
+When a repo has no changes since its last check, do not re-run checks for it.
+Update its `**Last checked:**` field to:
+
+```
+2026-05-20T10:00:00Z (verified current at 2026-05-31T12:00:00Z)
+```
+
+Do not alter its findings.
 
 ---
 
 ## Safety contract
 
-A sanity check makes exactly one write: `sanity/last-result.md` in this repo is overwritten with the
-findings at the end of every run. No other files are created, edited, or deleted anywhere.
+A sanity check writes only to this repo, never to any subject repo:
+
+- `sanity/current-state/<repo>.md` for each checked repo
+- `sanity/overview.md` — regenerated at the end of every run
+
+No other files are created, edited, or deleted anywhere.
 
 ---
 
 ## Confirmation gate
 
-Before executing any `run sanity-check` command, the agent must:
+**After** the inference phase (or immediately for `--force`), the agent must:
 
-1. **Paraphrase** the intended run — which repos, which categories, and whether the cost table
-   indicates a 🐢 long runner.
+1. **State what will run** — repos, categories, cost estimate, and which repos (if any) were
+   skipped as current.
 2. **Ask for confirmation:** *"Really run this now?"* — wait for an explicit yes before proceeding.
 3. If any 🐢 category is involved across more than one repo, also **suggest autopilot:**
    *"This is a long runner — consider `/autopilot` so it runs unattended without further interruptions."*
+4. If `--deep` was given, note upfront: *"Deep analysis will read diffs before proposing a run."*
 
 **Exception:** if autopilot is already active, skip confirmation entirely and proceed.
-Autopilot is the deliberate opt-in to unattended execution; asking for permission inside it would
-contradict its purpose.
 
 ---
 
@@ -175,23 +260,31 @@ To run a full sanity check without any permission interruptions:
 run sanity-check --profile full
 ```
 
-`/autopilot` auto-approves all agent actions. The safety contract above guarantees no writes occur.
-To exit autopilot after the check: `/autopilot` again (it toggles).
+`/autopilot` auto-approves all agent actions. The safety contract above guarantees no writes
+occur outside the two state files in this repo.
 
 ---
 
 ## How an agent executes a sanity check
 
 1. **Read `../AGENTS.md`** — orientation, repo paths, and the full execution protocol.
-2. **Load criteria** — for each requested category, read the corresponding `criteria/<category>.md` file in the `criteria/` subfolder.
+2. **Run the inference phase** — smart (trigger-table) or deep (diff analysis) before loading
+   criteria or opening subject repos. Produce the proposed run scope.
+3. **Present the confirmation gate** — state what will run and wait for approval.
+4. **Load criteria** — for each requested category, read `criteria/<category>.md`.
    Some categories require additional context files (listed in AGENTS.md execution steps).
-3. **Load per-repo notes** — for each requested repo, read `../repos/<repo-name>.md`,
-   specifically the `## Sanity Notes` section, to understand known exceptions and repo-specific expectations.
-4. **Inspect each repo** — apply the loaded criteria to the actual code in the repo at its relative path.
-5. **Report findings** — grouped by repo, then by category:
+5. **Load per-repo notes** — for each requested repo, read `../repos/<repo-name>.md`,
+   specifically the `## Sanity Notes` section.
+6. **Inspect each repo** — apply the loaded criteria to the actual code in the repo at its
+   relative path.
+7. **Write findings** — overwrite `sanity/current-state/<repo>.md` for each checked repo.
+   Set `**Last checked:**` to the current UTC timestamp. Grouped by category:
    - List every **violation** explicitly with file path and reason.
    - Confirm every **clean area** explicitly — silence is not a pass.
    - Note any area that **could not be verified** (e.g. repo not found, build broken) and why.
+8. **Update skipped repos** — for repos with no changes, update their `**Last checked:**` field
+   with a `(verified current at <now>)` suffix. Do not alter findings.
+9. **Regenerate `sanity/overview.md`** — aggregate from all five state files.
 
 ---
 
@@ -234,13 +327,14 @@ josyn-backend / tests
 fix violations [--repo <repo-name>] [--check <category>]
 ```
 
-Both flags are optional. Omitting means all violations in `sanity/last-result.md`.
+Both flags are optional. Omitting means all violations across all repos.
 Combine with `--repo` and `--check` to scope the fix session to a single area.
 
 ### Source of truth
 
-Always fix from `sanity/last-result.md`. Never fix from memory or from a previous run.
-If the result file is stale, run a fresh sanity check first.
+Always fix from `sanity/current-state/<repo>.md` for the target repo.
+Never fix from `sanity/overview.md` (summary only) or from memory.
+If the state file is stale, run a fresh sanity check first.
 
 ### Workflow — one repo/category pair at a time
 

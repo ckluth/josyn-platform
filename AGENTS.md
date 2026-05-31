@@ -102,10 +102,21 @@ No content is duplicated here. Read the canonical source when a topic requires d
 
 ```
 run sanity-check [--profile <name>] [--check <category>] [--repo <repo-name>]
+run sanity-check --deep [--profile <name>] [--check <category>] [--repo <repo-name>]
+run sanity-check --force [--profile <name>] [--check <category>] [--repo <repo-name>]
 ```
 
-All flags are optional and repeatable. `--profile` and `--check` can be combined (union of categories).
-Omitting both `--profile` and `--check` means all categories. Omitting `--repo` means all repos.
+`--profile`, `--check`, and `--repo` are all optional and repeatable.
+`--profile` and `--check` can be combined — the union of categories is used as the filter.
+Omitting `--repo` means all repos.
+
+| Flag | Behaviour |
+|------|-----------|
+| *(none)* | **Smart default** — trigger-table inference; proposes a targeted run |
+| `--deep` | **Deep smart** — full diff analysis, semantic inference; warns about extra cost |
+| `--force` | **Forced** — no inference; runs exactly what is specified (or everything if no filters) |
+
+`--deep` and `--force` cannot be combined — reject with a clear error message.
 
 ### Profiles
 
@@ -114,14 +125,6 @@ Omitting both `--profile` and `--check` means all categories. Omitting `--repo` 
 | `--profile quick` | `architecture` + `standards` | ⚡ fast |
 | `--profile code` | `principles` + `docs` | 🐢 slow |
 | `--profile full` | all 5 categories | 🐢 slowest |
-
-```
-run sanity-check                                          # all checks, all repos
-run sanity-check --repo josyn-foundation                  # all checks, one repo
-run sanity-check --check docs                             # one category, all repos
-run sanity-check --check docs --repo josyn-foundation      # one category, one repo
-run sanity-check --check docs --check tests               # two categories, all repos
-```
 
 ### Repos in scope
 
@@ -139,38 +142,77 @@ The five subject repos (`josyn-platform` itself is never a sanity-check target):
 | `architecture` | `sanity/criteria/architecture.md` | Dependency chain integrity, forbidden references |
 | `standards` | `sanity/criteria/standards.md` | Naming, project file conventions, directory structure |
 
+### Smart inference (default mode)
+
+**Before** loading criteria or opening subject repos, the agent runs a preflight inference phase:
+
+1. For each repo in scope: read `sanity/current-state/<repo>.md` — extract the `**Last checked:**`
+   timestamp. If the value is `never`, skip inference for this repo and propose a full check
+   (filtered by any `--check`/`--profile` intersection in effect).
+2. Collect changed file paths in the subject repo since that timestamp:
+   - `git log --since=<timestamp> --name-only --pretty=format:` for committed changes
+   - `git status --short` for staged, unstaged, untracked, deleted, and renamed files
+3. Apply the trigger table in `sanity/triggers.md` to the changed paths — derive the categories
+   that need re-checking.
+4. If `--check` or `--profile` flags were given, **intersect** the derived categories with the
+   requested ones — only run categories that appear in both sets.
+5. If no changes are detected in a repo → mark it as current in the proposal; skip its checks.
+6. If all repos are current → report that everything is up to date; no run is needed unless
+   `--force` is used.
+
+### Deep inference (`--deep`)
+
+Identical to smart inference steps 1–2, then:
+
+3. Read the actual diffs (`git diff` and `git diff --staged`) for each changed file.
+4. Reason semantically about the nature of each change — new public API, deleted tests,
+   added `throw`, changed project reference, etc. — to derive categories.
+5. Apply `--check`/`--profile` intersection as in smart step 4 above.
+6. At the confirmation gate, note: *"Deep analysis read N diffs before this proposal."*
+
+### Force execution (`--force`)
+
+No inference phase. Run exactly the repos and categories specified.
+If neither `--check` nor `--profile` is given, run all five categories across all repos.
+
 ### Confirmation gate
 
-Before executing any `run sanity-check` command, the agent **must**:
+**After** the inference phase (or immediately for `--force`), the agent **must**:
 
-1. Explicitly paraphrase the intended run — which repos, which categories, and whether the cost
-   table indicates a 🐢 long run.
+1. Explicitly state what will run — repos, categories, cost estimate, and which repos (if any)
+   were skipped as current.
 2. Ask: *"Really run this now?"* and wait for explicit confirmation.
-3. If the expected runtime includes any 🐢 category across multiple repos, also suggest:
+3. If any 🐢 category is involved across multiple repos, also suggest:
    *"This is a long runner — consider `/autopilot` so it runs unattended."*
 
-**Exception:** If autopilot is already active, skip steps 1–3 and proceed directly. Autopilot is
-the deliberate opt-in to unattended execution; confirmation would contradict it.
+**Exception:** If autopilot is already active, skip steps 1–3 and proceed directly.
 
-### Safety contract — READ-ONLY
+### Safety contract
 
-A sanity check makes exactly one write: `sanity/last-result.md` in this repo is overwritten with the
-findings at the end of every run. No other files are created, edited, or deleted — not in this repo,
-not in any subject repo. `dotnet test` is the only command with side effects beyond reading and writing
-that one result file.
+A sanity check writes only to this repo, never to any subject repo:
+
+- `sanity/current-state/<repo>.md` — one file per repo that was checked, overwritten with findings
+- `sanity/overview.md` — regenerated from all five state files at the end of every run
+
+`dotnet test` is the only command with side effects beyond reading and writing these two targets.
 
 ### Execution steps
 
 1. Read this file (done).
-2. For each requested **category**: read `sanity/criteria/<category>.md` to load the criteria.
+2. Run the **inference phase** (smart or deep) — produce the proposed run scope.
+3. Present the **confirmation gate** — wait for approval before proceeding.
+4. For each requested **category**: read `sanity/criteria/<category>.md`.
    - Before `principles`: also read `architecture/coding-standards.md`.
    - Before `architecture`: also read `architecture/overview.md`.
    - Before `standards` or `docs`: also read `architecture/naming-conventions.md`.
-3. For each requested **repo**: open the repo at its relative path and apply all loaded criteria.
-   Per-repo detail (assemblies, packages, current state) is in `repos/<repo-name>.md`.
-4. Collect all findings.
-5. Overwrite `sanity/last-result.md` with the structured report (see `sanity/README.md` for format).
-   Confirm clean areas — silence is not a pass.
+5. For each requested **repo**: open the repo at its relative path and apply all loaded criteria.
+   Per-repo detail is in `repos/<repo-name>.md`.
+6. Collect all findings.
+7. Overwrite `sanity/current-state/<repo>.md` for each checked repo. Set `**Last checked:**` to
+   the current UTC timestamp. Confirm clean areas — silence is not a pass.
+8. If a repo was skipped as current, update its `**Last checked:**` field to
+   `<previous-timestamp> (verified current at <now>)` — do not alter its findings.
+9. Regenerate `sanity/overview.md` from all five current-state files.
 
 ### Fixing violations
 
@@ -178,8 +220,9 @@ that one result file.
 fix violations [--repo <repo-name>] [--check <category>]
 ```
 
-Source of truth is always `sanity/last-result.md`. Fix one repo/category pair at a time,
-verify with a targeted re-run, commit before moving to the next.
+Source of truth is always `sanity/current-state/<repo>.md` for the target repo.
+Never fix from `sanity/overview.md` (summary only) or from memory.
+Fix one repo/category pair at a time, verify with a targeted re-run, commit before moving to the next.
 Full strategy: `sanity/README.md` → *Fixing violations* section.
 
 ⚠️ Fixing is a write operation — do not use `/autopilot`. Stop and ask before refactoring `principles` violations.
