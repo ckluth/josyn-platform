@@ -58,7 +58,7 @@ Its purposes are:
 
 Errors and experiments here carry no consequences for the platform.
 `josyn-sandbox` is not a platform component. It is not maintained to platform standards.
-It is the maintainer's playground.
+***It is the maintainer's playground.***
 
 ---
 
@@ -92,7 +92,7 @@ graph TD
 
     B <-->|"IPC (JAPServer ↔ job.exe)"| H
     B -->|NuGet| F
-    B -->|"NuGet (shared pkgs)"| J
+    B -->|"NuGet<br/>(JAPServer the only consumer!)"| J
     J -->|NuGet| F
     H -->|NuGet| F
     H -->|NuGet| J

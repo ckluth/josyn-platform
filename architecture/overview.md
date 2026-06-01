@@ -212,7 +212,8 @@ job.exe                           JAPServer
   │   ├─ LocalLog.Error (local)       │
   │   └─ PutError(ErrorReport) ──────►│
   │                                   ├─ PropertyBag.Deserialize<ErrorReport>
-  │                                   └─ LocalLog.Error(report.Causer, ...)
+  │                                   │─ LocalLog.Error(report.Causer, ...)
+  │                                   └─ Propagate error to session store (backend) 
   │
   └─ PutError itself fails
       └─ LocalLog.Error fallback (local only)
