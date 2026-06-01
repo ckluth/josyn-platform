@@ -1,3 +1,10 @@
+> **Transition notice — ADR-004 accepted (2026-06-01)**
+> `JOSYN.Jap.JAPServer` (the EXE) will be relocated into this repo from `josyn-backend`.
+> The repo will become a multi-solution repo: JAPServer in its own solution, a
+> SessionStarter-mock as a sibling solution, and the local-build covering all solutions.
+> This document describes the **current state** and will be updated once the implementation
+> is complete. See `decisions/ADR-004-japserver-relocation.md`.
+
 # josyn-backend
 
 **Role:** Scheduler and session-orchestration layer — the integration bridge between the

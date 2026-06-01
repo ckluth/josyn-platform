@@ -1,3 +1,9 @@
+> **Transition notice — ADR-004 accepted (2026-06-01)**
+> `JOSYN.Jap.JAPServer` (the EXE) will be relocated from this repo into `josyn-backend`.
+> `josyn-jap` will become a contracts-only repo, retaining only `JOSYN.Jap.Shared.Contract`
+> and `JOSYN.Jap.Shared.Log`. This document describes the **current state** and will be
+> updated once the implementation is complete. See `decisions/ADR-004-japserver-relocation.md`.
+
 # josyn-jap
 
 **Role:** Per-session JAP protocol server — handles a single job session from argument delivery
