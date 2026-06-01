@@ -10,7 +10,10 @@ josyn-backend (SessionStarter)
     │  1. Detect scheduled execution (TriggerAgent / Service / WorkflowAdapter)
     │  2. Assign fresh session GUID; write session record to session store
     │  3. Spawn: JAPServer.exe JOSYN-IPC <sessionGUID>
-    │  4. Spawn: job.exe       JOSYN-IPC <sessionGUID>
+    ▼
+JOSYN.Jap.JAPServer (in josyn-backend)
+    │
+    │  4. Spawn: job.exe JOSYN-IPC <sessionGUID>
     ▼
 job.exe  ──► Core.Run(args)
     │
@@ -61,8 +64,11 @@ Any step fails
 ## Component Map
 
 ```
-josyn-backend (stub)
-└── JOSYN.Backend.SessionStarter      ← session lifecycle: GUID, session store, process spawning
+josyn-backend (stub + JAPServer)
+├── JOSYN.Backend.SessionStarter      ← session lifecycle: GUID, session store, process spawning
+└── JOSYN.Jap.JAPServer (EXE)         ← relocated from josyn-jap per ADR-004
+        ├── Host.cs                       ← lifecycle, JipDispatcher wiring
+        └── JAPServer.cs                  ← IJosynApplicationProtocol implementation
 
 josyn-foundation (NuGet packages)
 ├── JOSYN.Foundation.ResultPattern        ← Result<T>, Error, CallerInfo
@@ -71,12 +77,9 @@ josyn-foundation (NuGet packages)
         ├── Transport:  PipesClient, PipesServer, PipesProtocol
         └── Convention: JipClient, JipServer, JipDispatcher, Request, Response
 
-josyn-jap (NuGet packages + EXE)
+josyn-jap (NuGet packages — protocol contracts only)
 ├── JOSYN.Jap.Shared.Contract          ← IJosynApplicationProtocol, ErrorReport
-├── JOSYN.Jap.Shared.Log               ← LocalLog (static, file-based, caller-aware)
-└── JOSYN.Jap.JAPServer (EXE)
-        ├── Host.cs                       ← lifecycle, JipDispatcher wiring
-        └── JAPServer.cs                  ← IJosynApplicationProtocol implementation
+└── JOSYN.Jap.Shared.Log               ← LocalLog (static, file-based, caller-aware)
 
 josyn-job-host (NuGet library)
 └── JOSYN.JobHost
@@ -112,9 +115,10 @@ JOSYN.Jap.Shared.Log      (+ ResultPattern)
         ▲                         ▲
         │                         │
 JOSYN.Jap.JAPServer       JOSYN.JobHost
-(+ JIP + PropertyBag      (+ JIP + PropertyBag
- + Contract + Log)         + Contract + Log)
-[protocol server]         [protocol client]
+(in josyn-backend          (+ JIP + PropertyBag
+ + JIP + PropertyBag        + Contract + Log)
+ + Contract + Log)         [protocol client]
+[protocol server]
         │                         │
         └── IJosynApplication   ──┘
             Protocol
@@ -136,13 +140,20 @@ JOSYN.Jap.JAPServer       JOSYN.JobHost
 ### Runtime (spawn) relationships — not code imports
 
 ```
-josyn-backend ──spawns──► JOSYN.Jap.JAPServer.exe  (JOSYN-IPC <guid>) <- the JobSession-UID
-josyn-backend ──spawns──► job.exe                  (JOSYN-IPC <guid>)
+josyn-backend ──spawns──► JOSYN.Jap.JAPServer.exe  (JOSYN-IPC <guid>)
+JOSYN.Jap.JAPServer  ──spawns──► job.exe           (JOSYN-IPC <guid>)
 ```
 
-`josyn-jap` and `josyn-job-host` are **architecturally symmetric**: both consume the same
-foundation packages and speak the same protocol. They never reference each other.
-`josyn-backend` never takes a NuGet dependency on `josyn-jap`; the coupling is the GUID.
+`josyn-jap` (shared contracts and logger packages) and `josyn-job-host` speak the same
+protocol and consume the same foundation packages — but are not symmetric in the same sense
+as before: `josyn-job-host` remains a pure library, while `josyn-jap` is now a contracts-only
+repo (the EXE was relocated to `josyn-backend` per ADR-004). They still never reference
+each other.
+
+`josyn-backend` takes a NuGet dependency on `JOSYN.Jap.Shared.Contract` and
+`JOSYN.Jap.Shared.Log` (via `JOSYN.Jap.JAPServer`). This is intentional and downward:
+the contracts repo is a lower-layer package; taking a dependency on it from the backend is
+not a layering violation.
 
 ---
 

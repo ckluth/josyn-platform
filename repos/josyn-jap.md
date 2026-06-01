@@ -1,14 +1,8 @@
-> **Transition notice — ADR-004 accepted (2026-06-01)**
-> `JOSYN.Jap.JAPServer` (the EXE) will be relocated from this repo into `josyn-backend`.
-> `josyn-jap` will become a contracts-only repo, retaining only `JOSYN.Jap.Shared.Contract`
-> and `JOSYN.Jap.Shared.Log`. This document describes the **current state** and will be
-> updated once the implementation is complete. See `decisions/ADR-004-japserver-relocation.md`.
-
 # josyn-jap
 
-**Role:** Per-session JAP protocol server — handles a single job session from argument delivery
-to result/error collection. Contains the shared protocol contract, a shared logger, and the
-backend server executable.
+**Role:** JAP protocol contracts — the single source of truth for the contract shared between
+`JOSYN.Jap.JAPServer` (server, in `josyn-backend`) and `JOSYN.JobHost` (client). Contains the
+shared protocol contract and the shared process-local logger.
 
 **Location:** `C:\Users\chris\OneDrive\DevGit\josyn-jap`
 **Version:** `1.0.0-preview01`
@@ -19,13 +13,14 @@ backend server executable.
 
 ```
 josyn-jap/
-├── josyn-jap-shared/             ← NuGet libraries (two packages)
-│   ├── JOSYN.Jap.Shared.Contract/
-│   ├── JOSYN.Jap.Shared.Log/
-│   └── JOSYN.Jap.Shared.Log.Test/
-└── josyn-jap-japserver/          ← Backend EXE
-    └── JOSYN.Jap.JAPServer/
+└── josyn-jap-shared/             ← NuGet libraries (two packages)
+    ├── JOSYN.Jap.Shared.Contract/
+    ├── JOSYN.Jap.Shared.Log/
+    └── JOSYN.Jap.Shared.Log.Test/
 ```
+
+> `JOSYN.Jap.JAPServer` (the EXE) was relocated to `josyn-backend` per ADR-004.
+> See `decisions/ADR-004-japserver-relocation.md`.
 
 ---
 
@@ -126,72 +121,10 @@ Log entries include: timestamp, header, message, optional CallStack section, opt
 
 ---
 
-## JOSYN.Jap.JAPServer
-
-**Purpose:** Backend server executable. Listens on named pipes (JIP), receives JAP requests from job executables, dispatches to the `IJosynApplicationProtocol` implementation.
-
-**Dependencies:** `JOSYN.Foundation.JIP`, `JOSYN.Foundation.PropertyBag`, `JOSYN.Foundation.ResultPattern`, `JOSYN.Jap.Shared.Contract`, `JOSYN.Jap.Shared.Log`
-
-**Type:** `net10.0` Console EXE
-
-### CLI contract
-
-```
-JOSYN.Jap.JAPServer.exe JOSYN-IPC <sessionGUID>
-```
-
-Exit codes:
-- `0` — success
-- `1` — fatal error (missing key, IPC failure, unhandled exception)
-
-### Structure
-
-```csharp
-// Program.cs — thin entry point
-static async Task<int> Main(string[] args) => await Host.Run(args);
-
-// Host.cs — lifecycle and dispatch
-static class Host
-{
-    static Task<int> Run(string[] args)
-    {
-        // 1. Parse session key from args
-        // 2. Create JAPServer instance
-        // 3. Register all IJosynApplicationProtocol methods with JipDispatcher
-        // 4. Start PipesServer — blocking until ESC or fatal error
-    }
-}
-
-// JAPServer.cs — IJosynApplicationProtocol implementation
-sealed class JAPServer : IJosynApplicationProtocol
-{
-    Task<Result<string>> GetRawArguments();        // PoC: returns fake INI data
-    Task<Result> PutRawResult(string result);      // PoC: prints to console
-    Task<Result> PutError(string serializedError); // deserializes ErrorReport → LocalLog
-}
-```
-
-### JIP dispatcher wiring
-
-```csharp
-_jipDispatcher.RegisterAll<IJosynApplicationProtocol>(jAPServer);
-```
-
-`RegisterAll` auto-discovers all methods on `IJosynApplicationProtocol` via reflection and maps them to `what` strings matching method names.
-
-### PoC limitations
-
-- `GetRawArguments` returns hardcoded fake INI data (`FakeReadArgumentsFromFile`)
-- Demo session key: `dea5611d-d740-437f-ad93-7a5dc5ae4299` in `launchSettings.json`
-- Machine-specific build output path in `Directory.Build.props`
-
----
-
 ## Build & Package
 
 ```
 josyn-jap-shared/.local-build/pack.cmd      ← packs Contract + Log to ../../local-packages/
-josyn-jap-japserver/.local-build/build.cmd
 ```
 
 License: MIT | Company: HAEVG AG | Target: net10.0
@@ -201,16 +134,12 @@ License: MIT | Company: HAEVG AG | Target: net10.0
 ## Sanity Notes
 
 ### Structural specifics
-- **Multi-subdirectory repo**: `josyn-jap-shared/` (two NuGet packages) and `josyn-jap-japserver/` (EXE). Each subdirectory has its own `.local-build/` scripts and is evaluated independently.
+- **Single-subdirectory repo**: `josyn-jap-shared/` contains the two NuGet packages. Evaluated as one unit.
 - `JOSYN.Jap.Shared.Contract` and `JOSYN.Jap.Shared.Log` are NuGet libraries — must have `GenerateDocumentationFile`, NuGet metadata, `icon.png`.
-- `JOSYN.Jap.JAPServer` is a Console EXE — must **not** have `GenerateDocumentationFile` or NuGet metadata.
 
 ### Dependency constraints
-- Shared packages (`Contract`, `Log`) may only reference `JOSYN.Foundation.ResultPattern`. Any reference to `PropertyBag`, `JIP`, or any `josyn-jap` package is a violation.
-- JAPServer may reference: `JOSYN.Foundation.JIP`, `JOSYN.Foundation.PropertyBag`, `JOSYN.Foundation.ResultPattern`, `JOSYN.Jap.Shared.Contract`, `JOSYN.Jap.Shared.Log`.
+- Shared packages (`Contract`, `Log`) may only reference `JOSYN.Foundation.ResultPattern`. Any reference to `PropertyBag`, `JIP`, or any other package is a violation.
 
 ### Known exceptions (not violations)
-- `JAPServer.cs` uses `sealed class` (not `static`) — correct; it has instance state implementing `IJosynApplicationProtocol`.
-- `GetRawArguments()` returns hardcoded fake INI data — known PoC limitation, not a violation in the current phase.
-- Demo session key in `launchSettings.json` — PoC convenience, not a violation.
+- No EXE project in this repo — `JOSYN.Jap.JAPServer` was relocated to `josyn-backend` per ADR-004.
 

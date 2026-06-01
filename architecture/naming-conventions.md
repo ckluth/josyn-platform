@@ -50,7 +50,7 @@ JOSYN
 │   ├── Shared
 │   │   ├── Contract               ← IJosynApplicationProtocol, ErrorReport
 │   │   └── Log                    ← LocalLog
-│   └── JAPServer                  ← per-session JAP server EXE
+│   └── JAPServer                  ← per-session JAP server EXE (lives in josyn-backend)
 ├── JobHost                        ← josyn-job-host (consumer-facing API — see note below)
 │   └── Attributes                 ← [JobEntryPoint], [BeforeJobEntryPoint], etc.
 ├── Backend                        ← josyn-backend
@@ -75,7 +75,7 @@ Assembly names match their namespace root exactly:
 | `JOSYN.Foundation.JIP` | `JOSYN.Foundation.JIP` / `JOSYN.Foundation.JIP.Jip` | josyn-foundation |
 | `JOSYN.Jap.Shared.Contract` | `JOSYN.Jap.Shared.Contract` | josyn-jap |
 | `JOSYN.Jap.Shared.Log` | `JOSYN.Jap.Shared.Log` | josyn-jap |
-| `JOSYN.Jap.JAPServer` | `JOSYN.Jap.JAPServer` | josyn-jap |
+| `JOSYN.Jap.JAPServer` | `JOSYN.Jap.JAPServer` | josyn-backend (relocated from josyn-jap per ADR-004) |
 | `JOSYN.JobHost` | `JOSYN.JobHost` | josyn-job-host |
 | `JOSYN.Backend.SessionStarter` | `JOSYN.Backend.SessionStarter` | josyn-backend |
 | *(TBD)* | `JOSYN.Commons.*` | josyn-commons |

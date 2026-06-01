@@ -17,7 +17,7 @@ All repos are siblings under a common parent directory:
 | Repo | Role | Relative path |
 |------|------|---------------|
 | `josyn-foundation` | Infrastructure primitives — Result pattern, serialization, IPC transport | `../josyn-foundation` |
-| `josyn-jap` | Per-session JAP server — JAPServer EXE, shared contracts, logging | `../josyn-jap` |
+| `josyn-jap` | JAP protocol contracts — shared contracts and logging | `../josyn-jap` |
 | `josyn-job-host` | Job execution runtime — library linked by each job executable | `../josyn-job-host` |
 | `josyn-backend` | Scheduler and session-orchestration layer | `../josyn-backend` |
 | `josyn-commons` | Generic utility helpers — domain-agnostic, never referenced by Foundation | `../josyn-commons` |

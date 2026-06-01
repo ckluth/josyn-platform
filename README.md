@@ -29,7 +29,7 @@ JOSYN (Job System Next) is a platform for executing scheduled jobs as isolated e
 | Repo | Role | Namespace root |
 |------|------|----------------|
 | [`josyn-foundation`](../josyn-foundation/README.md) | Infrastructure primitives — Result pattern, serialization, IPC transport | `JOSYN.Foundation.*` |
-| [`josyn-jap`](../josyn-jap/README.md) | Per-session JAP server — JAPServer EXE, shared contracts, logging | `JOSYN.Jap.*` |
+| [`josyn-jap`](../josyn-jap/README.md) | JAP protocol contracts — shared contracts and logging; `JOSYN.Jap.JAPServer` now lives in `josyn-backend` | `JOSYN.Jap.*` |
 | [`josyn-job-host`](../josyn-job-host/README.md) | Job execution runtime — library linked by each job executable | `JOSYN.JobHost` |
 | [`josyn-backend`](../josyn-backend/README.md) | Scheduler and session-orchestration layer — triggers sessions, spawns JAPServer | `JOSYN.Backend.*` |
 | [`josyn-commons`](../josyn-commons/README.md) | Generic utility helpers — domain-agnostic, open for growth, never referenced by foundation | `JOSYN.Commons.*` |
@@ -41,7 +41,7 @@ Job executables are **decoupled consumers** of the JOSYN protocol, not internal 
 
 ### Why `josyn-backend` is separate from `josyn-jap`
 
-`josyn-backend` owns the *when* and *what* of job execution (scheduling, session persistence, JAPServer spawning). `josyn-jap` owns only the *how* of a single in-flight session (the JAP protocol server, including spawning the job executable). They are coupled solely by the session GUID passed on the command line — there is no NuGet dependency between them. See [decisions/ADR-002-josyn-backend.md](decisions/ADR-002-josyn-backend.md).
+`josyn-backend` owns the *when* and *what* of job execution (scheduling, session persistence, JAPServer spawning). `josyn-jap` owns only the *contract* of a single in-flight session (the JAP protocol interface and the shared logger). `JOSYN.Jap.JAPServer` — the server implementation — lives in `josyn-backend` because it needs direct access to backend resources (`SessionStore`, `CompanyConfig`); see [decisions/ADR-004-japserver-relocation.md](decisions/ADR-004-japserver-relocation.md). `josyn-backend` takes a NuGet dependency on the two shared packages from `josyn-jap` (`Shared.Contract`, `Shared.Log`) for this reason. The session GUID remains the only runtime coupling between JAPServer and `job.exe`.
 
 ---
 
@@ -68,7 +68,7 @@ It is the maintainer's playground.
 |------|--------------------------|
 | **Platform** | The entire JOSYN ecosystem — all six repos together |
 | **Backend** | The scheduler and session-orchestration layer (`josyn-backend`) |
-| **JAP** | The per-session JAP protocol server and shared packages (`josyn-jap`) |
+| **JAP** | The JAP protocol contracts and shared packages (`josyn-jap`); the server implementation (`JAPServer`) lives in `josyn-backend` |
 | **Job Host** | The runtime embedded in each job executable (`josyn-job-host`) |
 | **Foundation** | Cross-cutting infrastructure primitives (`josyn-foundation`) |
 | **Commons** | Generic utility helpers — domain-agnostic toolbox, open for growth (`josyn-commons`) |
@@ -81,24 +81,21 @@ See [architecture/naming-conventions.md](architecture/naming-conventions.md) for
 
 ```mermaid
 graph TD
-    B["josyn-backend<br/>Scheduler & Orchestrator"]
-
-    subgraph session["Per-Job Session"]
-        J["josyn-jap<br/>Per-Session JAP Server"]
-        H["josyn-job-host<br/>Job Execution Runtime"]
-    end
-
+    B["josyn-backend<br/>Scheduler, Orchestrator<br/>+ JAPServer EXE"]
+    H["josyn-job-host<br/>Job Execution Runtime"]
+    J["josyn-jap<br/>Protocol Contracts"]
     F["josyn-foundation<br/>Infrastructure Primitives"]
 
     subgraph satellite["⬡ Utility Satellite"]
         C["josyn-commons<br/>Generic Utilities<br/>(may use ResultPattern) ⟶"]
     end
 
-    B -->|spawns| J
-    J <-->|IPC| H
+    B <-->|"IPC (JAPServer ↔ job.exe)"| H
     B -->|NuGet| F
+    B -->|"NuGet (shared pkgs)"| J
     J -->|NuGet| F
     H -->|NuGet| F
+    H -->|NuGet| J
     B -.->|NuGet| C
     J -.->|NuGet| C
     H -.->|NuGet| C
