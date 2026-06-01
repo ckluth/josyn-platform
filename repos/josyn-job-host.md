@@ -38,14 +38,9 @@ josyn-job-host/
 │       ├── JobArgumentsAttribute.cs         ← marks argument type (placeholder)
 │       ├── JobResultAttribute.cs            ← marks result type (placeholder)
 │       └── ParallelExecutionAllowedAttribute.cs  ← parallel flag (placeholder)
-├── JOSYN.JobHost.Test/
-│   ├── JobInvokerTests.cs                   ← 7 tests
-│   └── JobInvokerTestSupport.cs             ← fakes, stubs, stub records
-└── JOSYN.MyDemoJob/                         ← reference job executable
-    ├── Mandatory/MyFirstJob.cs              ← [JobEntryPoint] example
-    └── Optional/
-        ├── MyArguments.cs                   ← argument record (diverse types)
-        └── MyResult.cs                      ← result record
+└── JOSYN.JobHost.Test/
+    ├── JobInvokerTests.cs                   ← 7 tests
+    └── JobInvokerTestSupport.cs             ← fakes, stubs, stub records
 ```
 
 ---
@@ -224,7 +219,7 @@ License: MIT | Company: HAEVG AG | Target: net10.0
 - `JAPClient` is `internal sealed class` — correct; it has instance state and implements `IJosynApplicationProtocol`. The `internal` access modifier is intentional.
 - `JobInvoker` is `internal static class` — correct; job authors never use it directly.
 - Placeholder attributes (`BeforeJobEntryPoint`, `JobArguments`, `JobResult`, `ParallelExecutionAllowed`) carry `<remarks>Not yet implemented</remarks>` — correct state, not a violation.
-- `JOSYN.MyDemoJob` is a reference job executable — not a NuGet package. Must not have NuGet metadata or `GenerateDocumentationFile`.
+- `JOSYN.MyDemoJob` has moved to `josyn-sandbox` as `MyDemoCompany.MyDemoProduct.MyDemoJob` — not a NuGet package, uses a cross-repo `ProjectReference` to `JOSYN.JobHost`.
 
 ### Test baseline
 - Minimum 7 NUnit tests in `JobInvokerTests`. A lower count is a violation (tests removed without replacement).
