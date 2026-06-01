@@ -86,7 +86,8 @@ agent infrastructure.
 in any other session — the agent must:**
 
 1. Briefly state what it is about to do and why.
-2. Wait for explicit confirmation from the human before creating or editing any file.
+2. Wait for explicit confirmation from the human before creating or editing any file,
+   or running any git operation (`commit`, `push`, `branch`, `merge`, etc.).
 
 Passing a rubber-duck critique, completing an inference phase, or reaching an internal
 conclusion does not count as confirmation. Only an explicit go-ahead from the human does.
