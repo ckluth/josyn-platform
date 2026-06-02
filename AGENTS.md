@@ -104,6 +104,7 @@ No content is duplicated here. Read the canonical source when a topic requires d
 |-------|-----------------|
 | Architecture, runtime flow, component map | `architecture/overview.md` |
 | Naming conventions, namespace rules, directory structure | `architecture/naming-conventions.md` |
+| Repo structure patterns (Pattern A vs B, per-repo assignment) | `architecture/repo-structure-conventions.md` |
 | Coding standards, principles, Result pattern reference | `architecture/coding-standards.md` |
 | Architectural decision records | `decisions/` |
 | Per-repo summaries (packages, assemblies, current state) | `repos/` |

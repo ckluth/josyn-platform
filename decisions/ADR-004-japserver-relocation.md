@@ -47,27 +47,32 @@ the contract shared by the two parties that speak JAP: `josyn-job-host` (client)
 
 ### Solution structure in josyn-backend
 
-JAPServer receives its **own, separate solution** — it is not merged into the existing
-`JOSYN.Backend.SessionStarter.slnx`. Each logical build unit in `josyn-backend` lives in
-its own solution file:
+JAPServer receives its **own, separate solution** inside its own kebab sub-folder, following
+Pattern B (multi-solution repo). Each logical build unit in `josyn-backend` lives in its own
+kebab sub-folder containing its solution file, `Directory.Build.props`, and `nuget.config`.
 
 ```
 josyn-backend/
-├── JOSYN.Backend.SessionStarter.slnx       ← existing solution (library)
-├── JOSYN.Backend.SessionStarter/
-│
-├── JOSYN.Backend.SessionStarter.Mock.slnx  ← sibling solution (mock EXE for local testing)
-├── JOSYN.Backend.SessionStarter.Mock/
-│
-├── JOSYN.Jap.JAPServer.slnx                ← new solution (relocated EXE)
-├── JOSYN.Jap.JAPServer/
-│
-└── .local-build/
-    └── build.cmd                           ← builds ALL solutions
+├── .local-build/
+│   ├── build.cmd                           ← builds ALL solutions in the repo
+│   └── pack.cmd
+├── josyn-backend-jap-server/               ← self-contained solution root
+│   ├── Directory.Build.props
+│   ├── nuget.config
+│   ├── JOSYN.Jap.JAPServer.slnx
+│   ├── .local-build/                       ← solution-local build + launch scripts
+│   └── JOSYN.Jap.JAPServer/
+├── josyn-backend-session-starter/          ← future; not yet created
+│   ├── JOSYN.Backend.SessionStarter.slnx
+│   └── JOSYN.Backend.SessionStarter/
+└── josyn-backend-session-starter-mock/     ← future; not yet created
+    ├── JOSYN.Backend.SessionStarter.Mock.slnx
+    └── JOSYN.Backend.SessionStarter.Mock/
 ```
 
-The **local-build script builds all solutions** in the repo. No solution is left out of
-the automated build.
+The **repo-root `.local-build/build.cmd`** builds all solutions in the repo. Each solution
+sub-folder may additionally carry its own `.local-build/` for solution-specific launch and
+debug scripts.
 
 ---
 

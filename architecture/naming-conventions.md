@@ -84,6 +84,10 @@ Assembly names match their namespace root exactly:
 
 ## Directory Structure Convention
 
+> **Repo-level structure** (Pattern A vs Pattern B — single vs multi-solution repo) is defined
+> in [`repo-structure-conventions.md`](repo-structure-conventions.md). The layout below
+> describes how projects are arranged *within* a solution root, regardless of pattern.
+
 Each repo organises its projects as:
 
 ```
