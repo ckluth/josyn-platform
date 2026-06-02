@@ -19,7 +19,7 @@ The git root **is** the solution root. There is no intermediate folder level.
 ├── Directory.Build.props         ← build output config (scoped to this solution)
 ├── nuget.config                  ← local package feed (scoped to this solution)
 ├── README.md
-├── .local-build/                 ← build scripts
+├── .local-build/                 ← local developer tooling (see local-build.md)
 ├── <AssemblyName>/               ← main project
 └── <AssemblyName>.Test/          ← test project
 ```
@@ -44,12 +44,13 @@ self-contained Pattern-A root.
 <repo-root>/
 ├── README.md                     ← repo-level overview only
 ├── LICENCE
-├── .local-build/                 ← repo-level build tooling
+├── .local-build/                 ← local developer tooling — batch level (see local-build.md)
 ├── <kebab-solution-a>/           ← self-contained solution root (Pattern A inside)
 │   ├── <AssemblyName>.slnx
 │   ├── Directory.Build.props
 │   ├── nuget.config
 │   ├── README.md
+│   ├── .local-build/             ← local developer tooling — single-target (see local-build.md)
 │   ├── <AssemblyName>/
 │   └── <AssemblyName>.Test/
 └── <kebab-solution-b>/           ← independent; same structure
@@ -57,6 +58,7 @@ self-contained Pattern-A root.
     ├── Directory.Build.props
     ├── nuget.config
     ├── README.md
+    ├── .local-build/             ← local developer tooling — single-target (see local-build.md)
     ├── <AssemblyName>/
     └── <AssemblyName>.Test/
 ```
@@ -69,14 +71,10 @@ Sub-folder names follow the same kebab-case pattern as repo names:
 
 ### `.local-build/` at two levels
 
-Pattern B repos carry `.local-build/` at **two distinct levels** with different scopes:
-
-| Level | Location | Purpose |
-|-------|----------|---------|
-| Repo-wide | `<repo-root>/.local-build/` | Orchestrates all solutions — e.g., `build.cmd` that iterates every sub-folder solution in dependency order |
-| Solution-local | `<kebab-solution>/.local-build/` | Solution-specific scripts — build, debug, launch, test for that one solution only |
-
-A sub-folder that has no solution-specific scripts (e.g., a library with no launch step) may omit its own `.local-build/`. The repo-root one is always present.
+Pattern B repos carry `.local-build/` at two distinct levels with different characters —
+**batch/orchestrator** at the repo root and **single-target** at each sub-solution folder.
+See [`local-build.md`](local-build.md) for the full definition of both characters, script
+naming conventions, and assignment rules.
 
 **Canonical examples:** `josyn-foundation`, `josyn-jap`
 
