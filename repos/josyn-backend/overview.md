@@ -9,6 +9,16 @@ legacy job backend and the JOSYN platform. Also the home of `JOSYN.Jap.JAPServer
 
 ---
 
+## Decisions
+
+Backend-specific architectural decisions are recorded in [`decisions/`](decisions/).
+
+| ADR | Title |
+|-----|-------|
+| [ADR-001](decisions/ADR-001-backend-building-block-model.md) | Backend Building Block Model |
+
+---
+
 ## Architectural position
 
 `josyn-backend` is the **outermost layer** of the JOSYN platform. It owns:
@@ -263,4 +273,3 @@ License: MIT | Company: HAEVG AG | Target: net10.0
 - `GetRawArguments()` returns hardcoded fake INI data — known PoC limitation, not a violation in the current phase.
 - Demo session key in `launchSettings.json` — PoC convenience, not a violation.
 - `JOSYN.Jap.JAPServer` namespace says "Jap" but the assembly lives in `josyn-backend` — intentional per ADR-004 Challenge 5 rebuttal; the namespace reflects what the component *is*, not where it lives.
-

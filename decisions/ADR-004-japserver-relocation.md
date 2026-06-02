@@ -81,7 +81,7 @@ the automated build.
   downward and intentional.
 - `josyn-backend` becomes a **multi-solution repo**. The local-build script is extended
   to cover all solutions.
-- `repos/josyn-jap.md` and `repos/josyn-backend.md` are updated to reflect the new state.
+- `repos/josyn-jap.md` and `repos/josyn-backend/overview.md` are updated to reflect the new state.
 
 ---
 
