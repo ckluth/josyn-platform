@@ -16,6 +16,8 @@ Backend-specific architectural decisions are recorded in [`decisions/`](decision
 | ADR | Title |
 |-----|-------|
 | [ADR-001](decisions/ADR-001-backend-building-block-model.md) | Backend Building Block Model |
+| [ADR-002](decisions/ADR-002-session-store.md) | SessionStore |
+| [ADR-003](decisions/ADR-003-global-config.md) | GlobalConfig |
 
 ---
 
@@ -81,23 +83,56 @@ Old and new can coexist: jobs migrated to the JOSYN model are started via the ne
 
 ---
 
-## Current state — JAPServer (working PoC)
+## Current state
 
 `JOSYN.Jap.JAPServer` is a working PoC EXE, relocated from `josyn-jap` per ADR-004.
-`JOSYN.Backend.SessionStarter` has been removed — it was an empty stub with no value
-at this stage. It will be re-introduced when the migration work begins in earnest.
+`JOSYN.Backend.SessionStore` is the first real Category A NuGet package, ported from the
+sandbox prototype per ADR-002.
+`JOSYN.Backend.GlobalConfig` is the second Category A NuGet package; provides `IGlobalConfig`
+and the PoC `HardcodedGlobalConfig` placeholder, per ADR-003.
+`JOSYN.Backend.SessionStarter` is the third Category A NuGet package; provides `ISessionStarter`
+which persists the session and spawns `JAPServer.exe`, per Phase 3 of the PoC roadmap.
+`JOSYN.Backend.Demo.FakeSessionStarterConsumer` is the Phase 4 PoC demo EXE; wires all three
+NuGet packages into a full session round-trip and proves end-to-end connectivity.
+`JOSYN.Jap.JAPServer` has been fully wired: `GetRawArguments` reads from `SessionStore`,
+`PutRawResult` writes back to `SessionStore` — fake methods removed.
 
 ```
 josyn-backend/
 ├── .local-build/
 │   ├── build.cmd                           ← builds ALL solutions in the repo
 │   └── pack.cmd
-└── josyn-backend-jap-server/              ← Pattern B sub-folder
+├── local-packages/                         ← local NuGet feed
+├── josyn-backend-session-store/            ← Pattern B sub-folder
+│   ├── Directory.Build.props
+│   ├── nuget.config
+│   ├── JOSYN.Backend.SessionStore.slnx
+│   ├── .local-build/                       ← solution-local build + pack scripts
+│   └── JOSYN.Backend.SessionStore/
+├── josyn-backend-global-config/            ← Pattern B sub-folder
+│   ├── Directory.Build.props
+│   ├── nuget.config
+│   ├── JOSYN.Backend.GlobalConfig.slnx
+│   ├── .local-build/                       ← solution-local build + pack scripts
+│   └── JOSYN.Backend.GlobalConfig/
+├── josyn-backend-session-starter/          ← Pattern B sub-folder
+│   ├── Directory.Build.props
+│   ├── nuget.config
+│   ├── JOSYN.Backend.SessionStarter.slnx
+│   ├── .local-build/                       ← solution-local build + pack scripts
+│   └── JOSYN.Backend.SessionStarter/
+├── josyn-backend-jap-server/              ← Pattern B sub-folder
+│   ├── Directory.Build.props
+│   ├── nuget.config
+│   ├── JOSYN.Jap.JAPServer.slnx
+│   ├── .local-build/                       ← solution-local build + launch scripts
+│   └── JOSYN.Jap.JAPServer/
+└── josyn-backend-demo/                    ← Pattern B sub-folder (EXE, no pack)
     ├── Directory.Build.props
     ├── nuget.config
-    ├── JOSYN.Jap.JAPServer.slnx
-    ├── .local-build/                       ← solution-local build + launch scripts
-    └── JOSYN.Jap.JAPServer/
+    ├── JOSYN.Backend.Demo.FakeSessionStarterConsumer.slnx
+    ├── .local-build/                       ← solution-local build + clean scripts
+    └── JOSYN.Backend.Demo.FakeSessionStarterConsumer/
 ```
 
 ## JOSYN.Jap.JAPServer
@@ -134,17 +169,18 @@ static class Host
     static Task<int> Run(string[] args)
     {
         // 1. Parse session key from args
-        // 2. Create JAPServer instance
-        // 3. Register all IJosynApplicationProtocol methods with JipDispatcher
-        // 4. Start PipesServer — blocking until ESC or fatal error
+        // 2. Construct HardcodedGlobalConfig + SessionStore
+        // 3. Create JAPServer(sessionStore, sessionKey)
+        // 4. Register all IJosynApplicationProtocol methods with JipDispatcher
+        // 5. Start PipesServer — blocking until ESC or fatal error
     }
 }
 
 // JAPServer.cs — IJosynApplicationProtocol implementation
-sealed class JAPServer : IJosynApplicationProtocol
+sealed class JAPServer(ISessionStore sessionStore, Guid sessionGuid) : IJosynApplicationProtocol
 {
-    Task<Result<string>> GetRawArguments();        // PoC: returns fake INI data
-    Task<Result> PutRawResult(string result);      // PoC: prints to console
+    Task<Result<string>> GetRawArguments();        // reads Arguments from SessionStore
+    Task<Result> PutRawResult(string result);      // writes Result back to SessionStore
     Task<Result> PutError(string serializedError); // deserializes ErrorReport → LocalLog
 }
 ```
@@ -159,7 +195,6 @@ _jipDispatcher.RegisterAll<IJosynApplicationProtocol>(jAPServer);
 
 ### PoC limitations
 
-- `GetRawArguments` returns hardcoded fake INI data (`FakeReadArgumentsFromFile`)
 - Demo session key: `dea5611d-d740-437f-ad93-7a5dc5ae4299` in `launchSettings.json`
 - Machine-specific build output path in `Directory.Build.props`
 
@@ -173,9 +208,10 @@ When migrated, `josyn-backend` will contain the JOSYN-native replacements for al
 |------------------|----------|-------|
 | `JOSYN.Backend.TriggerAgent` | `JobSystem.TriggerAgent` | Polls for scheduled executions |
 | `JOSYN.Backend.Scheduling` | `JobSystem.Scheduling` | Time-scheduling logic |
-| `JOSYN.Backend.SessionStore` | `JobSystem.Database` | Session persistence (EF Core; own SQL context) |
+| `JOSYN.Backend.SessionStore` ✅ | `JobSystem.Database` | **Done** — EF Core, SQL Server, `josyn` schema |
+| `JOSYN.Backend.GlobalConfig` ✅ | *(new)* | **Done** — `IGlobalConfig` contract + `HardcodedGlobalConfig` PoC placeholder |
+| `JOSYN.Backend.SessionStarter` ✅ | `JobSystem.SessionStarter` | **Done** — `ISessionStarter`; allocates GUID, persists session, spawns `JAPServer.exe` |
 | `JOSYN.Backend.JobRepository` | `JobSystem.JobRepository` | Resolves job.exe path from job name |
-| `JOSYN.Backend.SessionStarter` | `JobSystem.SessionStarter` | Not yet created — re-introduce when migration work begins |
 | `JOSYN.Backend.Service` | `JobSystem.Service` | Windows service host |
 | `JOSYN.Backend.WorkflowAdapter` | `JobSystem.WorkflowAdapter` | Workflow integration |
 
@@ -184,12 +220,31 @@ When migrated, `josyn-backend` will contain the JOSYN-native replacements for al
 ## Dependencies
 
 ```xml
-<!-- JOSYN.Jap.JAPServer: foundation + josyn-jap shared packages -->
+<!-- JOSYN.Backend.SessionStore: foundation + EF Core -->
+<PackageReference Include="JOSYN.Foundation.ResultPattern"          Version="1.0.0-preview01"/>
+<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer"  Version="9.0.5"/>
+
+<!-- JOSYN.Backend.GlobalConfig: no NuGet dependencies -->
+
+<!-- JOSYN.Backend.SessionStarter: depends on SessionStore + GlobalConfig + ResultPattern -->
+<PackageReference Include="JOSYN.Backend.GlobalConfig"     Version="1.0.0-preview01"/>
+<PackageReference Include="JOSYN.Backend.SessionStore"     Version="1.0.0-preview01"/>
+<PackageReference Include="JOSYN.Foundation.ResultPattern" Version="1.0.0-preview01"/>
+
+<!-- JOSYN.Jap.JAPServer: foundation + josyn-jap shared packages + backend packages -->
+<PackageReference Include="JOSYN.Backend.GlobalConfig"        Version="1.0.0-preview01"/>
+<PackageReference Include="JOSYN.Backend.SessionStore"        Version="1.0.0-preview01"/>
 <PackageReference Include="JOSYN.Foundation.JIP"              Version="1.0.0-preview01"/>
 <PackageReference Include="JOSYN.Foundation.PropertyBag"      Version="1.0.0-preview01"/>
 <PackageReference Include="JOSYN.Foundation.ResultPattern"    Version="1.0.0-preview01"/>
 <PackageReference Include="JOSYN.Jap.Shared.Contract"         Version="1.0.0-preview01"/>
 <PackageReference Include="JOSYN.Jap.Shared.Log"              Version="1.0.0-preview01"/>
+
+<!-- JOSYN.Backend.Demo.FakeSessionStarterConsumer: all three backend packages -->
+<PackageReference Include="JOSYN.Backend.GlobalConfig"     Version="1.0.0-preview01"/>
+<PackageReference Include="JOSYN.Backend.SessionStarter"   Version="1.0.0-preview01"/>
+<PackageReference Include="JOSYN.Backend.SessionStore"     Version="1.0.0-preview01"/>
+<PackageReference Include="JOSYN.Foundation.ResultPattern" Version="1.0.0-preview01"/>
 ```
 
 Runtime spawn relationships (not NuGet dependencies):
@@ -201,11 +256,15 @@ Runtime spawn relationships (not NuGet dependencies):
 ## Build & Package
 
 ```
-.local-build\build.cmd [Release|Debug]              ← builds ALL solutions in the repo
-josyn-backend-jap-server\.local-build\build.cmd     ← builds JAPServer only
+.local-build\build.cmd [Release|Debug]               ← builds ALL solutions in the repo
+josyn-backend-jap-server\.local-build\build.cmd      ← builds JAPServer only
+josyn-backend-global-config\.local-build\build.cmd   ← builds GlobalConfig only
+josyn-backend-session-starter\.local-build\build.cmd ← builds SessionStarter only
+josyn-backend-demo\.local-build\build.cmd            ← builds demo EXE only
 ```
 
-`pack.cmd` at the repo root is a no-op stub — `josyn-backend` currently contains no NuGet packages.
+`pack.cmd` at the repo root packs `SessionStore`, `GlobalConfig`, and `SessionStarter` to the local feed.
+The demo EXE (`FakeSessionStarterConsumer`) and `JAPServer` are not packed.
 
 License: MIT | Company: HAEVG AG | Target: net10.0
 
@@ -215,20 +274,25 @@ License: MIT | Company: HAEVG AG | Target: net10.0
 
 ### Current state — expected
 
-- `JOSYN.Backend.SessionStarter` does not exist — expected; removed as a premature stub. Re-introduce when migration work begins.
 - No test project for `JOSYN.Jap.JAPServer` — known gap in the current PoC phase, not a violation.
-- `GetRawArguments()` returns hardcoded fake INI data — known PoC limitation, not a violation.
-- The planned components (`TriggerAgent`, `Scheduling`, `SessionStore`, etc.) do not exist yet — expected.
+- No test project for `JOSYN.Backend.SessionStore` — known gap in the current PoC phase, not a violation.
+- No test project for `JOSYN.Backend.GlobalConfig` — known gap in the current PoC phase, not a violation.
+- No test project for `JOSYN.Backend.SessionStarter` — known gap in the current PoC phase, not a violation.
+- `HardcodedGlobalConfig` uses compile-time developer-machine constants — known PoC limitation, not a violation.
+- `SessionStarter`: on `Process.Start` failure after session is saved, an orphaned row with empty `Result` remains in the store — known PoC limitation; requires a session status column to fix.
+- `FakeSessionStarterConsumer` uses a 500 ms poll loop to detect result completion — known PoC mechanism; a production implementation would use a push signal.
+- The planned components (`TriggerAgent`, `Scheduling`, etc.) do not exist yet — expected.
 
 ### Structural specifics
 
 - **Pattern B repo**: each solution lives in its own kebab sub-folder (`josyn-backend-jap-server/`). See `architecture/repo-structure-conventions.md`.
 - **Solution boundary rule**: a project in one solution must not take a project reference to a project in a different solution within this repo. Cross-solution dependencies go via NuGet. Any cross-solution project reference is a violation.
 - `JOSYN.Jap.JAPServer` is a Console EXE — must **not** have `GenerateDocumentationFile` or NuGet packaging metadata.
+- `JOSYN.Backend.Demo.FakeSessionStarterConsumer` is a Console EXE — must **not** be packed; no `pack.cmd` in its `.local-build/`.
 
 ### Dependency constraints
 
-- `JOSYN.Jap.JAPServer`: permitted references are `JOSYN.Foundation.JIP`, `JOSYN.Foundation.PropertyBag`, `JOSYN.Foundation.ResultPattern`, `JOSYN.Jap.Shared.Contract`, `JOSYN.Jap.Shared.Log`. Any other cross-repo reference is a violation.
+- `JOSYN.Jap.JAPServer`: permitted references are `JOSYN.Foundation.JIP`, `JOSYN.Foundation.PropertyBag`, `JOSYN.Foundation.ResultPattern`, `JOSYN.Jap.Shared.Contract`, `JOSYN.Jap.Shared.Log`, `JOSYN.Backend.SessionStore`, `JOSYN.Backend.GlobalConfig`. Any other cross-repo reference is a violation.
 - Neither current nor future projects in this repo may reference `josyn-job-host` packages.
 - Runtime spawning of `JAPServer.exe` (built within this repo) is correct — this is **not** a NuGet dependency.
 

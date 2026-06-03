@@ -64,11 +64,23 @@ Any step fails
 ## Component Map
 
 ```
-josyn-backend (stub + JAPServer)
-├── JOSYN.Backend.SessionStarter      ← session lifecycle: GUID, session store, process spawning
-└── JOSYN.Jap.JAPServer (EXE)         ← relocated from josyn-jap per ADR-004
-        ├── Host.cs                       ← lifecycle, JipDispatcher wiring
-        └── JAPServer.cs                  ← IJosynApplicationProtocol implementation
+josyn-backend (NuGet packages + EXEs)
+├── JOSYN.Backend.GlobalConfig         ← runtime config: connection string, exe paths
+├── JOSYN.Backend.SessionStore         ← session persistence: EF Core, SQL Server
+├── JOSYN.Backend.SessionStarter       ← session lifecycle: GUID, store write, process spawn
+├── JOSYN.Jap.JAPServer (EXE)          ← relocated from josyn-jap; backed by SessionStore
+│       ├── Host.cs                        ← lifecycle, config + store wiring, JipDispatcher
+│       └── JAPServer.cs                   ← IJosynApplicationProtocol: reads/writes SessionStore
+├── JOSYN.Backend.Demo.FakeSessionStarterConsumer (EXE, PoC)  ← round-trip demo
+│
+└── ── Future (placeholders) ───────────────────────────────────
+    ├── JOSYN.Backend.TriggerAgent     ← replaces JobSystem.TriggerAgent
+    ├── JOSYN.Backend.Scheduling       ← replaces JobSystem.Scheduling
+    ├── JOSYN.Backend.Service          ← replaces JobSystem.Service (Windows service host)
+    ├── JOSYN.Backend.WorkflowAdapter  ← replaces JobSystem.WorkflowAdapter
+    ├── listener-service (EXE)         ← future: receives "start job" requests
+    ├── ticker-service   (EXE)         ← future: polls for scheduled executions
+    └── cli-exe          (EXE)         ← future: operator CLI
 
 josyn-foundation (NuGet packages)
 ├── JOSYN.Foundation.ResultPattern        ← Result<T>, Error, CallerInfo
@@ -102,11 +114,11 @@ josyn-platform (this repo)
 ### Code (NuGet) dependencies
 
 ```
-       JOSYN.Foundation.ResultPattern (no dependencies)
-            ▲               ▲                    ▲
-            │               │                    │
-       JOSYN.Foundation.   JOSYN.Foundation.  JOSYN.Backend.
-       PropertyBag         JIP                SessionStarter  (stub — ResultPattern only)
+       JOSYN.Foundation.ResultPattern  (no dependencies)
+            ▲               ▲
+            │               │
+       JOSYN.Foundation.   JOSYN.Foundation.
+       PropertyBag         JIP
             ▲               ▲
             └───────┬───────┘
                     │
@@ -117,12 +129,31 @@ JOSYN.Jap.Shared.Log      (+ ResultPattern)
 JOSYN.Jap.JAPServer       JOSYN.JobHost
 (in josyn-backend          (+ JIP + PropertyBag
  + JIP + PropertyBag        + Contract + Log)
- + Contract + Log)         [protocol client]
+ + SessionStore            [protocol client]
+ + GlobalConfig
+ + Contract + Log)
 [protocol server]
         │                         │
-        └── IJosynApplication   ──┘
-            Protocol
-     (IPC at runtime — not a code dep.)
+        └── IJosynApplicationProtocol ──┘
+             (IPC at runtime — not a code dep.)
+```
+
+```
+── josyn-backend package chain ────────────────────────────────────────
+
+Backend.GlobalConfig  (no NuGet dependencies)
+Backend.SessionStore  (+ ResultPattern)
+        ▲                   ▲
+        └─────────┬──────────┘
+                  │
+Backend.SessionStarter  (+ ResultPattern)
+
+Consumers of the backend packages:
+  JOSYN.Jap.JAPServer (EXE)                → + SessionStore + GlobalConfig  (see above)
+  Demo.FakeSessionStarterConsumer (EXE)    → + SessionStarter + SessionStore
+                                              + GlobalConfig + ResultPattern
+
+────────────────────────────────────────────────────────────────────────
 ```
 
 ```
