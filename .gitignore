@@ -1,2 +1,5 @@
 # Sanity check output — always overwritten, not tracked
 sanity/last-result.md
+
+# Visual Studio local state
+.vs/

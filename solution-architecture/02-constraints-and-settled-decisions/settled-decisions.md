@@ -27,7 +27,7 @@ This is not a preference — it is the structural foundation of the platform.
 per session: one for requests (`JOSYN-REQ-<guid>`), one for responses (`JOSYN-RSP-<guid>`).
 Wire format: length-prefixed binary (int32 LE + UTF-8). Session isolation via GUID-named pipes.
 
-There is no plan to replace named pipes with sockets, HTTP, gRPC, or any other transport.
+There is no plan to replace this with HTTP, gRPC, or any other network transport. Note: `System.IO.Pipes` abstracts over platform primitives — on Linux it uses Unix domain sockets under the hood — so the JIP transport layer is portable in principle without any protocol change. A Linux port is not planned but is not structurally blocked.
 
 ## Session Store: SQL Server
 
