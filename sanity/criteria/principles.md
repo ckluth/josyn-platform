@@ -42,6 +42,7 @@ Evaluate each item for every type and method in scope.
 | Signal | Verdict |
 |--------|---------|
 | Public static type without a companion interface in `Contracts/` | ❌ violation |
+| Public method signature uses a concrete type where the companion interface exists and should be used (e.g. `ServerStartArguments` instead of `IServerStartArguments` as a parameter) | ❌ violation |
 | Interface implemented by more than one non-test class | ⚠️ candidate — review whether intent is polymorphism vs. shape contract |
 | Implementation duplicates interface doc instead of using `<inheritdoc/>` | ❌ violation |
 | `static abstract` members on companion interface match the static class surface | ✅ pass |
