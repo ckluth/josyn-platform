@@ -107,6 +107,7 @@ No content is duplicated here. Read the canonical source when a topic requires d
 | Repo structure patterns (Pattern A vs B, per-repo assignment) | `architecture/repo-structure-conventions.md` |
 | `.local-build` purpose, characters, script conventions | `architecture/local-build.md` |
 | Coding standards, principles, Result pattern reference | `architecture/coding-standards.md` |
+| Storage realm: schema, DDL scripts, `IxxxRecord` convention, dev setup | `architecture/storage.md` |
 | Architectural decision records | `decisions/` |
 | Per-repo summaries (packages, assemblies, current state) | `repos/` |
 | Sanity check protocol, inference algorithm, execution steps | `sanity/README.md` |

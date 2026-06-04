@@ -68,10 +68,10 @@ josyn-backend (NuGet packages + EXEs)
 ├── JOSYN.Backend.GlobalConfig         ← runtime config: connection string, exe paths
 ├── JOSYN.Backend.SessionStore         ← session persistence: EF Core, SQL Server
 ├── JOSYN.Backend.SessionStarter       ← session lifecycle: GUID, store write, process spawn
+├── JOSYN.Backend.JobRegistry          ← job registration: Name, TechnicalUserName; josyn.JobRegistrations table
 ├── JOSYN.Jap.JAPServer (EXE)          ← relocated from josyn-jap; backed by SessionStore
 │       ├── Host.cs                        ← lifecycle, config + store wiring, JipDispatcher
 │       └── JAPServer.cs                   ← IJosynApplicationProtocol: reads/writes SessionStore
-├── JOSYN.Backend.Demo.FakeSessionStarterConsumer (EXE, PoC)  ← round-trip demo
 │
 └── ── Future (placeholders) ───────────────────────────────────
     ├── JOSYN.Backend.TriggerAgent     ← replaces JobSystem.TriggerAgent
@@ -150,8 +150,6 @@ Backend.SessionStarter  (+ ResultPattern)
 
 Consumers of the backend packages:
   JOSYN.Jap.JAPServer (EXE)                → + SessionStore + GlobalConfig  (see above)
-  Demo.FakeSessionStarterConsumer (EXE)    → + SessionStarter + SessionStore
-                                              + GlobalConfig + ResultPattern
 
 ────────────────────────────────────────────────────────────────────────
 ```

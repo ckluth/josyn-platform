@@ -52,7 +52,9 @@ the raw string arrives (e.g., CLI argument parsing in `JAPServer`), not in the s
 
 `SessionStoreDbContext` and `SessionStoreEntity` are `internal sealed`. They are
 implementation details of `SessionStore` and must not leak into the public API.
-Only `ISessionStore`, `IJobSession`, and `JobSession` are public.
+Only `ISessionStore`, `IJobSessionRecord`, and `JobSessionRecord` are public.
+The `IJobSessionRecord` / `JobSessionRecord` naming follows the platform-wide
+`IxxxRecord` convention established in ADR-007.
 
 ### 5. No Mock in this package
 
