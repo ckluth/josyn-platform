@@ -31,7 +31,7 @@ Current and anticipated domains:
 |-------------------------|------------------------------|----------|
 | Session records         | `josyn.SessionStore`         | Existing |
 | Job registrations       | `josyn.JobRegistrations`     | Planned  |
-| Error records           | *(table TBD)*                | Future   |
+| Error records           | `josyn.ErrorStore`           | Existing |
 | Infrastructure registry | *(table TBD)*                | Future   |
 
 Each new domain requires a decision recorded either as an ADR or in the owning

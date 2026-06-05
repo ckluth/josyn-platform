@@ -1,6 +1,6 @@
 # josyn-commons
 
-**Role:** Generic utility helpers — domain-agnostic, open for growth.
+**Role:** Domain-agnostic platform utilities — open for growth.
 Consumed by any repo as NuGet packages. Never referenced by `josyn-foundation`.
 
 **Location:** `C:\Users\chris\OneDrive\DevGit\josyn-commons`
@@ -10,7 +10,7 @@ Consumed by any repo as NuGet packages. Never referenced by `josyn-foundation`.
 
 ## Architectural position
 
-`josyn-commons` is the **utility satellite** of the JOSYN platform.
+`josyn-commons` is the **domain-agnostic platform utilities** layer of the JOSYN platform.
 
 ```
 JOSYN.Commons.*  (no deps, or ResultPattern only)
@@ -55,9 +55,11 @@ would pull `josyn-commons` out of its bottom-of-DAG position.
 
 ## Packages
 
-No packages exist yet. Packages are added as helpers accumulate across the platform.
+| Package | Sub-folder | Status |
+|---------|-----------|--------|
+| `JOSYN.Commons.Log` | `josyn-commons-log/` | Existing |
 
-Each package will follow the naming pattern:
+Each package follows the naming pattern:
 
 ```
 josyn-commons-<topic>/   →  JOSYN.Commons.<Topic>
@@ -81,9 +83,9 @@ License: MIT | Company: HAEVG AG | Target: net10.0
 
 ## Sanity Notes
 
-### Current state — empty (expected)
-- No packages exist yet — this is the correct initial state, not a violation.
-- An empty repo with only scaffolding (`.local-build/`, `nuget.config`, `Directory.Build.props`) is fully compliant.
+### Current state
+
+- `JOSYN.Commons.Log` — process-local file logger; migrated from `JOSYN.Jap.Shared.Log` per ADR-008.
 
 ### Admission criteria (for any new package)
 Before any new package is added, verify it meets **all three** criteria:

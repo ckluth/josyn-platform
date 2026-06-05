@@ -75,3 +75,21 @@ Evaluate each item for every type and method in scope.
 |--------|---------|
 | `async void` method (outside event handler) | ❌ violation |
 | `.Result` property or `.GetAwaiter().GetResult()` call on a `Task` | ❌ violation |
+
+### 9. Error handler call site completeness
+
+`IErrorHandler` has two overloads by design. The compiler enforces that `callStack` and
+`exceptionDetails` are always provided explicitly on the raw path. What the compiler cannot
+enforce is *which overload* to use. That is a code-review responsibility.
+
+| Signal | Verdict |
+|--------|---------|
+| `Handle(result, ...)` used when a failed `Result` is in scope | ✅ pass — preferred path |
+| `Handle(msg, null, null)` when no `Result` or `Exception` exists at the call site | ✅ pass — honest acknowledgement |
+| `Handle(msg, null, null)` or `Handle(msg, null, ex.ToString())` when a failed `Result` is in scope | ❌ violation — use the `Result` overload; raw-string call discards the call chain |
+| `Handle(msg, callStack: null, exceptionDetails: ex.ToString())` when a caught `Exception` is in scope and no `Result` exists | ✅ pass |
+
+**Why:** The `Result`-typed overload extracts `ErrorMessage`, `CallStackAsString`, and
+`Exception` automatically. Using the raw overload when a `Result` is available is a manual
+re-extraction that is both more verbose and prone to forgetting `CallStackAsString`.
+The compiler prevents the worst case (bare call); this rule prevents the subtle case.

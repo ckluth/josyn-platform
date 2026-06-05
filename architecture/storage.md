@@ -42,7 +42,7 @@ never appear in the public API of a storage package.
 |-------------------------|----------------------------------|------------------------------|----------|
 | Session records         | `JOSYN.Backend.SessionStore`     | `josyn.SessionStore`         | Existing |
 | Job registry            | `JOSYN.Backend.JobRegistry`      | `josyn.JobRegistry`          | Planned  |
-| Error records           | *(TBD)*                          | *(TBD)*                      | Future   |
+| Error records           | `JOSYN.Backend.ErrorHandler`     | `josyn.ErrorStore`           | Existing |
 | Infrastructure registry | *(TBD)*                          | *(TBD)*                      | Future   |
 
 Each new domain must be recorded as an ADR or in the owning component's documentation

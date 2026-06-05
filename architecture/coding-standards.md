@@ -137,6 +137,7 @@ Prefer `internal` over `public` wherever the wider API surface is not required.
 - When a failure path exists: return `Result.Error(...)` or `return ex;` — never `throw`.
 - When propagating a failure upward: use `Result.Propagate(inner)` — never re-wrap.
 - When choosing an access modifier: default to `internal`; escalate to `public` only when the member is part of the intended public API.
+- When calling `IErrorHandler.Handle()` and a failed `Result` is in scope at the call site: use the `Handle(Result, ...)` overload — it extracts all diagnostic context automatically. The raw `Handle(string, string?, string?, ...)` overload is for paths where no `Result` exists; passing `null, null` there is correct and deliberate. Using the raw overload when a `Result` is available is a violation.
 
 ### Never do
 
