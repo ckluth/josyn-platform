@@ -207,6 +207,16 @@ At the convention layer (JIP), messages are JSON objects:
 ```
 
 `JipDispatcher` on the server side auto-discovers handler methods via reflection on `IJosynApplicationProtocol`.
+`RegisterAll` supports exactly three method signatures (see ADR-011):
+
+| Signature | Wire encoding |
+|-----------|---------------|
+| `Task<Result<string>> Method()` | String payload as-is |
+| `Task<Result<TEnum>> Method()` where `typeof(TEnum).IsEnum` | `Enum.ToString()` / `Enum.Parse<TEnum>()` |
+| `Task<Result> Method(string)` | String payload as-is |
+
+Any other signature causes a hard failure at startup. This rule is closed: `string` and `enum`
+are the only supported value types at the JIP convention layer.
 
 Session isolation: each job execution gets a fresh GUID. The scheduler passes this GUID as the first CLI argument (`JOSYN-IPC <guid>`). Both sides use it to name the pipes — zero port conflicts, zero cross-contamination.
 

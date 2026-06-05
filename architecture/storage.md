@@ -43,7 +43,7 @@ never appear in the public API of a storage package.
 | Session records         | `JOSYN.Backend.SessionStore`     | `josyn.SessionStore`         | Existing |
 | Job registry            | `JOSYN.Backend.JobRegistry`      | `josyn.JobRegistry`          | Planned  |
 | Error records           | `JOSYN.Backend.ErrorHandler`     | `josyn.ErrorStore`           | Existing |
-| Configuration           | `JOSYN.Backend.ConfigStore`      | `josyn.ConfigStore`          | Planned  |
+| Configuration           | `JOSYN.Backend.ConfigStore`      | `josyn.ConfigStore`          | Existing |
 | Infrastructure registry | *(TBD)*                          | *(TBD)*                      | Future   |
 
 Each new domain must be recorded as an ADR or in the owning component's documentation
@@ -105,3 +105,14 @@ josyn-backend/db/
 ```
 
 Scripts are applied manually. No migration runner tool is used.
+
+---
+
+## ConfigStore Key Catalogue
+
+All well-known keys are defined as constants in `JOSYN.Backend.ConfigStore.ConfigKeys`.
+Use the constant — never a raw string.
+
+| Key | Type / Valid Values | Written by | Read by | Notes |
+|-----|---------------------|------------|---------|-------|
+| `RuntimeEnvironment` | `RuntimeEnvironment` enum name: `DEV`, `INT`, `PROD` | Installation / setup script | `JAPServer.GetEnvironment()` | One value per installation. See ADR-010. |

@@ -90,6 +90,25 @@ return ex;                           // Exception → Result<Assembly>
 return Result.Success;               // void success
 ```
 
+> **Ternary trap — `Result<string>`:** When `TValue = string`, never rely on the implicit
+> `string → Result<string>` conversion as a ternary branch when the other branch is `Error`.
+> The C# compiler resolves the common type of both branches — not the target type — and will
+> silently convert the `string` to `Error(string)` (a failure). Always use
+> `Result<string>.Success(value)` explicitly on the success branch:
+>
+> ```csharp
+> // WRONG — "INT" silently becomes Error("INT"):
+> Result<string> GetValue(string key) =>
+>     dict.TryGetValue(key, out var v) ? v : Result.Error("not found");
+>
+> // CORRECT:
+> Result<string> GetValue(string key) =>
+>     dict.TryGetValue(key, out var v) ? Result<string>.Success(v) : Result.Error("not found");
+> ```
+>
+> `implicit operator Error(string)` has been deliberately removed from `Error` to prevent
+> this class of bug. `string → Error` no longer compiles.
+
 ### 5. Interfaces as contracts, not polymorphism
 
 Public static types get a companion interface with `static abstract` members in `Contracts/`.

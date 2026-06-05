@@ -7,19 +7,9 @@
 
 ## ⏭ Next session — start here
 
-**Prompt to give the agent:**
+**PoC is complete. Next work is production hardening and ADR-010 resolution.**
 
-> "Der prompt ist `C:\Users\chris\OneDrive\DevGit\josyn-roadmap\prompts\prompt-017.md`.
-> Lies zuerst `josyn-platform/plans/context-provider-poc-plan.md` und
-> `josyn-platform/decisions/ADR-009-runtime-context-provider-pattern.md`.
-> Wir sind bei Step 3 (AdapterContracts-Package). Mach weiter."
-
-**State to know:**
-- Steps 1 + 2 are done and built. Pack-chain runs clean.
-- The demo round-trip works end-to-end.
-- `JOSYN.Backend.ConfigStore` is the adapter target — not `BootstrapConfig`.
-- Step 3 needs a new minimal package `JOSYN.Backend.AdapterContracts` with `IConfigSource`.
-- `ConfigStore` will then reference `AdapterContracts` and `SqlConfigSource` will implement `IConfigSource`.
+Suggested starting point: read `josyn-platform/decisions/ADR-010-environment-separation.md` and resolve its open questions now that the adapter pattern is proven..
 
 ---
 
@@ -28,6 +18,12 @@
 - ADR-009 is **Accepted**. The pattern is decided.
 - A working demo round-trip already exists (job spawning + JAP args flow).
 - ✅ **Step 1 complete:** `BootstrapConfig` (INI file) is implemented and wired up.
+- ✅ **Step 2 complete:** `ConfigStore` (SQL) is implemented. `ConfigKeys` holds well-known keys. `RuntimeEnvironment` is wired into `JAPServer.GetEnvironment()`.
+- ✅ **Step 3 complete:** `JOSYN.Backend.AdapterContracts` package created with `IConfigSource`. `SqlConfigSource` implements it in `ConfigStore`.
+- ✅ **Step 4 complete:** `AdapterLoadContext` implemented. `BootstrapConfig` has optional `ConfigSourceType`. `Host.cs` resolves `IConfigSource` at startup — `SqlConfigSource` if absent, adapter via ALC if present. Fail-fast with clear messages.
+- ✅ **Step 5 complete:** `josyn-contoso` repo created. `ContosoConfigSource` implements `IConfigSource` with hardcoded `INT`. Demo confirmed both paths work: with adapter → `INT`, without → `DEV` from SQL.
+
+**PoC complete. ADR-009 is proved.**
 
 ---
 
