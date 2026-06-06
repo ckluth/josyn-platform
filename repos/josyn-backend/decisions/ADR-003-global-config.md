@@ -55,8 +55,7 @@ implementations.
 
 ### 5. `JapServerExePath` is a developer-machine path in the PoC implementation
 
-The hardcoded path `C:\Temp\VS.OUT\JOSYN\JOSYN.Jap.JAPServer\bin\Release\...` matches
-the output path produced by `Directory.Build.props` on development machines. It is
+The hardcoded path `C:\Temp\VS.OUT\JOSYN\JOSYN.Jap.JAPServer\bin\Release\...` is
 Release-only and machine-specific. This is intentional and documented — the path will
 be supplied by a real config source when the platform leaves the PoC phase.
 

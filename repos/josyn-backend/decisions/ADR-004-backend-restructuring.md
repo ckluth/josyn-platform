@@ -50,7 +50,6 @@ Each trigger executable lives in its own Pattern B sub-folder and solution:
 
 ```
 josyn-backend-listener/
-├── Directory.Build.props
 ├── nuget.config
 ├── JOSYN.Backend.Listener.slnx
 ├── .local-build/
@@ -60,7 +59,6 @@ josyn-backend-listener/
     └── Program.cs                  ← EXE stub; references SessionStarter via NuGet
 
 josyn-backend-ticker/
-├── Directory.Build.props
 ├── nuget.config
 ├── JOSYN.Backend.Ticker.slnx
 ├── .local-build/
@@ -70,7 +68,6 @@ josyn-backend-ticker/
     └── Program.cs                  ← EXE stub; references SessionStarter via NuGet
 
 josyn-backend-cli/
-├── Directory.Build.props
 ├── nuget.config
 ├── JOSYN.Backend.CLI.slnx
 ├── .local-build/
@@ -90,7 +87,6 @@ Listener, Ticker, and CLI will evolve into components with completely different 
 
 ```
 josyn-backend-error-handler/
-├── Directory.Build.props
 ├── nuget.config
 ├── JOSYN.Backend.ErrorHandler.slnx
 ├── .local-build/
@@ -201,7 +197,7 @@ least likely to generate it.
 
 *Listener, Ticker, and CLI are currently empty stubs. They are nearly identical: one `Program.cs`,
 one set of NuGet references, one `.local-build`. Maintaining three separate solutions, build
-scripts, and `Directory.Build.props` files for three stub projects imposes structural overhead
+scripts, and `nuget.config` files for three stub projects imposes structural overhead
 with no immediate benefit.*
 
 **Rebuttal:** The overhead at stub stage is exactly one `Program.cs` and a build script per

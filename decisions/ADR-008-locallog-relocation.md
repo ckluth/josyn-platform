@@ -52,7 +52,6 @@ The public API, behaviour, and dependency (ResultPattern only) are unchanged.
 ```
 josyn-commons/
 └── josyn-commons-log/
-    ├── Directory.Build.props
     ├── nuget.config
     ├── JOSYN.Commons.Log.slnx
     ├── .local-build/

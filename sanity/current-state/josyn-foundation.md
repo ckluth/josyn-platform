@@ -120,7 +120,6 @@ All criteria pass.
 - File names match type names throughout ✅
 - Interface files prefixed with `I` ✅
 
-**Known PoC limitations (documented in `POC-HACKS.md`, not violations):**
-- `Directory.Build.props` uses hardcoded `C:\Temp\VS.OUT\JOSYN\` build output path
+**Known PoC limitations:**
 - Local NuGet feed path — production-only concern
 

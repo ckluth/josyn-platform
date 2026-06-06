@@ -35,7 +35,6 @@ Layout:
 
 ```
 josyn-backend-job-registry/
-├── Directory.Build.props
 ├── nuget.config
 ├── JOSYN.Backend.JobRegistry.slnx
 ├── .local-build/

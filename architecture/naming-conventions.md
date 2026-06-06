@@ -100,7 +100,6 @@ Each repo organises its projects as:
 ├── <AssemblyName>.Test/          ← test project; directory matches assembly name
 │   └── <AssemblyName>.Test.csproj
 ├── <AssemblyName>.slnx           ← solution file at repo root
-├── Directory.Build.props         ← shared build output paths
 ├── nuget.config                  ← local package feed
 └── .local-build/                 ← local build scripts
     ├── build.cmd

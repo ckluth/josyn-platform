@@ -114,37 +114,31 @@ josyn-backend/
 │       └── V003__error_store.sql           ← josyn.ErrorStore
 ├── local-packages/                         ← local NuGet feed
 ├── josyn-backend-session-store/            ← Pattern B sub-folder
-│   ├── Directory.Build.props
 │   ├── nuget.config
 │   ├── JOSYN.Backend.SessionStore.slnx
 │   ├── .local-build/                       ← solution-local build + pack scripts
 │   └── JOSYN.Backend.SessionStore/
 ├── josyn-backend-global-config/            ← Pattern B sub-folder
-│   ├── Directory.Build.props
 │   ├── nuget.config
 │   ├── JOSYN.Backend.GlobalConfig.slnx
 │   ├── .local-build/                       ← solution-local build + pack scripts
 │   └── JOSYN.Backend.GlobalConfig/
 ├── josyn-backend-session-starter/          ← Pattern B sub-folder
-│   ├── Directory.Build.props
 │   ├── nuget.config
 │   ├── JOSYN.Backend.SessionStarter.slnx
 │   ├── .local-build/                       ← solution-local build + pack scripts
 │   └── JOSYN.Backend.SessionStarter/
 ├── josyn-backend-job-registry/             ← Pattern B sub-folder
-│   ├── Directory.Build.props
 │   ├── nuget.config
 │   ├── JOSYN.Backend.JobRegistry.slnx
 │   ├── .local-build/                       ← solution-local build + pack scripts
 │   └── JOSYN.Backend.JobRegistry/
 ├── josyn-backend-error-handler/            ← Pattern B sub-folder
-│   ├── Directory.Build.props
 │   ├── nuget.config
 │   ├── JOSYN.Backend.ErrorHandler.slnx
 │   ├── .local-build/                       ← solution-local build + pack scripts
 │   └── JOSYN.Backend.ErrorHandler/
 ├── josyn-backend-jap-server/              ← Pattern B sub-folder
-│   ├── Directory.Build.props
 │   ├── nuget.config
 │   ├── JOSYN.Jap.JAPServer.slnx
 │   ├── .local-build/                       ← solution-local build + launch scripts
@@ -213,7 +207,6 @@ _jipDispatcher.RegisterAll<IJosynApplicationProtocol>(jAPServer);
 ### PoC limitations
 
 - Demo session key: `dea5611d-d740-437f-ad93-7a5dc5ae4299` in `launchSettings.json`
-- Machine-specific build output path in `Directory.Build.props`
 
 ---
 

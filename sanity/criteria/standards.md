@@ -67,7 +67,6 @@ Each repo must follow:
 ├── <AssemblyName>.Test/          ← test project directory matches assembly name
 │   └── <AssemblyName>.Test.csproj
 ├── <AssemblyName>.slnx           ← solution file at repo root
-├── Directory.Build.props         ← shared build output redirect
 ├── nuget.config                  ← local package feed at `..\..\local-packages\`
 └── .local-build/
     ├── build.cmd

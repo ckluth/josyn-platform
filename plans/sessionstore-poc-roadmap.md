@@ -19,7 +19,7 @@ New Pattern-B sub-folder: `josyn-backend/josyn-backend-session-store/`
 - `Db/SessionStoreDbContext.cs` (internal), `Db/SessionStoreEntity.cs` (internal)
 - Dependencies: `JOSYN.Foundation.ResultPattern`, `Microsoft.EntityFrameworkCore.SqlServer`
 
-Supporting: solution, `Directory.Build.props`, `nuget.config`, `.local-build/`
+Supporting: solution, `nuget.config`, `.local-build/`
 
 Documentation:
 - `ADR-002-session-store.md` in `josyn-platform/repos/josyn-backend/decisions/`
@@ -44,7 +44,7 @@ This is a placeholder. The real implementation (file-based, registry, or company
 is a future concern. The interface stabilises the contract so all consumers are wired correctly
 from day one.
 
-Supporting: solution, `Directory.Build.props`, `nuget.config`, `.local-build/`
+Supporting: solution, `nuget.config`, `.local-build/`
 
 Documentation:
 - `ADR-003-global-config.md` in `josyn-platform/repos/josyn-backend/decisions/`
@@ -66,7 +66,7 @@ New Pattern-B sub-folder: `josyn-backend/josyn-backend-session-starter/`
 Note: NuGet producer only - no EXE here.
 Future Category B executables (listener-service, ticker-service, cli-exe) are the consumers.
 
-Supporting: solution, `Directory.Build.props`, `nuget.config`, `.local-build/`
+Supporting: solution, `nuget.config`, `.local-build/`
 
 ---
 

@@ -49,7 +49,7 @@ the contract shared by the two parties that speak JAP: `josyn-job-host` (client)
 
 JAPServer receives its **own, separate solution** inside its own kebab sub-folder, following
 Pattern B (multi-solution repo). Each logical build unit in `josyn-backend` lives in its own
-kebab sub-folder containing its solution file, `Directory.Build.props`, and `nuget.config`.
+kebab sub-folder containing its solution file and `nuget.config`.
 
 ```
 josyn-backend/
@@ -57,7 +57,6 @@ josyn-backend/
 │   ├── build.cmd                           ← builds ALL solutions in the repo
 │   └── pack.cmd
 ├── josyn-backend-jap-server/               ← self-contained solution root
-│   ├── Directory.Build.props
 │   ├── nuget.config
 │   ├── JOSYN.Jap.JAPServer.slnx
 │   ├── .local-build/                       ← solution-local build + launch scripts

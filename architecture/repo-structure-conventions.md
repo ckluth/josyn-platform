@@ -16,7 +16,6 @@ The git root **is** the solution root. There is no intermediate folder level.
 ```
 <repo-root>/
 ├── <AssemblyName>.slnx           ← the one solution
-├── Directory.Build.props         ← build output config (scoped to this solution)
 ├── nuget.config                  ← local package feed (scoped to this solution)
 ├── README.md
 ├── .local-build/                 ← local developer tooling (see local-build.md)
@@ -24,8 +23,7 @@ The git root **is** the solution root. There is no intermediate folder level.
 └── <AssemblyName>.Test/          ← test project
 ```
 
-`Directory.Build.props` and `nuget.config` are **repo-scoped and solution-scoped
-simultaneously** — there is no distinction because there is only one solution.
+`nuget.config` is **repo-scoped and solution-scoped simultaneously** — there is no distinction because there is only one solution.
 
 **Canonical example:** `josyn-job-host`
 
@@ -47,7 +45,6 @@ self-contained Pattern-A root.
 ├── .local-build/                 ← local developer tooling — batch level (see local-build.md)
 ├── <kebab-solution-a>/           ← self-contained solution root (Pattern A inside)
 │   ├── <AssemblyName>.slnx
-│   ├── Directory.Build.props
 │   ├── nuget.config
 │   ├── README.md
 │   ├── .local-build/             ← local developer tooling — single-target (see local-build.md)
@@ -55,7 +52,6 @@ self-contained Pattern-A root.
 │   └── <AssemblyName>.Test/
 └── <kebab-solution-b>/           ← independent; same structure
     ├── <AssemblyName>.slnx
-    ├── Directory.Build.props
     ├── nuget.config
     ├── README.md
     ├── .local-build/             ← local developer tooling — single-target (see local-build.md)
@@ -63,8 +59,8 @@ self-contained Pattern-A root.
     └── <AssemblyName>.Test/
 ```
 
-`Directory.Build.props` and `nuget.config` belong to the **sub-folder**, never the repo root.
-Each solution controls its own build paths and feed config independently.
+`nuget.config` belongs to the **sub-folder**, never the repo root.
+Each solution controls its own feed config independently.
 
 Sub-folder names follow the same kebab-case pattern as repo names:
 `<repo-name>-<solution-descriptor>` (e.g., `josyn-foundation-result-pattern`).

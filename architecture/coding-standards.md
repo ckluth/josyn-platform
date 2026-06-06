@@ -248,8 +248,6 @@ Every NuGet-publishable project includes:
 </PropertyGroup>
 ```
 
-`Directory.Build.props` at repo root redirects all build output to `C:\Temp\VS.OUT\JOSYN\<ProjectName>\` (PoC convenience — replace with standard paths for CI).
-
 ---
 
 ## NuGet Feed

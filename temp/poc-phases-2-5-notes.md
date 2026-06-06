@@ -37,7 +37,7 @@ public string JapServerExePath =>
 
 - **Connection string**: verify SQL Server is reachable at `localhost`, database `JobSystem` exists.
 - **JapServerExePath**: verify the Release build output path matches your machine.
-  After `build.cmd Release`, the EXE should be at exactly that path (driven by `Directory.Build.props`).
+  After `build.cmd Release`, the EXE should be at exactly that path.
 
 If you change these values you must re-pack GlobalConfig:
 ```
@@ -165,9 +165,7 @@ the store, writes back to the store. The demo just lacks an automated job-side c
 
 ## Stale item to clean up
 
-`josyn-backend/POC-HACKS.md` entry **"1. Fake-Implementierung (`JAPServer.cs`)"** is now
-obsolete — `FakeReadArgumentsFromFile` was removed in Phase 4. You can delete that entry
-(or the whole file if the other entries are also resolved).
+This section is now obsolete — `FakeReadArgumentsFromFile` was removed in Phase 4.
 
 ---
 
