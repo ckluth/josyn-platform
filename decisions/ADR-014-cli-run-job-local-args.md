@@ -113,6 +113,11 @@ an operator starts a parameterised job without an argument file.
 
 ### The `local-arguments` Convention
 
+> **Scope:** `local-arguments\` is a CLI and maintainer convention. It is **not** a production
+> execution vehicle. The `ticker-service` must not read from this folder without a dedicated
+> architectural decision. How scheduled job arguments reach the ticker at runtime is an
+> explicitly deferred question — see *Open Questions* below.
+
 Each job folder in the deployed job repository may optionally contain a `local-arguments\`
 subfolder:
 
@@ -245,6 +250,26 @@ may be omitted.
 ---
 
 ## Open Questions
+
+> **⚠ DEFERRED — Production argument sourcing for the `ticker-service`**
+>
+> How scheduled job arguments reach the `ticker-service` at runtime is an open architectural
+> decision that must be resolved before the scheduling subsystem is designed.
+>
+> Candidate options:
+> - **A — Database:** arguments stored inline in the scheduling descriptor or a dedicated
+>   `josyn.JobArgumentSets` table. Change path: SQL migration → source control → pipeline.
+> - **B — Source-controlled files:** `.ini` files version-controlled in the job repo,
+>   deployed by pipeline. `local-arguments\` on production becomes a pipeline output.
+> - **C — Management surface:** arguments managed via an admin API/UI, stored in DB,
+>   with built-in audit and versioning.
+>
+> **Governance constraint (non-negotiable):** the chosen mechanism must support pipeline-based
+> change management with full audit trail. RDP-based file editing is not an acceptable
+> change path for production argument sets.
+>
+> `local-arguments\` must **not** be assumed as the answer for the ticker-service without
+> an explicit decision captured in a follow-up ADR.
 
 1. **`local-arguments` source of truth:** Where do the `.ini` and `.cmd` files live before
    deployment?
