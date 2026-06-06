@@ -157,6 +157,7 @@ Prefer `internal` over `public` wherever the wider API surface is not required.
 - When propagating a failure upward: use `Result.Propagate(inner)` — never re-wrap.
 - When choosing an access modifier: default to `internal`; escalate to `public` only when the member is part of the intended public API.
 - When calling `IErrorHandler.Handle()` and a failed `Result` is in scope at the call site: use the `Handle(Result, ...)` overload — it extracts all diagnostic context automatically. The raw `Handle(string, string?, string?, ...)` overload is for paths where no `Result` exists; passing `null, null` there is correct and deliberate. Using the raw overload when a `Result` is available is a violation.
+- When calling `IErrorHandler.Handle()`: do not also call `LocalLog` at the same site. The handler's own fallback writes to `LocalLog` if SQL fails — calling both unconditionally makes `LocalLog` a co-primary, not a fallback. The only legitimate `LocalLog` call sites outside `SqlErrorHandler` itself are bootstrap paths that execute before the error handler is constructed.
 
 ### Never do
 
@@ -166,6 +167,7 @@ Prefer `internal` over `public` wherever the wider API surface is not required.
 - Write defensive `try/catch` blocks outside the lowest-layer boundary.
 - Use `public` where `internal` is sufficient.
 - Use the null-forgiving operator (`!`) without an inline comment that proves the value cannot be null — prefer eliminating it via Result propagation entirely.
+- Call `LocalLog.WriteError(...)` and `errorHandler.Handle(...)` at the same error site — that is double-logging. `LocalLog` is the fallback *inside* the handler; call sites must not duplicate it. The no-swallow guarantee in ADR-006 §6 proves the fallback chain is closed without call-site involvement.
 
 ---
 

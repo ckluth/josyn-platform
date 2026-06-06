@@ -166,6 +166,23 @@ becoming an error source.
 
 Note: the fallback depends on `JOSYN.Commons.Log` being available (ADR-008 prerequisite).
 
+#### No-swallow guarantee
+
+The fallback chain is closed — no error can be silently lost inside `SqlErrorHandler`:
+
+| Scenario | Outcome |
+|----------|---------|
+| SQL write succeeds | Record persisted to `josyn.ErrorStore` |
+| SQL write fails (any exception) | `catch` fires → `LocalLog.WriteError(...)` |
+| `LocalLog` write fails (disk/permissions) | `LocalLog.AppendEntry` has its own bare `catch {}` — process is not endangered |
+
+The only total loss scenario is SQL down **and** filesystem write fails simultaneously —
+an infrastructure failure no in-process mechanism can recover from.
+
+This guarantee is the reason call sites must **not** duplicate `LocalLog` calls alongside
+`errorHandler.Handle()`. The fallback is owned entirely by `SqlErrorHandler`; adding it
+at call sites produces redundant double-logging without improving coverage.
+
 ### 7. `FileSystemErrorHandler` is removed
 
 The stub `FileSystemErrorHandler` is deleted. `SqlErrorHandler` is the sole production
