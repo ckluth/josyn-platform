@@ -1,200 +1,193 @@
-# ADR-012 — Maintainer Deployment (Erste Iteration)
+# ADR-012 — Maintainer Deployment (First Iteration)
 
 **Date:** 2026-06-06
-**Status:** Proposal — unter Konstruktion; dient als Basis für späteres Refinement
+**Status:** Proposal — under construction; serves as basis for later refinement
 
 ---
 
 ## Context
 
-Die JOSYN-Plattform befindet sich in der PoC-Phase. Es gibt noch kein CI/CD-System,
-keinen Installer und keine automatisierte Staging-Pipeline. Dennoch ist es notwendig,
-die aufeinander abgestimmten Artefakte (Backend-EXEs, Adapter-DLLs, Job-EXEs,
-bootstrap.ini) reproduzierbar und ohne Handarbeit auf einem Entwicklungsrechner zu
-deployen — sowohl für Integrationstests als auch zur manuellen Demonstration.
+The JOSYN platform is in the PoC phase. There is no CI/CD system, no installer, and no
+automated staging pipeline yet. Nevertheless it is necessary to deploy the coordinated set
+of artefacts (backend EXEs, adapter DLLs, job EXEs, bootstrap.ini) reproducibly and without
+manual steps on a developer machine — both for integration testing and for manual
+demonstration.
 
-Dieses ADR beschreibt die erste, bewusst einfach gehaltene Iteration: ein einzelnes
-PowerShell-Skript für den Maintainer-Einsatz auf demselben Rechner, auf dem die
-lokalen Repos liegen.
+This ADR describes the first, deliberately simple iteration: a single PowerShell script for
+maintainer use on the same machine where the local repos reside.
 
 ---
 
 ## Decision
 
-### Deployment-Skript
+### Deployment Script
 
-Ein PowerShell-Skript `deploy-maintainer.ps1` liegt in:
+A PowerShell script `deploy-maintainer.ps1` lives at:
 
 ```
 josyn-sandbox\tools\deploy\deploy-maintainer.ps1
 ```
 
-Das Skript ist in `josyn-sandbox` abgelegt, weil es:
-- keine Plattform-eigene Infrastruktur ist (kein CI, kein Service, kein Protokoll)
-- Maintainer-Tooling ist — bewusst außerhalb der produzierten Artefakte
-- Abhängigkeit auf mehrere Repos hat (`josyn-backend`, `josyn-contoso`) und deshalb
-  nicht sinnvoll in einem einzelnen Repo beheimatet ist
+The script is placed in `josyn-sandbox` because it:
+- is not platform infrastructure (no protocol, no CI, no service)
+- is maintainer tooling — deliberately outside the produced artefacts
+- has dependencies on multiple repos (`josyn-backend`, `josyn-contoso`) and therefore
+  does not belong cleanly in any single repo
 
-Das Skript verwendet **`dotnet publish --no-self-contained`** statt `dotnet build + Copy-Item`.
-Damit werden alle Laufzeit-Abhängigkeiten vollständig und ohne manuelle Selektion in
-den Zielordner publiziert.
+The script uses **`dotnet publish --no-self-contained`** instead of `dotnet build + Copy-Item`.
+This publishes all runtime dependencies completely and without manual selection into the
+target folder.
 
-### Zielstruktur
+### Target Structure
 
 ```
 $BackendRoot\                            (default: C:\ProgramData\JOSYN)
-    josyn.bootstrap.ini                  <- gemeinsame Bootstrap-Konfiguration
+    josyn.bootstrap.ini                  <- shared bootstrap configuration
     CLI\
-        JOSYN.Backend.CLI.exe            <- Backend-CLI-Executable
+        JOSYN.Backend.CLI.exe            <- backend CLI executable
     JAPServer\
-        JOSYN.Jap.JAPServer.exe          <- JAP-Server-Executable
+        JOSYN.Jap.JAPServer.exe          <- JAP server executable
         Adapters\
-            Contoso.Josyn.Adapter.dll    <- Adapter-Assembly (ADR-009)
+            Contoso.Josyn.Adapter.dll    <- adapter assembly (ADR-009)
 
 $JobRepositoryRoot\                      (default: C:\ProgramData\JOSYN\JobRepository)
     Contoso.DemoProduct.DemoJob\
-        Contoso.DemoProduct.DemoJob.exe  <- Erster Demojob
+        Contoso.DemoProduct.DemoJob.exe  <- first demo job
 ```
 
-### bootstrap.ini-Konvention
+### bootstrap.ini Convention
 
-`josyn.bootstrap.ini` liegt auf `$BackendRoot`-Ebene — eine Ebene **über** dem
-Verzeichnis des jeweiligen Trigger-Executables. Jedes Trigger-Exe (CLI, künftig
-Listener, Ticker, …) lädt sie über:
+`josyn.bootstrap.ini` lives at the `$BackendRoot` level — one level **above** the directory
+of each trigger executable. Every trigger exe (CLI, and in future: listener, ticker, …) loads
+it via:
 
 ```csharp
 Path.Combine(AppContext.BaseDirectory, "..", "josyn.bootstrap.ini")
 ```
 
-**Begründung:** Die ini ist keine CLI-eigene Konfiguration, sondern eine
-Installations-weite Bootstrap-Ressource. Sie einmal auf `$BackendRoot`-Ebene
-abzulegen vermeidet Duplizierung und stellt sicher, dass alle Trigger-Executables
-dieselbe Konfiguration sehen.
+**Rationale:** The ini is not CLI-specific configuration — it is an installation-wide bootstrap
+resource. Placing it once at `$BackendRoot` level avoids duplication and ensures that all
+trigger executables see the same configuration.
 
-### BackendRoot-Konvention
+### BackendRoot Convention
 
-Das Verzeichnis der geladenen `josyn.bootstrap.ini` **ist** der BackendRoot.
-Alle weiteren Deployment-Pfade werden daraus per Konvention abgeleitet —
-kein einziger Pfad steht explizit in der ini:
+The directory of the loaded `josyn.bootstrap.ini` **is** the BackendRoot.
+All further deployment paths are derived from it by convention —
+no path is stored explicitly in the ini:
 
-| Ressource | Konventionspfad |
-|-----------|----------------|
-| JAPServer-Executable | `BackendRoot\JAPServer\JOSYN.Jap.JAPServer.exe` |
-| Job-Repository | `BackendRoot\JobRepository\{JobTypeName}\{JobTypeName}.exe` |
+| Resource | Convention path |
+|----------|----------------|
+| JAPServer executable | `BackendRoot\JAPServer\JOSYN.Jap.JAPServer.exe` |
+| Job repository | `BackendRoot\JobRepository\{JobTypeName}\{JobTypeName}.exe` |
 | Adapters | `BackendRoot\JAPServer\Adapters\` |
 
-`BackendRoot` selbst wird in `FileBootstrapConfig` als `Path.GetDirectoryName(iniPath)`
-berechnet und über `IBootstrapConfig.BackendRoot` bereitgestellt.
+`BackendRoot` itself is computed in `FileBootstrapConfig` as `Path.GetDirectoryName(iniPath)`
+and exposed via `IBootstrapConfig.BackendRoot`.
 
-### JAPServer-Pfad-Konvention
+### JAPServer Path Convention
 
-Der Pfad zu `JOSYN.Jap.JAPServer.exe` wird **nicht** in der `josyn.bootstrap.ini`
-konfiguriert. Stattdessen berechnet `SessionStarter` ihn zur Laufzeit per Konvention:
+The path to `JOSYN.Jap.JAPServer.exe` is **not** configured in `josyn.bootstrap.ini`.
+Instead, `SessionStarter` computes it at runtime by convention:
 
 ```
-<Verzeichnis des aufrufenden Trigger-Executables>/../JAPServer/JOSYN.Jap.JAPServer.exe
+<directory of the invoking trigger executable>/../JAPServer/JOSYN.Jap.JAPServer.exe
 ```
 
-**Begründung:**  
-`SessionStarter` ist der einzige Ort, der `JAPServer.exe` kennen muss. Neben dem
-aktuellen CLI-Executable wird es künftig weitere Trigger-Executables geben
-(Scheduler-Service, Workflow-Adapter). Alle werden als Geschwister-Unterordner neben
-`JAPServer\` deployed. Die Konvention hält diese Kopplung ohne Konfigurationsaufwand
-konsistent — auf Kosten einer festen Verzeichnisstruktur, die durch dieses ADR
-verbindlich festgelegt wird.
+**Rationale:**
+`SessionStarter` is the only place that needs to know `JAPServer.exe`. Beyond the current
+CLI executable, further trigger executables will be introduced in future (scheduler service,
+workflow adapter). All are deployed as sibling sub-folders next to `JAPServer\`. The
+convention keeps this coupling consistent without any configuration overhead — at the cost
+of a fixed directory structure, which this ADR makes binding.
 
-**Konsequenz für Deployment:**  
-Der `JapServerExePath`-Schlüssel entfällt aus `josyn.bootstrap.ini` vollständig.
-`deploy-maintainer.ps1` schreibt ihn nicht mehr.
+**Consequence for deployment:**
+The `JapServerExePath` key is removed from `josyn.bootstrap.ini` entirely.
+`deploy-maintainer.ps1` no longer writes it.
 
-### bootstrap.ini-Anpassung
+### bootstrap.ini Adjustment
 
-Die `josyn.bootstrap.ini` aus dem `josyn-backend`-Repo-Wurzel wird kopiert und dabei
-zwei Schlüssel auf Deployment-Pfade umgeschrieben:
+`josyn.bootstrap.ini` from the `josyn-backend` repo root is copied as-is. No keys need
+to be rewritten:
 
-| Schlüssel | Ursprungswert (Repo) | Deployment-Wert |
-|-----------|----------------------|-----------------|
+| Key | Repo value | Deployment value |
+|-----|-----------|-----------------|
 | — | — | — |
 
-Keine Schlüssel müssen umgeschrieben werden. `SessionStoreConnectionString` und
-`ConfigSourceType` werden unverändert übernommen. Alle Pfad-Schlüssel entfallen —
-sie werden per BackendRoot-Konvention berechnet (siehe Abschnitt oben).
+`SessionStoreConnectionString` and `ConfigSourceType` are carried over unchanged.
+All path keys are gone — they are computed by convention from BackendRoot (see above).
 
-### Reihenfolge der Schritte
+### Execution Order
 
-1. Zielordner bereinigen (vollständiges Delete + Recreate)
-2. `JOSYN.Jap.JAPServer` publizieren → `$BackendRoot\JAPServer\`
-3. `JOSYN.Backend.CLI` publizieren → `$BackendRoot\CLI\`
-4. `Contoso.Josyn.Adapter` publizieren → `$BackendRoot\JAPServer\Adapters\`
-5. `Contoso.DemoProduct.DemoJob` publizieren → `$JobRepositoryRoot\Contoso.DemoProduct.DemoJob\`
-6. `josyn.bootstrap.ini` kopieren und anpassen (`JobRepositoryRoot`) → `$BackendRoot\`
+1. Clean target folder (full delete + recreate)
+2. Publish `JOSYN.Jap.JAPServer` → `$BackendRoot\JAPServer\`
+3. Publish `JOSYN.Backend.CLI` → `$BackendRoot\CLI\`
+4. Publish `Contoso.Josyn.Adapter` → `$BackendRoot\JAPServer\Adapters\`
+5. Publish `Contoso.DemoProduct.DemoJob` → `$JobRepositoryRoot\Contoso.DemoProduct.DemoJob\`
+6. Copy and adjust `josyn.bootstrap.ini` (`JobRepositoryRoot`) → `$BackendRoot\`
 
 ---
 
 ## Rationale
 
-**Warum `josyn-sandbox\tools\deploy\`?**
-Das Skript ist Maintainer-Tooling. Es hat keine Eigenschaft eines Plattform-Artefakts
-(kein Protokoll, kein NuGet-Paket, keine Assembly). `josyn-sandbox` ist der designierte
-Ort für solches Tooling. Der Sandbox-Constraint gilt in dieser Richtung nicht: das Skript
-*konsumiert* Plattform-Repos — es wird nicht von ihnen referenziert.
+**Why `josyn-sandbox\tools\deploy\`?**
+The script is maintainer tooling. It has no property of a platform artefact (no protocol,
+no NuGet package, no assembly). `josyn-sandbox` is the designated location for such tooling.
+The sandbox constraint does not apply in this direction: the script *consumes* platform repos
+— it is not referenced by them.
 
-**Warum vollständiges Löschen statt inkrementelles Update?**
-In der PoC-Phase ist das Zielverzeichnis kein produktiver Serviceordner — ein sauberer
-Zustand ist wichtiger als minimale Downtime. Der Maintainer deployt manuell; ein kurzer
-Ausfall ist akzeptabel.
+**Why a full delete instead of incremental update?**
+In the PoC phase the target directory is not a live service folder — a clean state is more
+important than minimal downtime. The maintainer deploys manually; a brief interruption is
+acceptable.
 
-**Warum `--no-self-contained`?**
-Der Entwicklungsrechner hat .NET 10 installiert. Self-contained würde die Deployment-
-Größe signifikant erhöhen ohne Mehrwert für diese Iteration.
+**Why `--no-self-contained`?**
+The developer machine has .NET 10 installed. Self-contained would significantly increase the
+deployment size with no benefit for this iteration.
 
 ---
 
-## Offene Fragen (Refinement-Basis)
+## Open Questions (Refinement Basis)
 
-Diese Fragen sind explizit offen — dieses ADR schließt sie nicht ab, dokumentiert
-sie aber als Input für eine spätere Deployment-Architektur:
+These questions are explicitly open — this ADR does not close them, but documents them as
+input for a future deployment architecture:
 
-1. **Staging-Umgebungen:** Wie wird zwischen DEV, INT, PROD unterschieden?
-   Separate bootstrap.ini pro Umgebung? Environment-Parameter im Skript?
-   (Vgl. ADR-010)
+1. **Staging environments:** How is the distinction between DEV, INT, and PROD handled?
+   Separate bootstrap.ini per environment? Environment parameter in the script?
+   (See ADR-010)
 
-2. **Job-Repository-Konvention:** Das `JobRepositoryRoot`-Konzept ist in
-   `IBootstrapConfig` als einfacher Stammpfad modelliert. Wenn Jobs mehrere
-   Dateien (Konfiguration, Icons, Manifest) benötigen, braucht jeder Job-Subfolder
-   eine definierte Struktur. Diese Struktur ist noch nicht entschieden.
+2. **Job repository convention:** The `JobRepositoryRoot` concept is modelled in
+   `IBootstrapConfig` as a simple root path. If jobs require multiple files (configuration,
+   icons, manifest), each job sub-folder needs a defined structure. That structure has not
+   been decided yet.
 
-3. **Adapter-Ladekonvention:** Das `Adapters\`-Unterverzeichnis neben dem Backend-EXE
-   ist eine Konvention aus ADR-009. Sie ist hier erstmals physisch umgesetzt.
-   Ob mehrere Adapter nebeneinander liegen können, ist noch nicht spezifiziert.
+3. **Adapter loading convention:** The `Adapters\` sub-directory next to the backend EXE is
+   a convention from ADR-009, physically implemented here for the first time. Whether multiple
+   adapters can coexist side by side has not been specified.
 
-4. **CI/CD:** Dieses Skript ist explizit kein CI-Build-Step. Wenn eine Pipeline
-   eingeführt wird, muss das Deployment-Modell neu entworfen werden (Staging-Slots,
-   Artifact-Upload, Rollback-Strategie).
+4. **CI/CD:** This script is explicitly not a CI build step. If a pipeline is introduced, the
+   deployment model must be redesigned (staging slots, artifact upload, rollback strategy).
 
-5. **Installer vs. Script:** Für eine echte Produktionsumgebung ist ein Windows-Installer
-   (MSI/WiX) oder ein Paketierungsformat naheliegend. Das ist außerhalb des aktuellen
-   Scopes.
+5. **Installer vs. script:** For a real production environment a Windows installer (MSI/WiX)
+   or a packaging format is the natural next step. That is outside the current scope.
 
-6. **Mehrere Jobs:** Derzeit ist `Contoso.DemoProduct.DemoJob` der einzige Job.
-   Wenn weitere Jobs hinzukommen, muss das Skript entweder erweitert oder
-   parametrisiert werden (z. B. Schleife über eine Liste von Job-Solutions).
+6. **Multiple jobs:** Currently `Contoso.DemoProduct.DemoJob` is the only job. When further
+   jobs are added the script must be extended or parameterised (e.g., a loop over a list of
+   job solutions).
 
 ---
 
 ## Consequences
 
-- Maintainer kann mit einem einzigen `pwsh .\deploy-maintainer.ps1`-Aufruf eine
-  vollständige, konsistente Deployment-Umgebung auf dem lokalen Rechner erstellen.
-- Die genaue Zielstruktur ist dokumentiert und reproducierbar.
-- Offene Fragen sind explizit festgehalten — späteres Refinement kann direkt
-  hier anknüpfen.
+- The maintainer can create a complete, consistent deployment environment on the local machine
+  with a single `pwsh .\deploy-maintainer.ps1` call.
+- The exact target structure is documented and reproducible.
+- Open questions are explicitly recorded — future refinement can pick up directly from here.
 
 ---
 
-## Relation zu anderen ADRs
+## Relation to Other ADRs
 
-- **ADR-009** (Runtime Context Provider / Adapter-Pattern): Das `Adapters\`-Verzeichnis
-  ist die physische Umsetzung der dort beschriebenen Adapter-Lademechanik.
-- **ADR-010** (Environment Separation): Dieses ADR adressiert nur DEV.
-  INT und PROD sind explizit offene Fragen (s. o.).
+- **ADR-009** (Runtime Context Provider / Adapter Pattern): The `Adapters\` directory is the
+  physical realisation of the adapter loading mechanism described there.
+- **ADR-010** (Environment Separation): This ADR addresses DEV only.
+  INT and PROD are explicitly open questions (see above).

@@ -73,7 +73,21 @@ agent infrastructure.
 
 ---
 
-## 4. Agent Behavior
+## 4. Language
+
+**All agent responses and all documents are written in English.**
+
+This applies regardless of the language the human uses in a given prompt. The maintainer's
+primary working language is English. German (or any other language) may appear in user
+messages; the agent always responds in English and produces all file content in English.
+
+This rule may be overridden only by an explicit instruction in a concrete prompt
+(e.g., "write this document in German"). That override applies to that single artefact only
+and does not carry over to subsequent responses or documents.
+
+---
+
+## 5. Agent Behavior
 
 - Stay sceptical — do not be a pleaser.
 - Always explain your plan before running anything.
@@ -96,7 +110,7 @@ This rule has no exceptions. A plan that has not been confirmed is not a plan th
 
 ---
 
-## 5. Knowledge Map
+## 6. Knowledge Map
 
 No content is duplicated here. Read the canonical source when a topic requires detail.
 
@@ -114,7 +128,7 @@ No content is duplicated here. Read the canonical source when a topic requires d
 
 ---
 
-## 6. Sanity Check Protocol
+## 7. Sanity Check Protocol
 
 The full sanity check protocol — command surface, profiles, inference algorithm, confirmation
 gate, execution steps, safety contract, and fixing violations — is defined in
