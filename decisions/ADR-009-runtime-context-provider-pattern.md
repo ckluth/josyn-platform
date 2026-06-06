@@ -90,7 +90,7 @@ adapter type:
 }
 ```
 
-JOSYN loads the assembly from a well-known `adapters/` subfolder of the backend installation
+JOSYN loads the assembly from a well-known `Adapters/` subfolder of the backend installation
 and instantiates the type via `Type.GetType()` + `Activator.CreateInstance()`. No assembly
 scanning. No MEF. This is a deliberate, bounded use of reflection — the second in the platform
 after `[JobEntryPoint]` dispatch.
@@ -104,7 +104,7 @@ This is the standalone path.
 
 - `josyn-backend` gains a `Backend.GlobalConfig` abstraction with an `IContextProvider`
   interface (or equivalent). The built-in implementation reads from the local config file.
-- The `adapters/` folder becomes a deployment-level concern: present and populated in HAEVG
+- The `Adapters/` folder becomes a deployment-level concern: present and populated in HAEVG
   installations, empty or absent in standalone.
 - Jobs cannot depend on runtime adapter availability. Any information a job might need must be
   anticipatable at session-start time and expressible as a job argument.

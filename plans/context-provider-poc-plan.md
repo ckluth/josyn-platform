@@ -101,7 +101,7 @@ The proof.
 
 - New project `HAEVG.Josyn.FakeAdapter` (separate assembly, not part of JOSYN)
 - Implements `IConfigSource`, returns hardcoded fake config values
-- Place DLL in `adapters/` folder, add type name to `josyn.bootstrap.ini`
+- Place DLL in `Adapters/` folder, add type name to `josyn.bootstrap.ini`
 - Backend picks it up at startup, uses fake values instead of DB
 
 **Done when:** Two demo runs side by side:

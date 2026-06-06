@@ -165,6 +165,7 @@ Prefer `internal` over `public` wherever the wider API surface is not required.
 - Create mutable state when an immutable data pipeline would work.
 - Write defensive `try/catch` blocks outside the lowest-layer boundary.
 - Use `public` where `internal` is sufficient.
+- Use the null-forgiving operator (`!`) without an inline comment that proves the value cannot be null — prefer eliminating it via Result propagation entirely.
 
 ---
 
@@ -173,7 +174,7 @@ Prefer `internal` over `public` wherever the wider API surface is not required.
 | Topic | Preference |
 |-------|-----------|
 | Class kind | `static class` by default; `record` for data; `class` only when mutable state or OOP is needed |
-| Nullability | `Nullable=enable` everywhere; `?` is deliberate, never defensive |
+| Nullability | `Nullable=enable` everywhere; `?` is deliberate, never defensive; `!` requires an inline justification comment — eliminate it via Result propagation where possible |
 | Error handling | `Result` / `Result<T>` — no `throw`, no `try/catch` above the lowest layer |
 | Comments | Only where the *why* is non-obvious; no restating what the code already says |
 | XML docs | On interfaces/contracts; implementations use `<inheritdoc>` |

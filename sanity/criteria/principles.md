@@ -76,7 +76,39 @@ Evaluate each item for every type and method in scope.
 | `async void` method (outside event handler) | ❌ violation |
 | `.Result` property or `.GetAwaiter().GetResult()` call on a `Task` | ❌ violation |
 
-### 9. Error handler call site completeness
+### 10. Null-forgiving operator (`!`)
+
+`Nullable=enable` is mandatory everywhere. The null-forgiving operator `!` suppresses a
+compiler safety net — it is the nullability equivalent of a bare `throw`: it converts a
+compile-time guarantee into a runtime gamble.
+
+| Signal | Verdict |
+|--------|---------|
+| `!` used without an inline comment that proves the value cannot be null at that point | ❌ violation |
+| `!` used on a `Result<T>.Value` access without first checking `.Succeeded` | ❌ violation — use the Result pattern; access `.Value` only inside a guarded branch |
+| `!` used with a clear, specific justification comment immediately on the same line or the line above | ✅ pass — the author has accepted responsibility and documented why |
+
+**Examples:**
+
+```csharp
+// ❌ violation — silent assumption
+var dir = Path.GetDirectoryName(path)!;
+
+// ❌ violation — undocumented .Value! dereference
+var config = FileBootstrapConfig.Load(path).Value!;
+
+// ✅ pass — justification is present and specific
+var dir = Path.GetDirectoryName(path)!; // path passed File.Exists() above — GetDirectoryName cannot return null for a valid file path
+
+// ✅ preferred — eliminate the ! entirely via Result propagation
+var loadResult = FileBootstrapConfig.Load(path);
+if (!loadResult.Succeeded)
+    return Result.Propagate(loadResult.ToResult());
+var config = loadResult.Value;
+```
+
+When reviewing: prefer eliminating `!` over justifying it. A justified `!` is a last resort,
+not a coding style.
 
 `IErrorHandler` has two overloads by design. The compiler enforces that `callStack` and
 `exceptionDetails` are always provided explicitly on the raw path. What the compiler cannot

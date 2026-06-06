@@ -42,17 +42,70 @@ den Zielordner publiziert.
 ### Zielstruktur
 
 ```
-$BackendRoot\                            (default: C:\Programme\JOSYN)
-    JOSYN.Jap.JAPServer.exe              <- JAP-Server-Executable
-    JOSYN.Backend.CLI.exe                <- Backend-CLI-Executable
-    josyn.bootstrap.ini                  <- angepasste Bootstrap-Konfiguration
-    adapters\
-        Contoso.Josyn.Adapter.dll        <- Adapter-Assembly (ADR-009)
+$BackendRoot\                            (default: C:\ProgramData\JOSYN)
+    josyn.bootstrap.ini                  <- gemeinsame Bootstrap-Konfiguration
+    CLI\
+        JOSYN.Backend.CLI.exe            <- Backend-CLI-Executable
+    JAPServer\
+        JOSYN.Jap.JAPServer.exe          <- JAP-Server-Executable
+        Adapters\
+            Contoso.Josyn.Adapter.dll    <- Adapter-Assembly (ADR-009)
 
-$JobRepositoryRoot\                      (default: C:\Programme\JOSYN\JobRepository)
+$JobRepositoryRoot\                      (default: C:\ProgramData\JOSYN\JobRepository)
     Contoso.DemoProduct.DemoJob\
         Contoso.DemoProduct.DemoJob.exe  <- Erster Demojob
 ```
+
+### bootstrap.ini-Konvention
+
+`josyn.bootstrap.ini` liegt auf `$BackendRoot`-Ebene — eine Ebene **über** dem
+Verzeichnis des jeweiligen Trigger-Executables. Jedes Trigger-Exe (CLI, künftig
+Listener, Ticker, …) lädt sie über:
+
+```csharp
+Path.Combine(AppContext.BaseDirectory, "..", "josyn.bootstrap.ini")
+```
+
+**Begründung:** Die ini ist keine CLI-eigene Konfiguration, sondern eine
+Installations-weite Bootstrap-Ressource. Sie einmal auf `$BackendRoot`-Ebene
+abzulegen vermeidet Duplizierung und stellt sicher, dass alle Trigger-Executables
+dieselbe Konfiguration sehen.
+
+### BackendRoot-Konvention
+
+Das Verzeichnis der geladenen `josyn.bootstrap.ini` **ist** der BackendRoot.
+Alle weiteren Deployment-Pfade werden daraus per Konvention abgeleitet —
+kein einziger Pfad steht explizit in der ini:
+
+| Ressource | Konventionspfad |
+|-----------|----------------|
+| JAPServer-Executable | `BackendRoot\JAPServer\JOSYN.Jap.JAPServer.exe` |
+| Job-Repository | `BackendRoot\JobRepository\{JobTypeName}\{JobTypeName}.exe` |
+| Adapters | `BackendRoot\JAPServer\Adapters\` |
+
+`BackendRoot` selbst wird in `FileBootstrapConfig` als `Path.GetDirectoryName(iniPath)`
+berechnet und über `IBootstrapConfig.BackendRoot` bereitgestellt.
+
+### JAPServer-Pfad-Konvention
+
+Der Pfad zu `JOSYN.Jap.JAPServer.exe` wird **nicht** in der `josyn.bootstrap.ini`
+konfiguriert. Stattdessen berechnet `SessionStarter` ihn zur Laufzeit per Konvention:
+
+```
+<Verzeichnis des aufrufenden Trigger-Executables>/../JAPServer/JOSYN.Jap.JAPServer.exe
+```
+
+**Begründung:**  
+`SessionStarter` ist der einzige Ort, der `JAPServer.exe` kennen muss. Neben dem
+aktuellen CLI-Executable wird es künftig weitere Trigger-Executables geben
+(Scheduler-Service, Workflow-Adapter). Alle werden als Geschwister-Unterordner neben
+`JAPServer\` deployed. Die Konvention hält diese Kopplung ohne Konfigurationsaufwand
+konsistent — auf Kosten einer festen Verzeichnisstruktur, die durch dieses ADR
+verbindlich festgelegt wird.
+
+**Konsequenz für Deployment:**  
+Der `JapServerExePath`-Schlüssel entfällt aus `josyn.bootstrap.ini` vollständig.
+`deploy-maintainer.ps1` schreibt ihn nicht mehr.
 
 ### bootstrap.ini-Anpassung
 
@@ -61,20 +114,20 @@ zwei Schlüssel auf Deployment-Pfade umgeschrieben:
 
 | Schlüssel | Ursprungswert (Repo) | Deployment-Wert |
 |-----------|----------------------|-----------------|
-| `JapServerExePath` | Entwickler-lokaler `C:\Temp\VS.OUT\...`-Pfad | `$BackendRoot\JOSYN.Jap.JAPServer.exe` |
-| `JobRepositoryRoot` | Entwickler-lokaler `C:\Temp\VS.OUT\...`-Pfad | `$JobRepositoryRoot` |
+| — | — | — |
 
-`SessionStoreConnectionString` und `ConfigSourceType` werden unverändert übernommen —
-sie sind deployment-unabhängig (Datenbankverbindung und Adapter-Typname bleiben gleich).
+Keine Schlüssel müssen umgeschrieben werden. `SessionStoreConnectionString` und
+`ConfigSourceType` werden unverändert übernommen. Alle Pfad-Schlüssel entfallen —
+sie werden per BackendRoot-Konvention berechnet (siehe Abschnitt oben).
 
 ### Reihenfolge der Schritte
 
 1. Zielordner bereinigen (vollständiges Delete + Recreate)
-2. `JOSYN.Jap.JAPServer` publizieren → `$BackendRoot\`
-3. `JOSYN.Backend.CLI` publizieren → `$BackendRoot\`
-4. `Contoso.Josyn.Adapter` publizieren → `$BackendRoot\adapters\`
+2. `JOSYN.Jap.JAPServer` publizieren → `$BackendRoot\JAPServer\`
+3. `JOSYN.Backend.CLI` publizieren → `$BackendRoot\CLI\`
+4. `Contoso.Josyn.Adapter` publizieren → `$BackendRoot\JAPServer\Adapters\`
 5. `Contoso.DemoProduct.DemoJob` publizieren → `$JobRepositoryRoot\Contoso.DemoProduct.DemoJob\`
-6. `josyn.bootstrap.ini` kopieren und anpassen
+6. `josyn.bootstrap.ini` kopieren und anpassen (`JobRepositoryRoot`) → `$BackendRoot\`
 
 ---
 
@@ -111,7 +164,7 @@ sie aber als Input für eine spätere Deployment-Architektur:
    Dateien (Konfiguration, Icons, Manifest) benötigen, braucht jeder Job-Subfolder
    eine definierte Struktur. Diese Struktur ist noch nicht entschieden.
 
-3. **Adapter-Ladekonvention:** Das `adapters\`-Unterverzeichnis neben dem Backend-EXE
+3. **Adapter-Ladekonvention:** Das `Adapters\`-Unterverzeichnis neben dem Backend-EXE
    ist eine Konvention aus ADR-009. Sie ist hier erstmals physisch umgesetzt.
    Ob mehrere Adapter nebeneinander liegen können, ist noch nicht spezifiziert.
 
@@ -141,7 +194,7 @@ sie aber als Input für eine spätere Deployment-Architektur:
 
 ## Relation zu anderen ADRs
 
-- **ADR-009** (Runtime Context Provider / Adapter-Pattern): Das `adapters\`-Verzeichnis
+- **ADR-009** (Runtime Context Provider / Adapter-Pattern): Das `Adapters\`-Verzeichnis
   ist die physische Umsetzung der dort beschriebenen Adapter-Lademechanik.
 - **ADR-010** (Environment Separation): Dieses ADR adressiert nur DEV.
   INT und PROD sind explizit offene Fragen (s. o.).
