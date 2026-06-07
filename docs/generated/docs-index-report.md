@@ -1,31 +1,22 @@
 # docs-index-builder — Execution Report
 
-**Run:** 2026-06-07T12:49:05.5961829+02:00
+**Run:** 2026-06-07T15:09:37.7694846+02:00
 
 ## Summary
 
 | | Count |
 |--|------:|
-| Repos scanned    | 10 |
+| Repos scanned    | 1 |
 | Repos skipped    | 0 |
-| Documents total  | 119 |
+| Documents total  | 8 |
 | New (added)      | 0 |
-| Updated          | 119 |
+| Retained         | 8 |
 | Removed          | 0 |
 | Pending enrichment | 0 |
 
 ## Per-repo detail
 
-| Repo | Found | New | Updated |
-|------|------:|----:|--------:|
-| josyn-platform | 83 | 0 | 83 |
-| josyn-foundation | 11 | 0 | 11 |
-| josyn-commons | 3 | 0 | 3 |
-| josyn-jap | 3 | 0 | 3 |
-| josyn-backend | 9 | 0 | 9 |
-| josyn-job-host | 1 | 0 | 1 |
-| josyn-playground | 2 | 0 | 2 |
-| josyn-toolbox | 6 | 0 | 6 |
-| josyn-contoso | 1 | 0 | 1 |
-| josyn-docs | 0 | 0 | 0 |
+| Repo | Found | New | Retained |
+|------|------:|----:|---------:|
+| josyn-toolbox | 8 | 0 | 8 |
 

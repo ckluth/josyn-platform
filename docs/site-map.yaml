@@ -1,0 +1,140 @@
+# JOSYN Documentation Site Map
+# ─────────────────────────────────────────────────────────────────────────────
+# Controls how the site-assembler builds the staging folder for doc-generator.
+#
+# RULE EVALUATION ORDER:
+#   1. skip      — docs matching any skip rule are excluded entirely
+#   2. sections  — first section whose include rules match a doc wins
+#   3. overrides — fully control a specific doc's target path or exclusion
+#   4. catch-all — docs matching no section land in "uncategorised" (with warning)
+#
+# RULE MATCHING:
+#   - Fields within a rule object are AND
+#   - Multiple rule objects in a list are OR
+#   - String values support wildcard * (e.g. "josyn-foundation*")
+#
+# SOURCE FILE RESOLUTION:
+#   Each doc is resolved as: {repos-root}\{repo}\{path}
+#   e.g. C:\DevGit\josyn-platform\architecture\overview.md
+
+# ── Site ──────────────────────────────────────────────────────────────────────
+
+site:
+  title: "JOSYN Documentation"
+  docs-index: "C:/DevGit/josyn-platform/docs/docs-index.json"
+  repos-root: "C:/DevGit"
+  output: "C:/DevGit/josyn-docs"
+  staging: "C:/DevGit/temp/josyn-site-staging"
+
+# ── Skip ──────────────────────────────────────────────────────────────────────
+# Docs matching any rule here are excluded before section matching.
+
+skip:
+  - { type: agent-instruction }   # AGENTS.md files — not intended for human readers on the site
+  - { state: superseded }         # retired docs
+  - { repo: josyn-playground }    # experiments, not platform documentation
+
+# ── Sections ─────────────────────────────────────────────────────────────────
+# Evaluated top-to-bottom. First section whose include rules match a doc wins.
+# 'folder' is the subfolder name in the staging directory.
+
+sections:
+
+  - title: Architecture
+    folder: architecture
+    include:
+      - { type: architecture-overview }
+      - { type: architecture-detail }
+      - { type: component-architecture }
+      - { type: solution-architecture }
+      - { type: overview, folder-context: solution-architecture }   # section READMEs
+
+  - title: Decisions
+    folder: decisions
+    include:
+      - { type: decision }
+
+  - title: Standards & Reference
+    folder: reference
+    include:
+      - { type: reference }
+
+  - title: Repos
+    folder: repos
+    include:
+      - { type: repo-summary }
+      - { type: overview, folder-context: "" }               # root repo READMEs
+      - { type: overview, folder-context: "josyn-foundation*" }   # foundation sub-packages
+      - { type: overview, folder-context: "josyn-jap*" }         # jap sub-packages
+
+  - title: Guides
+    folder: guides
+    include:
+      - { type: manual }
+      - { type: overview }   # catches remaining overviews (sanity, etc.)
+
+  - title: Working Notes
+    folder: notes
+    include:
+      - { type: working-note }
+      - { type: plan }
+
+# ── Overrides ────────────────────────────────────────────────────────────────
+# Per-file exceptions. Applied after section rules.
+# 'target' is the output path relative to the staging root. Setting it fully
+# overrides section rules — the doc lands exactly at that path.
+# 'skip: true' excludes a specific doc even if it matched a section rule.
+#
+# Example:
+#   - { repo: josyn-platform, path: README.md, target: repos/josyn-platform.md }
+#   - { repo: josyn-platform, path: MAINTAINERS.md, skip: true }
+
+overrides: []
+
+# ── Reading Paths ─────────────────────────────────────────────────────────────
+# Shown on the generated landing page as "who are you?" cards.
+# Hand-curated: short (3–5 links), ordered by recommended reading sequence.
+#
+# link types:
+#   { repo: x, path: y }   — link to a specific indexed doc
+#   { section: x }         — link to a section by its folder name
+
+reading-paths:
+
+  - perspective: stakeholder
+    label: "Stakeholder"
+    intro: "Understand what JOSYN is and where it is heading."
+    links:
+      - { repo: josyn-platform, path: README.md }
+      - { repo: josyn-platform, path: ROADMAP.md }
+
+  - perspective: maintainer-architect
+    label: "Maintainer — Architect"
+    intro: "You design the platform and govern its decisions."
+    links:
+      - { repo: josyn-platform, path: architecture/overview.md }
+      - { section: decisions }
+      - { repo: josyn-platform, path: ROADMAP.md }
+
+  - perspective: maintainer-developer
+    label: "Maintainer — Developer"
+    intro: "You work inside the platform repos. Start with the standards, then explore the repo summaries."
+    links:
+      - { repo: josyn-platform, path: architecture/coding-standards.md }
+      - { repo: josyn-platform, path: architecture/naming-conventions.md }
+      - { repo: josyn-platform, path: architecture/overview.md }
+      - { section: repos }
+
+  - perspective: maintainer-operator
+    label: "Maintainer — Operator"
+    intro: "You deploy, configure, and monitor the platform."
+    links:
+      - { repo: josyn-platform, path: architecture/storage.md }
+      - { repo: josyn-platform, path: architecture/local-build.md }
+
+  - perspective: job-developer
+    label: "Job Developer"
+    intro: "You write jobs that run on the JOSYN platform."
+    links:
+      - { section: guides }
+      - { section: repos }
