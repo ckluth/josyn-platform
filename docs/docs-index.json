@@ -1,5 +1,5 @@
 {
-  "generated": "2026-06-07T22:05:36.3169074+02:00",
+  "generated": "2026-06-07T22:19:04.6928032+02:00",
   "documents": [
     {
       "name": "AGENTS.md — JOSYN Platform",
@@ -7,7 +7,7 @@
       "path": "AGENTS.md",
       "folder-context": "",
       "created": "2026-05-30T22:31:38+02:00",
-      "touched": "2026-06-07T12:04:59+02:00",
+      "touched": "2026-06-07T22:09:59+02:00",
       "type": "agent-instruction",
       "perspective": [
         "agent"
@@ -39,7 +39,7 @@
       "path": "README.md",
       "folder-context": "",
       "created": "2026-05-29T09:57:21+02:00",
-      "touched": "2026-06-07T12:04:59+02:00",
+      "touched": "2026-06-07T22:09:59+02:00",
       "type": "overview",
       "perspective": [
         "maintainer-architect",
@@ -58,7 +58,7 @@
       "path": "ROADMAP.md",
       "folder-context": "",
       "created": "2026-06-07T12:04:59+02:00",
-      "touched": "2026-06-07T12:04:59+02:00",
+      "touched": "2026-06-07T22:09:59+02:00",
       "type": "plan",
       "perspective": [
         "maintainer-architect",
@@ -140,7 +140,7 @@
       "path": "architecture/overview.md",
       "folder-context": "architecture",
       "created": "2026-05-29T09:57:21+02:00",
-      "touched": "2026-06-05T23:51:03+02:00",
+      "touched": "2026-06-07T22:09:59+02:00",
       "type": "architecture-overview",
       "perspective": [
         "maintainer-architect",
@@ -478,7 +478,7 @@
       "path": "repos/josyn-commons.md",
       "folder-context": "repos",
       "created": "2026-05-30T18:04:47+02:00",
-      "touched": "2026-06-05T02:19:24+02:00",
+      "touched": "2026-06-07T22:09:59+02:00",
       "type": "repo-summary",
       "perspective": [
         "maintainer-architect",
@@ -494,7 +494,7 @@
       "path": "repos/josyn-foundation.md",
       "folder-context": "repos",
       "created": "2026-05-29T09:57:21+02:00",
-      "touched": "2026-05-30T22:34:13+02:00",
+      "touched": "2026-06-07T22:09:59+02:00",
       "type": "repo-summary",
       "perspective": [
         "maintainer-architect",
@@ -510,7 +510,7 @@
       "path": "repos/josyn-jap.md",
       "folder-context": "repos",
       "created": "2026-05-29T09:57:21+02:00",
-      "touched": "2026-06-05T02:19:24+02:00",
+      "touched": "2026-06-07T22:09:59+02:00",
       "type": "repo-summary",
       "perspective": [
         "maintainer-architect",
@@ -526,7 +526,7 @@
       "path": "repos/josyn-job-host.md",
       "folder-context": "repos",
       "created": "2026-05-29T09:57:21+02:00",
-      "touched": "2026-06-07T12:04:59+02:00",
+      "touched": "2026-06-07T22:09:59+02:00",
       "type": "repo-summary",
       "perspective": [
         "maintainer-architect",
@@ -543,7 +543,7 @@
       "path": "repos/josyn-backend/overview.md",
       "folder-context": "repos",
       "created": "2026-05-29T10:53:10+02:00",
-      "touched": "2026-06-07T12:04:59+02:00",
+      "touched": "2026-06-07T22:09:59+02:00",
       "type": "repo-summary",
       "perspective": [
         "maintainer-architect",
@@ -706,7 +706,7 @@
       "path": "sanity/README.md",
       "folder-context": "sanity",
       "created": "2026-05-30T22:37:12+02:00",
-      "touched": "2026-06-02T11:54:46+02:00",
+      "touched": "2026-06-07T22:09:59+02:00",
       "type": "manual",
       "perspective": [
         "maintainer-developer",
@@ -852,7 +852,7 @@
       "path": "sanity/current-state/josyn-foundation.md",
       "folder-context": "sanity",
       "created": "2026-05-31T12:54:05+02:00",
-      "touched": "2026-06-06T10:56:37+02:00",
+      "touched": "2026-06-07T22:09:59+02:00",
       "type": "reference",
       "perspective": [
         "maintainer-developer",
@@ -1029,7 +1029,7 @@
       "path": "solution-architecture/03-physical-architecture/README.md",
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
-      "touched": "2026-06-04T15:38:47+02:00",
+      "touched": "2026-06-07T22:09:59+02:00",
       "type": "overview",
       "perspective": [
         "maintainer-architect",
@@ -1045,7 +1045,7 @@
       "path": "solution-architecture/03-physical-architecture/services-and-executables.md",
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
-      "touched": "2026-06-04T15:38:47+02:00",
+      "touched": "2026-06-07T22:09:59+02:00",
       "type": "solution-architecture",
       "perspective": [
         "maintainer-architect",
@@ -1061,7 +1061,7 @@
       "path": "solution-architecture/03-physical-architecture/session-store.md",
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
-      "touched": "2026-06-04T15:38:47+02:00",
+      "touched": "2026-06-07T22:09:59+02:00",
       "type": "solution-architecture",
       "perspective": [
         "maintainer-architect",
@@ -1109,7 +1109,7 @@
       "path": "solution-architecture/05-deployment-and-operations/job-deployment.md",
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
-      "touched": "2026-06-04T15:38:47+02:00",
+      "touched": "2026-06-07T22:09:59+02:00",
       "type": "solution-architecture",
       "perspective": [
         "maintainer-operator",
@@ -1141,7 +1141,7 @@
       "path": "solution-architecture/06-company-fit/audit-and-session-record.md",
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
-      "touched": "2026-06-04T15:38:47+02:00",
+      "touched": "2026-06-07T22:09:59+02:00",
       "type": "solution-architecture",
       "perspective": [
         "maintainer-architect",
@@ -1174,7 +1174,7 @@
       "path": "solution-architecture/06-company-fit/isolation-vs-integration.md",
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
-      "touched": "2026-06-04T15:38:47+02:00",
+      "touched": "2026-06-07T22:09:59+02:00",
       "type": "solution-architecture",
       "perspective": [
         "maintainer-architect",
@@ -1270,7 +1270,7 @@
       "path": "solution-architecture/08-documentation-and-training/overview.md",
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
-      "touched": "2026-06-04T15:38:47+02:00",
+      "touched": "2026-06-07T22:09:59+02:00",
       "type": "solution-architecture",
       "perspective": [
         "maintainer-architect",
@@ -1351,7 +1351,7 @@
       "path": "README.md",
       "folder-context": "",
       "created": "2026-05-28T21:26:47+02:00",
-      "touched": "2026-06-06T10:56:39+02:00",
+      "touched": "2026-06-07T22:10:02+02:00",
       "type": "overview",
       "perspective": [
         "maintainer-architect",
@@ -1566,7 +1566,7 @@
       "path": "README.md",
       "folder-context": "",
       "created": "2026-05-29T08:41:58+02:00",
-      "touched": "2026-06-06T10:56:45+02:00",
+      "touched": "2026-06-07T22:10:05+02:00",
       "type": "overview",
       "perspective": [
         "maintainer-architect",
@@ -1582,7 +1582,7 @@
       "path": "josyn-jap-shared/README.md",
       "folder-context": "josyn-jap-shared",
       "created": "2026-05-29T08:41:58+02:00",
-      "touched": "2026-06-06T10:56:45+02:00",
+      "touched": "2026-06-07T22:10:05+02:00",
       "type": "overview",
       "perspective": [
         "maintainer-developer"
@@ -1612,7 +1612,7 @@
       "path": "README.md",
       "folder-context": "",
       "created": "2026-05-29T10:53:11+02:00",
-      "touched": "2026-06-01T21:58:21+02:00",
+      "touched": "2026-06-07T22:10:08+02:00",
       "type": "overview",
       "perspective": [
         "maintainer-architect",
@@ -1659,7 +1659,7 @@
       "path": "josyn-backend-bootstrap-config/JOSYN.Backend.BootstrapConfig/README.md",
       "folder-context": "josyn-backend-bootstrap-config",
       "created": "2026-06-04T00:22:32+02:00",
-      "touched": "2026-06-05T14:50:07+02:00",
+      "touched": "2026-06-07T22:10:08+02:00",
       "type": "component-architecture",
       "perspective": [
         "maintainer-developer"
@@ -1690,7 +1690,7 @@
       "path": "josyn-backend-jap-server/JOSYN.Jap.JAPServer/README.md",
       "folder-context": "josyn-backend-jap-server",
       "created": "2026-06-01T21:58:21+02:00",
-      "touched": "2026-06-02T19:52:36+02:00",
+      "touched": "2026-06-07T22:10:08+02:00",
       "type": "component-architecture",
       "perspective": [
         "maintainer-developer"
@@ -1721,7 +1721,7 @@
       "path": "josyn-backend-session-starter/JOSYN.Backend.SessionStarter/README.md",
       "folder-context": "josyn-backend-session-starter",
       "created": "2026-06-04T00:22:32+02:00",
-      "touched": "2026-06-04T00:22:32+02:00",
+      "touched": "2026-06-07T22:10:08+02:00",
       "type": "component-architecture",
       "perspective": [
         "maintainer-developer"
@@ -1860,7 +1860,7 @@
       "path": "git-tools/README.md",
       "folder-context": "git-tools",
       "created": "2026-06-07T11:59:43+02:00",
-      "touched": "2026-06-07T11:59:43+02:00",
+      "touched": "2026-06-07T22:10:13+02:00",
       "type": "manual",
       "perspective": [
         "maintainer-operator"

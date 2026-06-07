@@ -1,6 +1,6 @@
 # Documentation Index
 
-_Generated: 2026-06-07T22:05:36.3169074+02:00 — 123 documents across 10 repos._
+_Generated: 2026-06-07T22:19:04.6928032+02:00 — 123 documents across 10 repos._
 _Semantic fields (type, perspective, state, summary) are filled by the AI enrichment pass._
 
 ## josyn-backend
