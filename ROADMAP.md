@@ -65,3 +65,21 @@ The platform is being built incrementally, with a working round-trip already in 
 - Workflow support (multi-step jobs)
 - Migration path from old jobs to the new platform
 - Many `josyn-job-host` features beyond arguments/result basics
+
+---
+
+## Open documentation items
+
+Things that exist in the codebase but are not yet properly documented.
+Work these off before a public release.
+
+- **`josyn-backend` undocumented components** — five packages exist with no entry in
+  `repos/josyn-backend/overview.md`:
+  - `JOSYN.Backend.CLI` (`josyn-backend-cli`)
+  - `JOSYN.Backend.Listener` (`josyn-backend-listener`)
+  - `JOSYN.Backend.Ticker` (`josyn-backend-ticker`)
+  - `JOSYN.Backend.ConfigStore` (`josyn-backend-config-store`)
+  - `JOSYN.Backend.AdapterContracts` (`josyn-backend-adapter-contracts`)
+  Each needs a component description, dependency list, and sanity notes entry.
+
+- **`josyn-contoso`** — exists and works; no `repos/josyn-contoso.md` yet.

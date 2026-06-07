@@ -45,7 +45,7 @@ All criteria pass.
 - `Assert.Throws<TException>(() => ...)` used correctly for the two documented `throw` cases.
 - Test helpers (static factory methods, private scenario helpers) used appropriately.
 
-**Coverage note:** No integration tests cover the actual named pipe transport (`PipesClient` / `PipesServer` end-to-end). This is acceptable for PoC stage. Not a violation, but worth tracking.
+**Coverage note:** No integration tests cover the actual named pipe transport (`PipesClient` / `PipesServer` end-to-end). This is acceptable at the current stage. Not a violation, but worth tracking.
 
 ---
 
@@ -120,6 +120,6 @@ All criteria pass.
 - File names match type names throughout ✅
 - Interface files prefixed with `I` ✅
 
-**Known PoC limitations:**
+**Known limitations:**
 - Local NuGet feed path — production-only concern
 

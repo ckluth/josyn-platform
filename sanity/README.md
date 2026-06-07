@@ -318,7 +318,7 @@ An unverifiable area looks like:
 
 ```
 josyn-backend / tests
-  ⚠️ No test project found. Known gap — PoC stub phase. See repos/josyn-backend/overview.md Sanity Notes.
+  ⚠️ No test project found. Known gap — no tests written yet. See repos/josyn-backend/overview.md Sanity Notes.
 ```
 
 ---

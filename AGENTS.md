@@ -24,6 +24,8 @@ All repos are siblings under a common parent directory:
 | `josyn-platform` | Architecture, decisions, docs — **this repo** | `../josyn-platform` |
 | `josyn-playground` | Consumer playground — demos, experiments, non-platform code | `../josyn-playground` |
 | `josyn-toolbox` | Maintainer tooling — deployment scripts, code generators, machine-sync utilities | `../josyn-toolbox` |
+| `josyn-contoso` | Demo company adapter — implements platform extension points with fake data; not a platform component | `../josyn-contoso` |
+| `josyn-docs` | Generated HTML documentation site — output target for site-builder tooling; not a source repo | `../josyn-docs` |
 
 ---
 

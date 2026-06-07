@@ -3,7 +3,7 @@
 **Role:** Infrastructure primitives — no business logic, no topology awareness.
 Consumed by all other repos as NuGet packages.
 
-**Location:** `C:\Users\chris\OneDrive\DevGit\josyn-foundation`
+**Location:** `C:\DevGit\josyn-foundation`
 **Version:** `1.0.0-preview01`
 
 ---

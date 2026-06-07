@@ -27,7 +27,7 @@ It is the concrete, spatial picture of the system.
 - [machine-topology.md](machine-topology.md) — One backend per machine, no clustering, machine requirements
 - [folder-layout.md](folder-layout.md) — Backend folder, job repository structure, log folder layout
 - [services-and-executables.md](services-and-executables.md) — Current and planned services, per-session JAPServer, CLI contract
-- [session-store.md](session-store.md) — SQL Server session store, session lifecycle, known PoC gaps
+- [session-store.md](session-store.md) — SQL Server session store, session lifecycle, known gaps
 - [job-registry.md](job-registry.md) — What the registry is, current state, open decision on ownership
 
 ## Related Decisions

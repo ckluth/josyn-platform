@@ -5,7 +5,7 @@
 shared protocol contract (`JOSYN.Jap.Shared.Contract`). The process-local logger has been
 relocated to `JOSYN.Commons.Log` per ADR-008.
 
-**Location:** `C:\Users\chris\OneDrive\DevGit\josyn-jap`
+**Location:** `C:\DevGit\josyn-jap`
 **Version:** `1.0.0-preview01`
 
 ---

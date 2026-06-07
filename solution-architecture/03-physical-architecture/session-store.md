@@ -26,10 +26,10 @@ JAPServer       ──writes result─► session store  (PutRawResult / PutErro
 Backend         ──polls result──► session store  (completion detection)
 ```
 
-*(The current PoC backend uses a 500 ms poll loop to detect completion.
+*(The current backend uses a 500 ms poll loop to detect completion.
 A production implementation will use a push signal.)*
 
-## Known PoC Limitations
+## Known Limitations
 
 - No **session status column** — orphaned rows from failed process spawns are
   indistinguishable from running sessions. A `status` field (pending / running /
@@ -37,4 +37,4 @@ A production implementation will use a push signal.)*
 - No separated **start / end timestamps**.
 - No explicit **job identity** column linking the session to a registered job name.
 
-These are known gaps in the PoC, not final design choices.
+These are known gaps, not final design choices.

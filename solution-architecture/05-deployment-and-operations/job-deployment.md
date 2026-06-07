@@ -30,7 +30,7 @@ executable is free to make its own decision independently of other jobs or the b
 
 ## Installer
 
-*(TBD — no installer exists yet. The backend is currently deployed manually during PoC.)*
+*(TBD — no installer exists yet. The backend is currently deployed manually.)*
 
 ## Bootstrapping
 

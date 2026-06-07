@@ -45,7 +45,7 @@ Job executables are **decoupled consumers** of the JOSYN protocol, not internal 
 
 ---
 
-## Beyond the Platform — `josyn-playground` and `josyn-toolbox`
+## Beyond the Platform — `josyn-playground`, `josyn-toolbox`, `josyn-contoso`, and `josyn-docs`
 
 `josyn-playground` is a consumer repository that sits outside the platform's dependency graph.
 It may reference any platform repo — as a pure consumer. The platform never references it back.
@@ -64,6 +64,14 @@ Errors and experiments here carry no consequences for the platform.
 machine-sync utilities, code generators, and documentation tools. It is also a pure consumer:
 the platform does not know it exists. Toolbox content is stable and regularly executed;
 playground content is experimental and may be throwaway.
+
+`josyn-contoso` is a demo company adapter repository. It implements platform extension points
+(such as `IConfigSource`) with hardcoded fake data to demonstrate the ADR-009 adapter pattern
+end-to-end. It represents what a real company adapter would look like. The platform has no
+dependency on it — it is a pure consumer that will evolve alongside the platform.
+
+`josyn-docs` is the generation target for the published HTML documentation site. Its content
+is produced by the site-builder tooling in `josyn-toolbox` and should not be edited by hand.
 
 ---
 
@@ -124,7 +132,7 @@ Coding standards: [architecture/coding-standards.md](architecture/coding-standar
 
 ## Status
 
-All repos at version `1.0.0-preview01` — active PoC phase. `josyn-backend` is a compilable stub.
+All repos at version `1.0.0-preview01`. `josyn-backend` is in active development.
 
 See `decisions/` for architectural decision records.
 

@@ -3,7 +3,7 @@
 **Role:** Domain-agnostic platform utilities — open for growth.
 Consumed by any repo as NuGet packages. Never referenced by `josyn-foundation`.
 
-**Location:** `C:\Users\chris\OneDrive\DevGit\josyn-commons`
+**Location:** `C:\DevGit\josyn-commons`
 **Version:** `1.0.0-preview01`
 
 ---

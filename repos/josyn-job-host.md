@@ -4,7 +4,7 @@
 When a job process starts, it calls `Core.Run(args)` and the library handles all
 protocol communication, argument deserialization, reflection dispatch, and result routing.
 
-**Location:** `C:\Users\chris\OneDrive\DevGit\josyn-job-host`
+**Location:** `C:\DevGit\josyn-job-host`
 **Namespace:** `JOSYN.JobHost`
 **Version:** `1.0.0-preview01`
 
@@ -180,7 +180,7 @@ The scheduler spawns the executable with `JOSYN-IPC <sessionGUID>` as args.
 <PackageReference Include="JOSYN.Foundation.PropertyBag" Version="1.0.0-preview01"/>
 <PackageReference Include="JOSYN.Foundation.ResultPattern" Version="1.0.0-preview01"/>
 <PackageReference Include="JOSYN.Jap.Shared.Contract" Version="1.0.0-preview01"/>
-<PackageReference Include="JOSYN.Jap.Shared.Log" Version="1.0.0-preview01"/>
+<PackageReference Include="JOSYN.Commons.Log" Version="1.0.0-preview01"/>
 ```
 
 ---
@@ -225,6 +225,6 @@ License: MIT | Company: HAEVG AG | Target: net10.0
 - Minimum 7 NUnit tests in `JobInvokerTests`. A lower count is a violation (tests removed without replacement).
 
 ### Dependency constraints
-- Permitted references: `JOSYN.Foundation.JIP`, `JOSYN.Foundation.PropertyBag`, `JOSYN.Foundation.ResultPattern`, `JOSYN.Jap.Shared.Contract`, `JOSYN.Jap.Shared.Log`.
+- Permitted references: `JOSYN.Foundation.JIP`, `JOSYN.Foundation.PropertyBag`, `JOSYN.Foundation.ResultPattern`, `JOSYN.Jap.Shared.Contract`, `JOSYN.Commons.Log`.
 - `JOSYN.Jap.JAPServer` is **never** a dependency — it is a runtime peer, not a library.
 

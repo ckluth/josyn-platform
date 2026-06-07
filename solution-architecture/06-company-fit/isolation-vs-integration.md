@@ -42,7 +42,7 @@ This keeps JOSYN honest about its boundaries and gives companies a clear, stable
 - **No company-specific code in platform packages.** `JOSYN.Foundation.*`, `JOSYN.Jap.*`,
   `JOSYN.JobHost` must never contain any reference to HAEVG AG, the company config-manager,
   or any other company-specific concept.
-- **`HardcodedGlobalConfig` is a PoC placeholder**, not a model. The real `GlobalConfig`
+- **`HardcodedGlobalConfig` is a placeholder**, not a model. The real `GlobalConfig`
   implementation belongs to the company adapter layer — outside the platform proper.
 - **Extension points should be documented as such.** A company should be able to read the
   platform docs and understand exactly where to plug in — without reverse-engineering internals.

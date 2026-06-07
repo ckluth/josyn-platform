@@ -65,7 +65,7 @@ Any step fails
 
 ```
 josyn-backend (NuGet packages + EXEs)
-├── JOSYN.Backend.GlobalConfig         ← runtime config: connection string, exe paths
+├── JOSYN.Backend.BootstrapConfig      ← runtime config: connection string, exe paths (file-based INI)
 ├── JOSYN.Backend.SessionStore         ← session persistence: EF Core, SQL Server
 ├── JOSYN.Backend.SessionStarter       ← session lifecycle: GUID, store write, process spawn
 ├── JOSYN.Backend.JobRegistry          ← job registration: Name, TechnicalUserName; josyn.JobRegistrations table
@@ -90,8 +90,8 @@ josyn-foundation (NuGet packages)
         └── Convention: JipClient, JipServer, JipDispatcher, Request, Response
 
 josyn-jap (NuGet packages — protocol contracts only)
-├── JOSYN.Jap.Shared.Contract          ← IJosynApplicationProtocol, ErrorReport
-└── JOSYN.Jap.Shared.Log               ← LocalLog (static, file-based, caller-aware)
+└── JOSYN.Jap.Shared.Contract          ← IJosynApplicationProtocol, ErrorReport
+    (JOSYN.Jap.Shared.Log relocated to JOSYN.Commons.Log per ADR-008)
 
 josyn-job-host (NuGet library)
 └── JOSYN.JobHost
@@ -123,16 +123,14 @@ josyn-platform (this repo)
             └───────┬───────┘
                     │
 JOSYN.Jap.Shared.Contract (+ ResultPattern)
-JOSYN.Jap.Shared.Log      (+ ResultPattern)
-        ▲                         ▲
-        │                         │
+        ▲
+        │
 JOSYN.Jap.JAPServer       JOSYN.JobHost
 (in josyn-backend          (+ JIP + PropertyBag
- + JIP + PropertyBag        + Contract + Log)
+ + JIP + PropertyBag        + Contract)
  + SessionStore            [protocol client]
  + GlobalConfig
- + Contract + Log)
-[protocol server]
+ + Contract)
         │                         │
         └── IJosynApplicationProtocol ──┘
              (IPC at runtime — not a code dep.)
@@ -141,15 +139,15 @@ JOSYN.Jap.JAPServer       JOSYN.JobHost
 ```
 ── josyn-backend package chain ────────────────────────────────────────
 
-Backend.GlobalConfig  (no NuGet dependencies)
-Backend.SessionStore  (+ ResultPattern)
+Backend.BootstrapConfig  (+ PropertyBag + ResultPattern)
+Backend.SessionStore     (+ ResultPattern)
         ▲                   ▲
         └─────────┬──────────┘
                   │
 Backend.SessionStarter  (+ ResultPattern)
 
 Consumers of the backend packages:
-  JOSYN.Jap.JAPServer (EXE)                → + SessionStore + GlobalConfig  (see above)
+  JOSYN.Jap.JAPServer (EXE)                → + SessionStore + BootstrapConfig  (see above)
 
 ────────────────────────────────────────────────────────────────────────
 ```

@@ -5,12 +5,12 @@
 The JOSYN backend is a set of executables. Some are Windows services (long-running daemons);
 some are short-lived per-session processes. Future evolution may include Linux daemons.
 
-## Current State (PoC Phase)
+## Current State
 
 | Component | Type | Purpose |
 |-----------|------|---------|
 | `JOSYN.Jap.JAPServer.exe` | Console EXE (spawned per session) | Per-session JAP protocol server; bridges backend and job process |
-| `JOSYN.Backend.Demo.FakeSessionStarterConsumer.exe` | Console EXE (PoC demo only) | Proves end-to-end session round-trip; not a production component |
+| `JOSYN.Backend.Demo.FakeSessionStarterConsumer.exe` | Console EXE (demo only) | Proves end-to-end session round-trip; not a production component |
 
 ## Planned Components (Replacing JobSystem)
 

@@ -2,7 +2,7 @@
 
 ## Current State
 
-No formal end-user or operator documentation exists yet. JOSYN is in PoC phase.
+No formal end-user or operator documentation exists yet.
 The `josyn-platform` repository serves as the primary knowledge base for developers
 working on the platform itself.
 
