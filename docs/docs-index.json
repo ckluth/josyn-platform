@@ -1690,6 +1690,22 @@
       "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
+      "name": "josyn-job-host",
+      "repo": "josyn-job-host",
+      "path": "README.md",
+      "folder-context": "",
+      "created": "2026-06-07T19:31:00+02:00",
+      "touched": "2026-06-07T19:31:00+02:00",
+      "type": "overview",
+      "perspective": [
+        "maintainer-developer",
+        "job-developer"
+      ],
+      "state": "settled",
+      "summary": "Root overview of the josyn-job-host repo — the NuGet library linked by every JOSYN job executable.",
+      "enriched-at": "2026-06-07T19:31:00+02:00"
+    },
+    {
       "name": "JOSYN.JobHost",
       "repo": "josyn-job-host",
       "path": "JOSYN.JobHost/README.md",

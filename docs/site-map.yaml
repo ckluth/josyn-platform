@@ -1,12 +1,14 @@
+# site-map.yaml v2
 # JOSYN Documentation Site Map
 # ─────────────────────────────────────────────────────────────────────────────
 # Controls how the site-assembler builds the staging folder for doc-generator.
 #
 # RULE EVALUATION ORDER:
-#   1. skip      — docs matching any skip rule are excluded entirely
-#   2. sections  — first section whose include rules match a doc wins
-#   3. overrides — fully control a specific doc's target path or exclusion
-#   4. catch-all — docs matching no section land in "uncategorised" (with warning)
+#   1. overrides — matching repo+path with skip: true excludes a doc entirely
+#   2. overrides — matching repo+path with to: places a doc at that exact tree path
+#   3. mapping   — first matching rule with skip: true excludes a doc entirely
+#   4. mapping   — first matching rule with to: places a doc at the mapped tree path
+#   5. catch-all — docs matching no override or mapping land in the catch-all node
 #
 # RULE MATCHING:
 #   - Fields within a rule object are AND
@@ -26,67 +28,58 @@ site:
   output: "C:/DevGit/josyn-docs"
   staging: "C:/DevGit/temp/josyn-site-staging"
 
-# ── Skip ──────────────────────────────────────────────────────────────────────
-# Docs matching any rule here are excluded before section matching.
+# ── Tree ──────────────────────────────────────────────────────────────────────
+# Human-authored folder hierarchy for the staging directory and navigation.
 
-skip:
-  - { type: agent-instruction }   # AGENTS.md files — not intended for human readers on the site
-  - { state: superseded }         # retired docs
-  - { repo: josyn-playground }    # experiments, not platform documentation
+tree:
+  - architecture:
+      - platform
+      - solution-architecture
+      - components
+  - decisions:
+      - platform
+      - backend
+  - reference
+  - repos
+  - guides
+  - notes
+  - unsorted:
+      catch-all: true
 
-# ── Sections ─────────────────────────────────────────────────────────────────
-# Evaluated top-to-bottom. First section whose include rules match a doc wins.
-# 'folder' is the subfolder name in the staging directory.
+# ── Mapping ───────────────────────────────────────────────────────────────────
+# Evaluated top-to-bottom. First matching rule wins.
+# 'to' is the tree path in the staging directory.
+# 'skip: true' excludes matching docs entirely.
 
-sections:
-
-  - title: Architecture
-    folder: architecture
-    include:
-      - { type: architecture-overview }
-      - { type: architecture-detail }
-      - { type: component-architecture }
-      - { type: solution-architecture }
-      - { type: overview, folder-context: solution-architecture }   # section READMEs
-
-  - title: Decisions
-    folder: decisions
-    include:
-      - { type: decision }
-
-  - title: Standards & Reference
-    folder: reference
-    include:
-      - { type: reference }
-
-  - title: Repos
-    folder: repos
-    include:
-      - { type: repo-summary }
-      - { type: overview, folder-context: "" }               # root repo READMEs
-      - { type: overview, folder-context: "josyn-foundation*" }   # foundation sub-packages
-      - { type: overview, folder-context: "josyn-jap*" }         # jap sub-packages
-
-  - title: Guides
-    folder: guides
-    include:
-      - { type: manual }
-      - { type: overview }   # catches remaining overviews (sanity, etc.)
-
-  - title: Working Notes
-    folder: notes
-    include:
-      - { type: working-note }
-      - { type: plan }
+mapping:
+  - { type: agent-instruction, skip: true }
+  - { state: superseded, skip: true }
+  - { repo: josyn-playground, skip: true }
+  - { type: solution-architecture, to: architecture/solution-architecture }
+  - { type: architecture-overview, to: architecture/platform }
+  - { type: architecture-detail, to: architecture/platform }
+  - { type: component-architecture, to: architecture/components }
+  - { type: overview, folder-context: solution-architecture, to: architecture/solution-architecture }
+  - { type: decision, repo: josyn-platform, to: decisions/platform }
+  - { type: decision, repo: josyn-backend, to: decisions/backend }
+  - { type: decision, to: decisions/platform }
+  - { type: reference, to: reference }
+  - { type: repo-summary, to: repos }
+  - { type: overview, folder-context: "", to: repos }
+  - { type: overview, folder-context: "josyn-foundation*", to: repos }
+  - { type: overview, folder-context: "josyn-jap*", to: repos }
+  - { type: manual, to: guides }
+  - { type: overview, to: guides }
+  - { type: working-note, to: notes }
+  - { type: plan, to: notes }
 
 # ── Overrides ────────────────────────────────────────────────────────────────
-# Per-file exceptions. Applied after section rules.
-# 'target' is the output path relative to the staging root. Setting it fully
-# overrides section rules — the doc lands exactly at that path.
-# 'skip: true' excludes a specific doc even if it matched a section rule.
+# Per-file exceptions. Applied before mapping rules.
+# 'to' is the tree path relative to the staging root.
+# 'skip: true' excludes a specific doc even if it matched mapping rules.
 #
 # Example:
-#   - { repo: josyn-platform, path: README.md, target: repos/josyn-platform.md }
+#   - { repo: josyn-platform, path: README.md, to: repos }
 #   - { repo: josyn-platform, path: MAINTAINERS.md, skip: true }
 
 overrides: []
