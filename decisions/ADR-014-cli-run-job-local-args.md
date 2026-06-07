@@ -218,7 +218,7 @@ Notes:
 
 ### `ArgGen` — Deploy-Time Scaffold Generator
 
-`ArgGen` is a standalone console tool (`josyn-sandbox\tools\arg-gen\`) that generates the
+`ArgGen` is a standalone console tool (`josyn-toolbox\arg-gen\`) that generates the
 full `local-arguments\` scaffold for a job after it has been published.
 
 **Call signature:**

@@ -13,7 +13,7 @@ GUID, the job type name, the serialized arguments, and (after completion) the se
 This data bridges the three independent OS processes involved in a session
 (`SessionStarter` → `JAPServer` → `job.exe`).
 
-The sandbox prototype (`josyn-sandbox/.../SessionStore`) proved the EF Core model against
+The playground prototype (`josyn-playground/.../SessionStore`, formerly `josyn-sandbox`) proved the EF Core model against
 the legacy SQL Server schema. This ADR records the decisions taken when promoting that
 prototype to a production NuGet package.
 
@@ -44,7 +44,7 @@ how configuration is managed — that concern belongs to `JOSYN.Backend.GlobalCo
 
 ### 3. `ISessionStore.GetSession` accepts `Guid`, not `string`
 
-The sandbox version accepted `string sessionUid` and parsed it internally. The promoted
+The sandbox version (now in `josyn-playground`) accepted `string sessionUid` and parsed it internally. The promoted
 version accepts `Guid` directly — the parsing concern belongs at the boundary where
 the raw string arrives (e.g., CLI argument parsing in `JAPServer`), not in the store.
 

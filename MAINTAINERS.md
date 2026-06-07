@@ -39,7 +39,8 @@ josyn-platform     — this repo; documentation, decisions, architecture
 One repository stands outside this graph entirely:
 
 ```
-josyn-sandbox      — consumer; references the platform freely; the platform does not know it exists
+josyn-playground   — consumer; references the platform freely; the platform does not know it exists
+josyn-toolbox      — consumer; maintainer tooling; references the platform freely; the platform does not know it exists
 ```
 
 These relationships are not suggestions. They are contracts.
@@ -152,16 +153,18 @@ Purely internal backend decisions belong in backend-local documentation. Only de
 
 ---
 
-## Sandbox is not the platform
+## Playground and Toolbox are not the platform
 
-`josyn-sandbox` is a consumer repository. It may reference any platform repo it needs.
+`josyn-playground` is a consumer repository. It may reference any platform repo it needs.
 The platform never references it back — not in NuGet, not via project references, not through any convention or discovery mechanism.
 
-This is the one rule that defines its place: **the platform does not know josyn-sandbox exists.**
+This is the one rule that defines its place: **the platform does not know josyn-playground exists.**
 
-Because of this, sandbox carries none of the platform's obligations. It is not maintained to platform standards. Its code may be rough, experimental, or incomplete. That is not a deficiency — it is the point. It is the maintainer's space to demonstrate the living system, run exploratory integration scenarios, and develop new concepts before they earn a place in the real architecture.
+Because of this, the playground carries none of the platform's obligations. It is not maintained to platform standards. Its code may be rough, experimental, or incomplete. That is not a deficiency — it is the point. It is the maintainer's space to demonstrate the living system, run exploratory integration scenarios, and develop new concepts before they earn a place in the real architecture.
 
-When something in sandbox matures into a real feature, it moves — rewritten and reviewed — into the appropriate platform repo. The sandbox is not a permanent home.
+When something in the playground matures into a real feature, it moves — rewritten and reviewed — into the appropriate platform repo. The playground is not a permanent home.
+
+`josyn-toolbox` shares the same constraint: the platform does not know it exists, and it may not be referenced by any platform repo. It differs in character — toolbox content is stable, operational tooling (deployment scripts, code generators, machine-sync utilities) rather than throwaway experiments. Both repos are pure consumers.
 
 ---
 

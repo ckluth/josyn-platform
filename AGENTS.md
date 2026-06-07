@@ -22,6 +22,8 @@ All repos are siblings under a common parent directory:
 | `josyn-backend` | Scheduler and session-orchestration layer | `../josyn-backend` |
 | `josyn-commons` | Generic utility helpers — domain-agnostic, never referenced by Foundation | `../josyn-commons` |
 | `josyn-platform` | Architecture, decisions, docs — **this repo** | `../josyn-platform` |
+| `josyn-playground` | Consumer playground — demos, experiments, non-platform code | `../josyn-playground` |
+| `josyn-toolbox` | Maintainer tooling — deployment scripts, code generators, machine-sync utilities | `../josyn-toolbox` |
 
 ---
 
@@ -125,6 +127,10 @@ No content is duplicated here. Read the canonical source when a topic requires d
 | Architectural decision records | `decisions/` |
 | Per-repo summaries (packages, assemblies, current state) | `repos/` |
 | Sanity check protocol, inference algorithm, execution steps | `sanity/README.md` |
+| Project status, milestones, what's done and what's next | `ROADMAP.md` |
+| docs-index vocabulary (type, perspective, state closed lists) | `architecture/docs-index-vocabulary.md` |
+| Master documentation index (all repos, all docs) | `docs/docs-index.json` |
+| AI enrichment prompt for docs-index | `docs/enrich-docs-index-prompt.md` |
 
 ---
 

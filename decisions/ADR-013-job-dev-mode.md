@@ -238,9 +238,9 @@ The decision has not been made yet — this ADR captures the problem space and t
    `DevJAPServer` belong in `josyn-backend` (as the dev counterpart to `JAPServer`), in
    `josyn-job-host` (as dev tooling for the job side), or in a new `josyn-dev-tools` repo?
 
-6. **Relation to `josyn-sandbox`:** The sandbox repo is already the designated place for
-   maintainer tooling (`deploy-maintainer.ps1`, demo jobs). Could `DevJAPServer` be hosted
-   there without burdening the platform repos?
+6. **Relation to `josyn-playground` / `josyn-toolbox`:** The playground repo is the designated
+   place for experimental work and demo jobs; the toolbox holds operational scripts (`deploy-maintainer.ps1`).
+   Could `DevJAPServer` be hosted in one of these without burdening the platform repos?
 
 7. **Relation to test fakes:** `JOSYN.JobHost.Test` already contains stub implementations
    of `IJosynApplicationProtocol` (`JobInvokerTestSupport.cs`). Should those fakes be

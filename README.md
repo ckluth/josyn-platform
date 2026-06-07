@@ -45,9 +45,9 @@ Job executables are **decoupled consumers** of the JOSYN protocol, not internal 
 
 ---
 
-## Beyond the Platform — `josyn-sandbox`
+## Beyond the Platform — `josyn-playground` and `josyn-toolbox`
 
-`josyn-sandbox` is a consumer repository that sits outside the platform's dependency graph.
+`josyn-playground` is a consumer repository that sits outside the platform's dependency graph.
 It may reference any platform repo — as a pure consumer. The platform never references it back.
 
 Its purposes are:
@@ -57,8 +57,13 @@ Its purposes are:
 - **Experimental integration** — rough, non-regression-protected tests of the full runtime flow
 
 Errors and experiments here carry no consequences for the platform.
-`josyn-sandbox` is not a platform component. It is not maintained to platform standards.
+`josyn-playground` is not a platform component. It is not maintained to platform standards.
 ***It is the maintainer's playground.***
+
+`josyn-toolbox` is the sibling repo for operational and developer tooling — deployment scripts,
+machine-sync utilities, code generators, and documentation tools. It is also a pure consumer:
+the platform does not know it exists. Toolbox content is stable and regularly executed;
+playground content is experimental and may be throwaway.
 
 ---
 

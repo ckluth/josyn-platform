@@ -25,10 +25,10 @@ maintainer use on the same machine where the local repos reside.
 A PowerShell script `deploy-maintainer.ps1` lives at:
 
 ```
-josyn-sandbox\tools\deploy\deploy-maintainer.ps1
+josyn-toolbox\deploy\deploy-maintainer.ps1
 ```
 
-The script is placed in `josyn-sandbox` because it:
+The script is placed in `josyn-toolbox` because it:
 - is not platform infrastructure (no protocol, no CI, no service)
 - is maintainer tooling — deliberately outside the produced artefacts
 - has dependencies on multiple repos (`josyn-backend`, `josyn-contoso`) and therefore
@@ -129,10 +129,10 @@ All path keys are gone — they are computed by convention from BackendRoot (see
 
 ## Rationale
 
-**Why `josyn-sandbox\tools\deploy\`?**
+**Why `josyn-toolbox\deploy\`?**
 The script is maintainer tooling. It has no property of a platform artefact (no protocol,
-no NuGet package, no assembly). `josyn-sandbox` is the designated location for such tooling.
-The sandbox constraint does not apply in this direction: the script *consumes* platform repos
+no NuGet package, no assembly). `josyn-toolbox` is the designated location for such tooling.
+The toolbox constraint does not apply in this direction: the script *consumes* platform repos
 — it is not referenced by them.
 
 **Why a full delete instead of incremental update?**

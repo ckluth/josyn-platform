@@ -99,8 +99,8 @@ josyn-backend/db/
 Scripts are applied manually — no migration runner tool is required. The
 `migrations/` folder is the ordered, append-only history of all schema changes.
 
-The `josyn-sandbox/db/create-database.sql` is the origin of `bootstrap-local-dev.sql`
-and `migrations/V001__session_store.sql`. The sandbox file is superseded by these.
+The `josyn-playground/db/create-database.sql` (formerly in `josyn-sandbox`) is the origin of `bootstrap-local-dev.sql`
+and `migrations/V001__session_store.sql`. That file is superseded by these.
 
 ### 6. Architecture documentation
 
@@ -121,4 +121,4 @@ setting up a local database or adding a new storage domain.
   `josyn-backend/db/migrations/`
 - A new developer can bootstrap a local database by reading `architecture/storage.md`
   and running two scripts
-- The `josyn-sandbox/db/` SQL script is superseded and no longer the reference source
+- The `josyn-playground/db/` SQL script is superseded and no longer the reference source

@@ -2,7 +2,7 @@
 
 ## Starting point
 
-- `josyn-sandbox/.../SessionStore` - working prototype; contracts, EF Core impl, DB entity all present
+- `josyn-playground/.../SessionStore` (formerly `josyn-sandbox`) - working prototype; contracts, EF Core impl, DB entity all present
 - `ADR-001` mandates: Category A NuGet + separate `.Mock` companion, one solution per building block
 - `JOSYN.Jap.JAPServer` is the first real consumer - currently uses hardcoded fake args/result
 

@@ -89,7 +89,7 @@ Old and new can coexist: jobs migrated to the JOSYN model are started via the ne
 
 `JOSYN.Jap.JAPServer` is a working PoC EXE, relocated from `josyn-jap` per ADR-004.
 `JOSYN.Backend.SessionStore` is the first real Category A NuGet package, ported from the
-sandbox prototype per ADR-002.
+sandbox prototype per ADR-002. (The sandbox is now called `josyn-playground`.)
 `JOSYN.Backend.GlobalConfig` is the second Category A NuGet package; provides `IGlobalConfig`
 and the PoC `HardcodedGlobalConfig` placeholder, per ADR-003.
 `JOSYN.Backend.SessionStarter` is the third Category A NuGet package; provides `ISessionStarter`

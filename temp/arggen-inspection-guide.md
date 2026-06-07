@@ -6,7 +6,7 @@
 
 ## 1. Source Inspection
 
-**`josyn-sandbox\tools\arg-gen\`** — read these four files:
+**`josyn-toolbox\arg-gen\`** — read these four files:
 
 - `JobLoader.cs` — verify: loads `.dll` not `.exe`, finds `[JobEntryPoint]` by attribute *name*
   (string comparison, no hard dep on josyn-job-host), `<Clone>$` record detection,
@@ -16,8 +16,8 @@
 - `Program.cs` — verify: exit codes, `--cli-path` required check, no-parameters path exits 0
   with stderr note
 
-**`josyn-sandbox\tools\deploy\deploy-maintainer.ps1`** — verify:
-- `$SandboxRepoRoot` is derived from `$DevRoot` (same pattern as `$BackendRepoRoot`)
+**`josyn-toolbox\deploy\deploy-maintainer.ps1`** — verify:
+- `$ToolboxRepoRoot` is derived from `$DevRoot` (same pattern as `$BackendRepoRoot`)
 - Step 7a is positioned *after* job publish, *before* bootstrap.ini
 - `dotnet run ... --configuration Release` (not debug)
 - Error throw on non-zero exit code
@@ -32,7 +32,7 @@
 
 ```powershell
 # Setup
-$argGen = "C:\DevGit\josyn-sandbox\tools\arg-gen"
+$argGen = "C:\DevGit\josyn-toolbox\arg-gen"
 $jobExe = "C:\ProgramData\JOSYN\JobRepository\Contoso.DemoProduct.DemoJob\Contoso.DemoProduct.DemoJob.exe"
 $cliExe = "C:\ProgramData\JOSYN\CLI\JOSYN.Backend.CLI.exe"
 ```
@@ -85,7 +85,7 @@ Then trigger a real job run:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File `
-    "C:\DevGit\josyn-sandbox\tools\deploy\deploy-maintainer.ps1" -SkipNugets
+    "C:\DevGit\josyn-toolbox\deploy\deploy-maintainer.ps1" -SkipNugets
 ```
 
 ✅ Expect:
