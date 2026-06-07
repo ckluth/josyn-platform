@@ -1,5 +1,5 @@
 {
-  "generated": "2026-06-07T11:25:09.8906711+02:00",
+  "generated": "2026-06-07T12:49:05.5961829+02:00",
   "documents": [
     {
       "name": "AGENTS.md — JOSYN Platform",
@@ -7,12 +7,14 @@
       "path": "AGENTS.md",
       "folder-context": "",
       "created": "2026-05-30T22:31:38+02:00",
-      "touched": "2026-06-06T14:30:21+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "touched": "2026-06-07T12:04:59+02:00",
+      "type": "agent-instruction",
+      "perspective": [
+        "agent"
+      ],
+      "state": "settled",
+      "summary": "Defines authoritative operating instructions for AI agents working in JOSYN repositories.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN Platform — Maintainer's Guide",
@@ -20,12 +22,16 @@
       "path": "MAINTAINERS.md",
       "folder-context": "",
       "created": "2026-05-30T18:47:00+02:00",
-      "touched": "2026-05-31T17:19:01+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "touched": "2026-06-07T12:04:59+02:00",
+      "type": "reference",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer",
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "States the enduring architectural responsibilities and values for JOSYN maintainers.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN Platform",
@@ -33,12 +39,34 @@
       "path": "README.md",
       "folder-context": "",
       "created": "2026-05-29T09:57:21+02:00",
-      "touched": "2026-06-01T22:33:39+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "touched": "2026-06-07T12:04:59+02:00",
+      "type": "overview",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer",
+        "maintainer-operator",
+        "agent",
+        "stakeholder"
+      ],
+      "state": "settled",
+      "summary": "Introduces JOSYN, its repositories, architecture, and this repo’s authority.",
+      "enriched-at": "2026-06-07T10:26:00Z"
+    },
+    {
+      "name": "JOSYN Platform — Roadmap & Status",
+      "repo": "josyn-platform",
+      "path": "ROADMAP.md",
+      "folder-context": "",
+      "created": "2026-06-07T12:04:59+02:00",
+      "touched": "2026-06-07T12:04:59+02:00",
+      "type": "plan",
+      "perspective": [
+        "maintainer-architect",
+        "stakeholder"
+      ],
+      "state": "in-progress",
+      "summary": "Tracks platform status, milestones, completed work, and likely next steps.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Coding Standards — Functional-First C#",
@@ -47,24 +75,32 @@
       "folder-context": "architecture",
       "created": "2026-05-29T09:57:21+02:00",
       "touched": "2026-06-06T20:47:15+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "reference",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer",
+        "agent"
+      ],
+      "state": "settled",
+      "summary": "Defines JOSYN’s functional-first C# principles and coding rules.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "docs-index Vocabulary",
       "repo": "josyn-platform",
       "path": "architecture/docs-index-vocabulary.md",
       "folder-context": "architecture",
-      "created": null,
-      "touched": null,
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "created": "2026-06-07T12:04:59+02:00",
+      "touched": "2026-06-07T12:04:59+02:00",
+      "type": "reference",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer",
+        "agent"
+      ],
+      "state": "settled",
+      "summary": "Defines the closed vocabularies for docs-index semantic classification.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "`.local-build` — Local Developer Tooling",
@@ -73,11 +109,13 @@
       "folder-context": "architecture",
       "created": "2026-06-02T21:50:13+02:00",
       "touched": "2026-06-02T21:50:13+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "reference",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Defines the purpose and conventions of the local build wrapper scripts.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Naming Conventions",
@@ -86,11 +124,15 @@
       "folder-context": "architecture",
       "created": "2026-05-29T09:57:21+02:00",
       "touched": "2026-06-06T10:56:37+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "reference",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer",
+        "agent"
+      ],
+      "state": "settled",
+      "summary": "Defines naming, namespace, and vocabulary rules across the platform.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Architecture Overview",
@@ -99,11 +141,15 @@
       "folder-context": "architecture",
       "created": "2026-05-29T09:57:21+02:00",
       "touched": "2026-06-05T23:51:03+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "architecture-overview",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer",
+        "agent"
+      ],
+      "state": "settled",
+      "summary": "Explains the platform structure, runtime flow, and dependency graph.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Repo Structure Conventions",
@@ -111,12 +157,15 @@
       "path": "architecture/repo-structure-conventions.md",
       "folder-context": "architecture",
       "created": "2026-06-02T19:52:25+02:00",
-      "touched": "2026-06-06T10:56:37+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "touched": "2026-06-07T12:04:59+02:00",
+      "type": "reference",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Defines the allowed repository structure patterns used across JOSYN.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN Storage Realm",
@@ -125,11 +174,15 @@
       "folder-context": "architecture",
       "created": "2026-06-04T21:07:57+02:00",
       "touched": "2026-06-05T23:51:03+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "architecture-detail",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer",
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Details the storage realm, schema conventions, and development setup.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "ADR-001 — Platform Naming Vocabulary",
@@ -138,11 +191,14 @@
       "folder-context": "decisions",
       "created": "2026-05-29T09:57:21+02:00",
       "touched": "2026-05-30T13:45:37+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Establishes the platform naming vocabulary and repo naming boundaries.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "ADR-002 — Introducing `josyn-backend` as a Separate Layer",
@@ -151,11 +207,13 @@
       "folder-context": "decisions",
       "created": "2026-05-29T10:53:10+02:00",
       "touched": "2026-05-29T14:01:09+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect"
+      ],
+      "state": "settled",
+      "summary": "Introduces josyn-backend as a separate platform layer.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "ADR-003 — josyn-commons: A Generic Utility Layer",
@@ -164,11 +222,14 @@
       "folder-context": "decisions",
       "created": "2026-05-30T18:04:47+02:00",
       "touched": "2026-05-30T18:04:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Creates josyn-commons as the generic utility layer outside foundation.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "ADR-004 — JAPServer Relocation into josyn-backend",
@@ -177,11 +238,14 @@
       "folder-context": "decisions",
       "created": "2026-06-01T20:48:41+02:00",
       "touched": "2026-06-06T10:56:37+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Moves JAPServer implementation from josyn-jap into josyn-backend.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "ADR-005 — Documentation Governance and Agentic Way of Work",
@@ -190,11 +254,14 @@
       "folder-context": "decisions",
       "created": "2026-06-02T10:36:17+02:00",
       "touched": "2026-06-02T10:36:17+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect",
+        "agent"
+      ],
+      "state": "settled",
+      "summary": "Makes josyn-platform the authoritative home for documentation and agent guidance.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "ADR-006 — Instance Types for Dependency-Holding Services",
@@ -203,11 +270,14 @@
       "folder-context": "decisions",
       "created": "2026-06-04T00:22:26+02:00",
       "touched": "2026-06-04T00:22:26+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Defines instance-type rules for services that hold runtime dependencies.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "ADR-007 — The JOSYN Storage Realm",
@@ -215,12 +285,16 @@
       "path": "decisions/ADR-007-storage-realm.md",
       "folder-context": "decisions",
       "created": "2026-06-04T21:07:57+02:00",
-      "touched": "2026-06-05T02:19:24+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "touched": "2026-06-07T12:04:59+02:00",
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer",
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Establishes the governed storage realm for durable platform state.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "ADR-008 — LocalLog Relocation to josyn-commons",
@@ -229,11 +303,14 @@
       "folder-context": "decisions",
       "created": "2026-06-05T02:19:24+02:00",
       "touched": "2026-06-06T10:56:37+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "in-progress",
+      "summary": "Proposes moving LocalLog into josyn-commons as shared logging infrastructure.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "ADR-009 — Runtime Context Provider Pattern for External Integrations",
@@ -242,11 +319,14 @@
       "folder-context": "decisions",
       "created": "2026-06-05T14:49:56+02:00",
       "touched": "2026-06-06T14:02:23+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Defines runtime context providers for external integration and environment-specific data.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "ADR-010 — Environment Separation and Installation Model",
@@ -255,11 +335,14 @@
       "folder-context": "decisions",
       "created": "2026-06-05T14:49:56+02:00",
       "touched": "2026-06-05T14:49:56+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-operator"
+      ],
+      "state": "in-progress",
+      "summary": "Explores the installation and separation model for DEV, INT, and PROD environments.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "ADR-011 — JIP Wire-Type Extension: Enum Support in JipDispatcher",
@@ -268,11 +351,14 @@
       "folder-context": "decisions",
       "created": "2026-06-05T23:51:03+02:00",
       "touched": "2026-06-05T23:51:03+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Adds enum wire-type support to JIP dispatcher registration.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "ADR-012 — Maintainer Deployment (First Iteration)",
@@ -280,12 +366,15 @@
       "path": "decisions/ADR-012-maintainer-deployment.md",
       "folder-context": "decisions",
       "created": "2026-06-06T12:47:22+02:00",
-      "touched": "2026-06-06T14:30:21+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "touched": "2026-06-07T12:04:59+02:00",
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-operator"
+      ],
+      "state": "in-progress",
+      "summary": "Outlines the first deployment model for maintainers during the PoC phase.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "ADR-013 — Job Dev Mode: Running a Job Locally from the IDE",
@@ -293,12 +382,16 @@
       "path": "decisions/ADR-013-job-dev-mode.md",
       "folder-context": "decisions",
       "created": "2026-06-06T14:30:21+02:00",
-      "touched": "2026-06-06T14:30:21+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "touched": "2026-06-07T12:04:59+02:00",
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer",
+        "job-developer"
+      ],
+      "state": "in-progress",
+      "summary": "Defines a local IDE workflow for running jobs during development.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "ADR-014 — CLI `run-job` Command and Local Arguments Convention",
@@ -306,25 +399,30 @@
       "path": "decisions/ADR-014-cli-run-job-local-args.md",
       "folder-context": "decisions",
       "created": "2026-06-06T15:55:16+02:00",
-      "touched": "2026-06-06T21:35:41+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "touched": "2026-06-07T12:04:59+02:00",
+      "type": "decision",
+      "perspective": [
+        "maintainer-developer",
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Defines the run-job CLI command and local argument conventions.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Enrich docs-index — AI enrichment prompt",
       "repo": "josyn-platform",
       "path": "docs/enrich-docs-index-prompt.md",
       "folder-context": "docs",
-      "created": null,
-      "touched": null,
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "created": "2026-06-07T12:04:59+02:00",
+      "touched": "2026-06-07T12:04:59+02:00",
+      "type": "agent-instruction",
+      "perspective": [
+        "agent"
+      ],
+      "state": "settled",
+      "summary": "Provides the standing prompt for AI-based docs-index enrichment.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Context Provider PoC Plan",
@@ -333,11 +431,14 @@
       "folder-context": "plans",
       "created": "2026-06-05T14:49:56+02:00",
       "touched": "2026-06-06T14:02:23+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "plan",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "superseded",
+      "summary": "Records the completed PoC plan for validating the context provider pattern.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "SessionStore -> josyn-backend PoC Roadmap",
@@ -345,12 +446,15 @@
       "path": "plans/sessionstore-poc-roadmap.md",
       "folder-context": "plans",
       "created": "2026-06-04T00:22:26+02:00",
-      "touched": "2026-06-06T10:56:37+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "touched": "2026-06-07T12:04:59+02:00",
+      "type": "plan",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "in-progress",
+      "summary": "Plans the migration of the SessionStore prototype into josyn-backend.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "PROP-001 — JAPServer Relocation into josyn-backend",
@@ -359,11 +463,14 @@
       "folder-context": "proposals",
       "created": "2026-06-01T20:48:41+02:00",
       "touched": "2026-06-01T20:48:41+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "superseded",
+      "summary": "Records the superseded proposal to move JAPServer into josyn-backend.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "josyn-commons",
@@ -372,11 +479,14 @@
       "folder-context": "repos",
       "created": "2026-05-30T18:04:47+02:00",
       "touched": "2026-06-05T02:19:24+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "repo-summary",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Summarizes the role, boundaries, packages, and current state of josyn-commons.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "josyn-foundation",
@@ -385,11 +495,14 @@
       "folder-context": "repos",
       "created": "2026-05-29T09:57:21+02:00",
       "touched": "2026-05-30T22:34:13+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "repo-summary",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Summarizes the role, packages, and stability expectations of josyn-foundation.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "josyn-jap",
@@ -398,11 +511,14 @@
       "folder-context": "repos",
       "created": "2026-05-29T09:57:21+02:00",
       "touched": "2026-06-05T02:19:24+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "repo-summary",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Summarizes the protocol-contract role and package contents of josyn-jap.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "josyn-job-host",
@@ -410,12 +526,16 @@
       "path": "repos/josyn-job-host.md",
       "folder-context": "repos",
       "created": "2026-05-29T09:57:21+02:00",
-      "touched": "2026-06-01T23:11:43+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "touched": "2026-06-07T12:04:59+02:00",
+      "type": "repo-summary",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer",
+        "job-developer"
+      ],
+      "state": "settled",
+      "summary": "Summarizes the job runtime library, responsibilities, and package surface.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "josyn-backend",
@@ -423,12 +543,16 @@
       "path": "repos/josyn-backend/overview.md",
       "folder-context": "repos",
       "created": "2026-05-29T10:53:10+02:00",
-      "touched": "2026-06-06T10:56:37+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "touched": "2026-06-07T12:04:59+02:00",
+      "type": "repo-summary",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer",
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Summarizes josyn-backend responsibilities, building blocks, and current architecture.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "ADR-001 — Backend Building Block Model",
@@ -437,11 +561,14 @@
       "folder-context": "repos",
       "created": "2026-06-02T11:54:46+02:00",
       "touched": "2026-06-02T11:54:46+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Defines the building block model used inside josyn-backend.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "ADR-002 — SessionStore",
@@ -449,12 +576,15 @@
       "path": "repos/josyn-backend/decisions/ADR-002-session-store.md",
       "folder-context": "repos",
       "created": "2026-06-04T00:22:26+02:00",
-      "touched": "2026-06-04T21:07:57+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "touched": "2026-06-07T12:04:59+02:00",
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Introduces SessionStore as a Category A backend component.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "ADR-003 — GlobalConfig",
@@ -463,11 +593,14 @@
       "folder-context": "repos",
       "created": "2026-06-04T00:22:26+02:00",
       "touched": "2026-06-06T10:56:37+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Introduces GlobalConfig as a separate backend building block.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "ADR-004 — Backend Restructuring: Trigger Executables, ErrorHandler, and SessionStarter Fire-and-Forget Correction",
@@ -476,11 +609,14 @@
       "folder-context": "repos",
       "created": "2026-06-04T13:02:22+02:00",
       "touched": "2026-06-06T10:56:37+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "in-progress",
+      "summary": "Proposes backend restructuring and corrected fire-and-forget session startup.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "ADR-005 — JobRegistry",
@@ -489,11 +625,15 @@
       "folder-context": "repos",
       "created": "2026-06-04T21:07:57+02:00",
       "touched": "2026-06-06T10:56:37+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer",
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Introduces JobRegistry as the authoritative record of runnable jobs.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "ADR-006 — ErrorHandler",
@@ -502,11 +642,15 @@
       "folder-context": "repos",
       "created": "2026-06-05T02:19:24+02:00",
       "touched": "2026-06-06T20:47:15+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer",
+        "maintainer-operator"
+      ],
+      "state": "in-progress",
+      "summary": "Proposes a backend-wide error reporting component and contract.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Sanity Criteria — Decision-Maker Review",
@@ -515,11 +659,13 @@
       "folder-context": "sanity",
       "created": "2026-05-30T23:36:20+02:00",
       "touched": "2026-05-31T13:38:22+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "manual",
+      "perspective": [
+        "maintainer-architect"
+      ],
+      "state": "settled",
+      "summary": "Guides periodic review of sanity criteria quality, coverage, and noise.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Sanity Check — Last Result (Retired)",
@@ -528,11 +674,14 @@
       "folder-context": "sanity",
       "created": null,
       "touched": null,
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "reference",
+      "perspective": [
+        "maintainer-developer",
+        "agent"
+      ],
+      "state": "superseded",
+      "summary": "Redirects retired sanity results to the new per-repo state files.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Sanity Check — Platform Overview",
@@ -541,11 +690,15 @@
       "folder-context": "sanity",
       "created": "2026-05-31T12:54:05+02:00",
       "touched": "2026-05-31T14:57:26+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "overview",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer",
+        "agent"
+      ],
+      "state": "settled",
+      "summary": "Shows the aggregated sanity status across platform repositories.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Sanity Check — Method and Manual",
@@ -554,11 +707,14 @@
       "folder-context": "sanity",
       "created": "2026-05-30T22:37:12+02:00",
       "touched": "2026-06-02T11:54:46+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "manual",
+      "perspective": [
+        "maintainer-developer",
+        "agent"
+      ],
+      "state": "settled",
+      "summary": "Defines the sanity check method, profiles, workflow, and safety rules.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Sanity — Trigger Table",
@@ -567,11 +723,14 @@
       "folder-context": "sanity",
       "created": "2026-05-31T12:54:05+02:00",
       "touched": "2026-05-31T12:54:05+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "reference",
+      "perspective": [
+        "maintainer-developer",
+        "agent"
+      ],
+      "state": "settled",
+      "summary": "Maps changed file paths to sanity categories for smart-mode runs.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Sanity Criteria — architecture",
@@ -580,11 +739,15 @@
       "folder-context": "sanity",
       "created": "2026-05-30T22:31:38+02:00",
       "touched": "2026-06-01T21:29:35+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "reference",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer",
+        "agent"
+      ],
+      "state": "settled",
+      "summary": "Defines architecture criteria used during sanity checks.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Sanity Criteria — docs",
@@ -593,11 +756,14 @@
       "folder-context": "sanity",
       "created": "2026-05-30T22:31:38+02:00",
       "touched": "2026-05-31T13:28:15+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "reference",
+      "perspective": [
+        "maintainer-developer",
+        "agent"
+      ],
+      "state": "settled",
+      "summary": "Defines documentation completeness and quality criteria for sanity checks.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Sanity Criteria — principles",
@@ -606,11 +772,15 @@
       "folder-context": "sanity",
       "created": "2026-05-30T22:31:38+02:00",
       "touched": "2026-06-06T14:02:23+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "reference",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer",
+        "agent"
+      ],
+      "state": "settled",
+      "summary": "Defines principle-based coding criteria for sanity checks.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Sanity Criteria — standards",
@@ -619,11 +789,14 @@
       "folder-context": "sanity",
       "created": "2026-05-30T22:31:38+02:00",
       "touched": "2026-06-06T10:56:37+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "reference",
+      "perspective": [
+        "maintainer-developer",
+        "agent"
+      ],
+      "state": "settled",
+      "summary": "Defines naming and structural standards checked by sanity runs.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Sanity Criteria — tests",
@@ -632,11 +805,14 @@
       "folder-context": "sanity",
       "created": "2026-05-30T22:31:38+02:00",
       "touched": "2026-05-30T23:57:34+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "reference",
+      "perspective": [
+        "maintainer-developer",
+        "agent"
+      ],
+      "state": "settled",
+      "summary": "Defines test coverage, quality, and passing criteria for sanity checks.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Sanity State — josyn-backend",
@@ -645,11 +821,14 @@
       "folder-context": "sanity",
       "created": "2026-05-31T12:54:05+02:00",
       "touched": "2026-05-31T12:54:05+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "reference",
+      "perspective": [
+        "maintainer-developer",
+        "agent"
+      ],
+      "state": "thinking",
+      "summary": "Will report the current sanity status of josyn-backend once checked.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Sanity State — josyn-commons",
@@ -658,11 +837,14 @@
       "folder-context": "sanity",
       "created": "2026-05-31T12:54:05+02:00",
       "touched": "2026-05-31T12:54:05+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "reference",
+      "perspective": [
+        "maintainer-developer",
+        "agent"
+      ],
+      "state": "thinking",
+      "summary": "Will report the current sanity status of josyn-commons once checked.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Sanity State — josyn-foundation",
@@ -671,11 +853,14 @@
       "folder-context": "sanity",
       "created": "2026-05-31T12:54:05+02:00",
       "touched": "2026-06-06T10:56:37+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "reference",
+      "perspective": [
+        "maintainer-developer",
+        "agent"
+      ],
+      "state": "settled",
+      "summary": "Records the latest sanity findings and fixes for josyn-foundation.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Sanity State — josyn-jap",
@@ -684,11 +869,14 @@
       "folder-context": "sanity",
       "created": "2026-05-31T12:54:05+02:00",
       "touched": "2026-06-01T21:29:35+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "reference",
+      "perspective": [
+        "maintainer-developer",
+        "agent"
+      ],
+      "state": "settled",
+      "summary": "Records the latest sanity findings and scope for josyn-jap.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Sanity State — josyn-job-host",
@@ -697,11 +885,14 @@
       "folder-context": "sanity",
       "created": "2026-05-31T12:54:05+02:00",
       "touched": "2026-05-31T12:54:05+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "reference",
+      "perspective": [
+        "maintainer-developer",
+        "agent"
+      ],
+      "state": "thinking",
+      "summary": "Will report the current sanity status of josyn-job-host once checked.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Solution Architecture",
@@ -710,11 +901,14 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "overview",
+      "perspective": [
+        "maintainer-architect",
+        "stakeholder"
+      ],
+      "state": "settled",
+      "summary": "Introduces the solution architecture view of JOSYN in real deployment context.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN and its Predecessor",
@@ -723,11 +917,14 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "solution-architecture",
+      "perspective": [
+        "maintainer-architect",
+        "stakeholder"
+      ],
+      "state": "settled",
+      "summary": "Explains JOSYN’s purpose and its relationship to the legacy JobSystem.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Context",
@@ -736,11 +933,14 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "overview",
+      "perspective": [
+        "maintainer-architect",
+        "stakeholder"
+      ],
+      "state": "settled",
+      "summary": "Introduces the context chapter of the solution architecture.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Constraints & Settled Decisions",
@@ -749,11 +949,14 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "overview",
+      "perspective": [
+        "maintainer-architect",
+        "stakeholder"
+      ],
+      "state": "settled",
+      "summary": "Introduces the chapter covering fixed constraints and settled decisions.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Settled Decisions",
@@ -762,11 +965,14 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T17:15:46+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "solution-architecture",
+      "perspective": [
+        "maintainer-architect",
+        "stakeholder"
+      ],
+      "state": "settled",
+      "summary": "Lists the non-negotiable baseline decisions of the JOSYN solution.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Folder Layout",
@@ -775,11 +981,14 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "solution-architecture",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Defines the fixed machine folder layout used by JOSYN.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Job Registry",
@@ -788,11 +997,14 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "solution-architecture",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Explains how jobs are registered before JOSYN can execute them.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Machine Topology",
@@ -801,11 +1013,15 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "solution-architecture",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-operator",
+        "stakeholder"
+      ],
+      "state": "settled",
+      "summary": "Describes the single-machine deployment topology assumed by JOSYN.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Physical Architecture",
@@ -814,11 +1030,14 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "overview",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Introduces the chapter describing JOSYN’s physical deployment structure.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Services and Executables",
@@ -827,11 +1046,14 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "solution-architecture",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Describes the executables and service roles in the backend runtime.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Session Store",
@@ -840,11 +1062,14 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "solution-architecture",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Explains the session store’s runtime roles within the deployed solution.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Identity and Impersonation",
@@ -853,11 +1078,14 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "solution-architecture",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Explains service identities, permissions, and job impersonation requirements.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Identity & Security",
@@ -866,11 +1094,14 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "overview",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Introduces the chapter covering identity and security concerns.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Job Deployment",
@@ -879,11 +1110,14 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "solution-architecture",
+      "perspective": [
+        "maintainer-operator",
+        "job-developer"
+      ],
+      "state": "settled",
+      "summary": "Describes how a job is deployed into the JobRepository.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Deployment & Operations",
@@ -892,11 +1126,14 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "overview",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Introduces the chapter covering deployment, bootstrapping, and operations.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Audit and the Session Record",
@@ -905,11 +1142,15 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "solution-architecture",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-operator",
+        "stakeholder"
+      ],
+      "state": "settled",
+      "summary": "Explains how session records provide auditability for job executions.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Coexistence with JobSystem",
@@ -918,11 +1159,14 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "solution-architecture",
+      "perspective": [
+        "maintainer-architect",
+        "stakeholder"
+      ],
+      "state": "settled",
+      "summary": "Explains the planned parallel coexistence of JOSYN and the legacy JobSystem.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Isolation vs. Integration",
@@ -931,11 +1175,14 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "solution-architecture",
+      "perspective": [
+        "maintainer-architect",
+        "stakeholder"
+      ],
+      "state": "settled",
+      "summary": "Explains JOSYN’s portability and its fit within company-specific infrastructure.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Maintainability and Knowledge Transfer",
@@ -944,11 +1191,14 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "solution-architecture",
+      "perspective": [
+        "maintainer-architect",
+        "stakeholder"
+      ],
+      "state": "settled",
+      "summary": "Explains how JOSYN is designed for maintainability and knowledge transfer.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Company Fit",
@@ -957,11 +1207,14 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-06T16:59:16+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "overview",
+      "perspective": [
+        "maintainer-architect",
+        "stakeholder"
+      ],
+      "state": "settled",
+      "summary": "Introduces the chapter about governance, compliance, and organisational fit.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Evolution Horizon",
@@ -970,11 +1223,14 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "solution-architecture",
+      "perspective": [
+        "maintainer-architect",
+        "stakeholder"
+      ],
+      "state": "settled",
+      "summary": "Outlines realistic future evolution paths beyond the current Windows-only solution.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Evolution & Lifecycle",
@@ -983,11 +1239,14 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "overview",
+      "perspective": [
+        "maintainer-architect",
+        "stakeholder"
+      ],
+      "state": "settled",
+      "summary": "Introduces the chapter covering future evolution and lifecycle boundaries.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "YAGNI Decisions",
@@ -996,11 +1255,14 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "solution-architecture",
+      "perspective": [
+        "maintainer-architect",
+        "stakeholder"
+      ],
+      "state": "settled",
+      "summary": "Records capabilities deliberately deferred under YAGNI discipline.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Documentation and Training — Overview",
@@ -1009,11 +1271,16 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "solution-architecture",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer",
+        "maintainer-operator",
+        "stakeholder"
+      ],
+      "state": "settled",
+      "summary": "Summarizes current documentation and training coverage across the platform.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Documentation & Training",
@@ -1022,11 +1289,16 @@
       "folder-context": "solution-architecture",
       "created": "2026-06-04T15:38:47+02:00",
       "touched": "2026-06-04T15:38:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "overview",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer",
+        "maintainer-operator",
+        "stakeholder"
+      ],
+      "state": "settled",
+      "summary": "Introduces the chapter covering documentation, onboarding, and training.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "ArgGen — Inspection & Smoke-Test Guide",
@@ -1034,12 +1306,14 @@
       "path": "temp/arggen-inspection-guide.md",
       "folder-context": "temp",
       "created": "2026-06-06T21:35:41+02:00",
-      "touched": "2026-06-06T21:35:41+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "touched": "2026-06-07T12:04:59+02:00",
+      "type": "manual",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "in-progress",
+      "summary": "Provides a temporary inspection and smoke-test guide for ArgGen.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "PoC Phases 2–5 — Inspection & Runtime Notes",
@@ -1048,11 +1322,13 @@
       "folder-context": "temp",
       "created": "2026-06-04T00:22:26+02:00",
       "touched": "2026-06-06T10:56:37+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "working-note",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "in-progress",
+      "summary": "Captures temporary inspection and runtime notes from SessionStore PoC work.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Documentation Taxonomy — Working Note",
@@ -1061,11 +1337,13 @@
       "folder-context": "thinking",
       "created": "2026-06-06T18:08:25+02:00",
       "touched": "2026-06-06T18:08:25+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "working-note",
+      "perspective": [
+        "maintainer-architect"
+      ],
+      "state": "thinking",
+      "summary": "Brainstorms a future taxonomy for classifying documentation across JOSYN repos.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "josyn-foundation",
@@ -1074,11 +1352,14 @@
       "folder-context": "",
       "created": "2026-05-28T21:26:47+02:00",
       "touched": "2026-06-06T10:56:39+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "overview",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Introduces the foundation repo and its three core infrastructure packages.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "josyn-foundation-jip",
@@ -1087,11 +1368,13 @@
       "folder-context": "josyn-foundation-jip",
       "created": "2026-05-28T21:26:47+02:00",
       "touched": "2026-05-29T00:11:18+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "overview",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Introduces the JIP transport sub-repo and links to package documentation.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Changelog",
@@ -1100,11 +1383,13 @@
       "folder-context": "josyn-foundation-jip",
       "created": "2026-05-28T21:26:47+02:00",
       "touched": "2026-05-29T00:11:18+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "reference",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Records release history and notable changes for the JIP package.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN.Foundation.JIP",
@@ -1113,11 +1398,13 @@
       "folder-context": "josyn-foundation-jip",
       "created": "2026-05-28T21:26:47+02:00",
       "touched": "2026-05-29T00:11:18+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "component-architecture",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Explains the named-pipe transport component used for JOSYN IPC.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN-IPC-Protocol",
@@ -1126,11 +1413,14 @@
       "folder-context": "josyn-foundation-jip",
       "created": "2026-05-28T21:26:47+02:00",
       "touched": "2026-05-28T21:26:47+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "architecture-detail",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "thinking",
+      "summary": "Drafts the layered IPC protocol used between JOSYN processes.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "josyn-foundation-property-bag",
@@ -1139,11 +1429,13 @@
       "folder-context": "josyn-foundation-property-bag",
       "created": "2026-05-28T21:26:47+02:00",
       "touched": "2026-05-29T00:11:18+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "overview",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Introduces the PropertyBag sub-repo and links to package documentation.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Changelog",
@@ -1152,11 +1444,13 @@
       "folder-context": "josyn-foundation-property-bag",
       "created": "2026-05-28T21:26:47+02:00",
       "touched": "2026-05-29T00:11:18+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "reference",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Records release history and notable changes for the PropertyBag package.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN.Foundation.PropertyBag",
@@ -1165,11 +1459,13 @@
       "folder-context": "josyn-foundation-property-bag",
       "created": "2026-05-28T21:26:47+02:00",
       "touched": "2026-05-29T00:11:18+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "component-architecture",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Explains the flat record serialization component used in JOSYN IPC.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "josyn-foundation-result-pattern",
@@ -1178,11 +1474,13 @@
       "folder-context": "josyn-foundation-result-pattern",
       "created": "2026-05-28T21:26:47+02:00",
       "touched": "2026-05-29T00:11:18+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "overview",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Introduces the ResultPattern sub-repo and links to package documentation.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Changelog",
@@ -1191,11 +1489,13 @@
       "folder-context": "josyn-foundation-result-pattern",
       "created": "2026-05-28T21:26:47+02:00",
       "touched": "2026-06-05T23:51:06+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "reference",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Records release history and notable changes for the ResultPattern package.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN.Foundation.ResultPattern",
@@ -1204,11 +1504,13 @@
       "folder-context": "josyn-foundation-result-pattern",
       "created": "2026-05-28T21:26:47+02:00",
       "touched": "2026-06-05T23:51:06+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "component-architecture",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Explains the result-based error handling component for JOSYN.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "Advice for Maintainers of josyn-commons",
@@ -1217,11 +1519,15 @@
       "folder-context": "",
       "created": "2026-05-30T18:47:07+02:00",
       "touched": "2026-05-30T18:47:07+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "reference",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer",
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Gives repo-specific maintainer guidance for josyn-commons.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "josyn-commons",
@@ -1230,11 +1536,14 @@
       "folder-context": "",
       "created": "2026-05-30T18:47:07+02:00",
       "touched": "2026-06-06T10:56:42+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "overview",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Introduces josyn-commons as the domain-agnostic utility layer.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN.Commons.Log",
@@ -1243,11 +1552,13 @@
       "folder-context": "josyn-commons-log",
       "created": "2026-06-05T02:19:32+02:00",
       "touched": "2026-06-05T02:19:32+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "component-architecture",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Explains the process-local file logging component in josyn-commons.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "josyn-jap",
@@ -1256,11 +1567,14 @@
       "folder-context": "",
       "created": "2026-05-29T08:41:58+02:00",
       "touched": "2026-06-06T10:56:45+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "overview",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Introduces josyn-jap as the shared protocol-contract layer.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN.Jap.Shared",
@@ -1269,11 +1583,13 @@
       "folder-context": "josyn-jap-shared",
       "created": "2026-05-29T08:41:58+02:00",
       "touched": "2026-06-06T10:56:45+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "overview",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Introduces the shared JAP libraries used by both session parties.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN.Jap.Shared.Contract",
@@ -1282,11 +1598,13 @@
       "folder-context": "josyn-jap-shared",
       "created": "2026-05-29T08:41:58+02:00",
       "touched": "2026-05-30T16:04:07+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "component-architecture",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Explains the shared application contract between JobHost and JAPServer.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "josyn-backend",
@@ -1295,11 +1613,15 @@
       "folder-context": "",
       "created": "2026-05-29T10:53:11+02:00",
       "touched": "2026-06-01T21:58:21+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "overview",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer",
+        "maintainer-operator"
+      ],
+      "state": "thinking",
+      "summary": "Will introduce the backend scheduler layer when full documentation exists.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN Error Report",
@@ -1308,11 +1630,13 @@
       "folder-context": "db",
       "created": "2026-06-06T12:47:35+02:00",
       "touched": "2026-06-06T12:47:35+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "reference",
+      "perspective": [
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Lists recent persisted backend error reports from the database.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN Session Report",
@@ -1321,11 +1645,13 @@
       "folder-context": "db",
       "created": "2026-06-06T20:47:23+02:00",
       "touched": "2026-06-06T21:48:00+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "reference",
+      "perspective": [
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Lists recent persisted job session records from the database.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN.Backend.GlobalConfig",
@@ -1334,11 +1660,13 @@
       "folder-context": "josyn-backend-bootstrap-config",
       "created": "2026-06-04T00:22:32+02:00",
       "touched": "2026-06-05T14:50:07+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "component-architecture",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Explains the runtime configuration contract used by backend components.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN.Backend.ErrorHandler",
@@ -1347,11 +1675,14 @@
       "folder-context": "josyn-backend-error-handler",
       "created": "2026-06-04T13:13:36+02:00",
       "touched": "2026-06-05T02:19:39+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "component-architecture",
+      "perspective": [
+        "maintainer-developer",
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Explains the backend-wide error reporting endpoint and contract.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN.Jap.JAPServer",
@@ -1360,11 +1691,13 @@
       "folder-context": "josyn-backend-jap-server",
       "created": "2026-06-01T21:58:21+02:00",
       "touched": "2026-06-02T19:52:36+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "component-architecture",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Explains the backend server executable for JAP sessions.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN.Backend.JobRegistry",
@@ -1373,11 +1706,14 @@
       "folder-context": "josyn-backend-job-registry",
       "created": "2026-06-04T21:08:03+02:00",
       "touched": "2026-06-04T21:08:03+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "component-architecture",
+      "perspective": [
+        "maintainer-developer",
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Explains the storage-backed registry of runnable jobs.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN.Backend.SessionStarter",
@@ -1386,11 +1722,13 @@
       "folder-context": "josyn-backend-session-starter",
       "created": "2026-06-04T00:22:32+02:00",
       "touched": "2026-06-04T00:22:32+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "component-architecture",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Explains the component that allocates sessions and spawns JAPServer.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN.Backend.SessionStore",
@@ -1399,11 +1737,14 @@
       "folder-context": "josyn-backend-session-store",
       "created": "2026-06-04T00:22:32+02:00",
       "touched": "2026-06-04T21:08:03+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "component-architecture",
+      "perspective": [
+        "maintainer-developer",
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Explains the persistence component for JOSYN job sessions.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN.JobHost",
@@ -1412,11 +1753,14 @@
       "folder-context": "JOSYN.JobHost",
       "created": "2026-05-29T09:14:06+02:00",
       "touched": "2026-06-06T01:45:40+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "type": "component-architecture",
+      "perspective": [
+        "job-developer",
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Explains the job runtime library used by JOSYN job executables.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "AGENTS.md — JOSYN Playground",
@@ -1424,12 +1768,14 @@
       "path": "AGENTS.md",
       "folder-context": "",
       "created": "2026-05-31T18:52:35+02:00",
-      "touched": "2026-06-07T00:00:00+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "touched": "2026-06-07T12:01:19+02:00",
+      "type": "agent-instruction",
+      "perspective": [
+        "agent"
+      ],
+      "state": "settled",
+      "summary": "Defines AI agent behavior for the consumer playground repository.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN Playground",
@@ -1437,77 +1783,120 @@
       "path": "README.md",
       "folder-context": "",
       "created": "2026-05-31T18:52:35+02:00",
-      "touched": "2026-06-07T00:00:00+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "touched": "2026-06-07T12:01:19+02:00",
+      "type": "overview",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Introduces the playground repo for demos, exploration, and experiments.",
+      "enriched-at": "2026-06-07T10:26:00Z"
+    },
+    {
+      "name": "AGENTS.md — JOSYN Toolbox",
+      "repo": "josyn-toolbox",
+      "path": "AGENTS.md",
+      "folder-context": "",
+      "created": "2026-06-07T11:59:43+02:00",
+      "touched": "2026-06-07T11:59:43+02:00",
+      "type": "agent-instruction",
+      "perspective": [
+        "agent"
+      ],
+      "state": "settled",
+      "summary": "Defines AI agent behavior for the maintainer tooling repository.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN Toolbox",
       "repo": "josyn-toolbox",
       "path": "README.md",
       "folder-context": "",
-      "created": "2026-06-07T00:00:00+02:00",
-      "touched": "2026-06-07T00:00:00+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "created": "2026-06-07T11:59:43+02:00",
+      "touched": "2026-06-07T11:59:43+02:00",
+      "type": "overview",
+      "perspective": [
+        "maintainer-developer",
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Introduces the toolbox repo for maintainer scripts and utilities.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "deploy",
       "repo": "josyn-toolbox",
       "path": "deploy/README.md",
       "folder-context": "deploy",
-      "created": "2026-06-06T12:47:40+02:00",
-      "touched": "2026-06-07T00:00:00+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "created": "2026-06-07T11:59:43+02:00",
+      "touched": "2026-06-07T11:59:43+02:00",
+      "type": "manual",
+      "perspective": [
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Documents local deployment scripts used by maintainers during development.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "doc-generator",
       "repo": "josyn-toolbox",
       "path": "doc-generator/README.md",
       "folder-context": "doc-generator",
-      "created": "2026-06-04T17:15:53+02:00",
-      "touched": "2026-06-04T17:15:53+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "created": "2026-06-07T11:59:43+02:00",
+      "touched": "2026-06-07T11:59:43+02:00",
+      "type": "manual",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Documents the HTML documentation generator and its intended usage.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "docs-index-builder",
       "repo": "josyn-toolbox",
       "path": "docs-index-builder/README.md",
       "folder-context": "docs-index-builder",
-      "created": null,
-      "touched": null,
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "created": "2026-06-07T11:59:43+02:00",
+      "touched": "2026-06-07T11:59:43+02:00",
+      "type": "manual",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Documents the tool that builds and updates docs-index.json.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
       "name": "JOSYN Toolbox",
       "repo": "josyn-toolbox",
       "path": "git-tools/README.md",
       "folder-context": "git-tools",
-      "created": "2026-06-02T21:50:35+02:00",
-      "touched": "2026-06-04T17:15:53+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
-      "enriched-at": null
+      "created": "2026-06-07T11:59:43+02:00",
+      "touched": "2026-06-07T11:59:43+02:00",
+      "type": "manual",
+      "perspective": [
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Documents convenience scripts for machine bootstrap and Git remote synchronization.",
+      "enriched-at": "2026-06-07T10:26:00Z"
+    },
+    {
+      "name": "josyn-contoso",
+      "repo": "josyn-contoso",
+      "path": "README.md",
+      "folder-context": "",
+      "created": "2026-06-05T20:10:56+02:00",
+      "touched": "2026-06-05T20:10:56+02:00",
+      "type": "overview",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Introduces the demo company adapter repo used for ADR-009.",
+      "enriched-at": "2026-06-07T10:26:00Z"
     }
   ]
 }

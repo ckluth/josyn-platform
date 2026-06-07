@@ -65,6 +65,14 @@ Skip all other entries. Do not re-classify what has not changed.
 
 ---
 
+## Safety contract — read-only source documents
+
+**Never modify any source document.**
+Markdown files are read-only inputs. The only file that may be written is `docs-index.json`.
+Any tool call that creates, edits, or deletes a `.md` file is a violation of this prompt.
+
+---
+
 ## Notes
 
 - `folder-context` is a hint, not a constraint. Use it to guide classification, but read
