@@ -1,18 +1,18 @@
 # docs-index-builder — Execution Report
 
-**Run:** 2026-06-07T22:19:04.6928032+02:00
+**Run:** 2026-06-08T20:12:44.5824196+02:00
 
 ## Summary
 
 | | Count |
 |--|------:|
-| Repos scanned    | 10 |
+| Repos scanned    | 9 |
 | Repos skipped    | 0 |
 | Documents total  | 123 |
 | New (added)      | 0 |
 | Retained         | 123 |
 | Removed          | 0 |
-| Pending enrichment | 44 |
+| Pending enrichment | 43 |
 
 ## Per-repo detail
 
@@ -27,11 +27,6 @@
 | josyn-playground | 2 | 0 | 2 |
 | josyn-toolbox | 9 | 0 | 9 |
 | josyn-contoso | 1 | 0 | 1 |
-| josyn-docs | 0 | 0 | 0 |
-
-## Pending enrichment — missing semantic fields (1)
-
-- josyn-toolbox/site-builder/site-map-authoring.md — missing: type, perspective, state, summary
 
 ## Pending enrichment — stale (43)
 
@@ -46,7 +41,7 @@
 - josyn-platform/decisions/ADR-012-maintainer-deployment.md — touched: 2026-06-07T12:04:59+02:00, enriched: 06/07/2026 10:26:00
 - josyn-platform/decisions/ADR-013-job-dev-mode.md — touched: 2026-06-07T12:04:59+02:00, enriched: 06/07/2026 10:26:00
 - josyn-platform/decisions/ADR-014-cli-run-job-local-args.md — touched: 2026-06-07T12:04:59+02:00, enriched: 06/07/2026 10:26:00
-- josyn-platform/docs/enrich-docs-index-prompt.md — touched: 2026-06-07T12:58:17+02:00, enriched: 06/07/2026 10:26:00
+- josyn-platform/docs/enrich-docs-index-prompt.md — touched: 2026-06-07T23:04:23+02:00, enriched: 06/07/2026 10:26:00
 - josyn-platform/plans/sessionstore-poc-roadmap.md — touched: 2026-06-07T12:04:59+02:00, enriched: 06/07/2026 10:26:00
 - josyn-platform/repos/josyn-commons.md — touched: 2026-06-07T22:09:59+02:00, enriched: 06/07/2026 10:26:00
 - josyn-platform/repos/josyn-foundation.md — touched: 2026-06-07T22:09:59+02:00, enriched: 06/07/2026 10:26:00

@@ -1,5 +1,5 @@
 {
-  "generated": "2026-06-07T22:19:04.6928032+02:00",
+  "generated": "2026-06-08T20:12:44.5824196+02:00",
   "documents": [
     {
       "name": "AGENTS.md — JOSYN Platform",
@@ -415,7 +415,7 @@
       "path": "docs/enrich-docs-index-prompt.md",
       "folder-context": "docs",
       "created": "2026-06-07T12:04:59+02:00",
-      "touched": "2026-06-07T12:58:17+02:00",
+      "touched": "2026-06-07T23:04:23+02:00",
       "type": "agent-instruction",
       "perspective": [
         "agent"
@@ -1890,11 +1890,13 @@
       "path": "site-builder/site-map-authoring.md",
       "folder-context": "site-builder",
       "created": "2026-06-07T21:01:08+02:00",
-      "touched": "2026-06-07T21:01:08+02:00",
-      "type": null,
-      "perspective": null,
-      "state": null,
-      "summary": null,
+      "touched": "2026-06-08T20:04:29+02:00",
+      "type": "manual",
+      "perspective": [
+        "maintainer"
+      ],
+      "state": "current",
+      "summary": "manual for authoring a site.map-yaml",
       "enriched-at": null
     },
     {

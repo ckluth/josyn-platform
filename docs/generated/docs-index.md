@@ -1,6 +1,6 @@
 # Documentation Index
 
-_Generated: 2026-06-07T22:19:04.6928032+02:00 — 123 documents across 10 repos._
+_Generated: 2026-06-08T20:12:44.5824196+02:00 — 123 documents across 9 repos._
 _Semantic fields (type, perspective, state, summary) are filled by the AI enrichment pass._
 
 ## josyn-backend
@@ -166,7 +166,7 @@ _Semantic fields (type, perspective, state, summary) are filled by the AI enrich
 | deploy | deploy/README.md | settled | manual | maintainer-operator | Documents local deployment scripts used by maintainers during development. |
 | JOSYN Toolbox | git-tools/README.md | settled | manual | maintainer-operator | Documents convenience scripts for machine bootstrap and Git remote synchronization. |
 | site-builder — JOSYN Documentation Pipeline | site-builder/README.md | current | manual | maintainer | Introduces the site-builder pipeline: a three-part toolchain (indexer, assembler, renderer) that assembles scattered JOSYN markdown documentation into a navigable HTML site, with source location and site structure kept as separate concerns. |
-| site-map.yaml — Authoring Guide | site-builder/site-map-authoring.md |  |  |  |  |
+| site-map.yaml — Authoring Guide | site-builder/site-map-authoring.md | current | manual | maintainer | manual for authoring a site.map-yaml |
 | site-builder-assembler | site-builder/site-builder-assembler/README.md | current | manual | maintainer | Documents the site-builder-assembler tool that reads docs-index.json and site-map.yaml, stages files into a logical folder structure, generates landing and search pages, and optionally invokes the renderer. |
 | site-builder-indexer | site-builder/site-builder-indexer/README.md | current | manual | maintainer | Documents the site-builder-indexer tool that scans all JOSYN repos for markdown files and produces the docs-index.json catalogue consumed by the rest of the pipeline. |
 | site-builder-renderer | site-builder/site-builder-renderer/README.md | current | manual | maintainer | Documents the site-builder-renderer C# tool that converts a staged folder of markdown files into a self-contained static HTML site with sidebar navigation and responsive design. |
