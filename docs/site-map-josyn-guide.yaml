@@ -1,0 +1,39 @@
+# site-map-josyn-guide.yaml
+# JOSYN Guide — curated documentation site
+# ─────────────────────────────────────────────────────────────────────────────
+# Curated subset: only explicitly listed documents are included.
+# All others are skipped by the final catch-all mapping rule.
+
+# ── Site ──────────────────────────────────────────────────────────────────────
+
+site:
+  title: "JOSYN Guide"
+  intro: "A curated guide to JOSYN."
+  docs-index: "C:/DevGit/josyn-platform/docs/docs-index.json"
+  repos-root: "C:/DevGit"
+  output: "C:/DevGit/josyn-guide"
+  staging: "C:/DevGit/temp/josyn-guide-staging"
+
+# ── Tree ──────────────────────────────────────────────────────────────────────
+
+tree:
+  - start
+
+# ── Mapping ───────────────────────────────────────────────────────────────────
+# Final rule skips everything not placed by an override.
+
+mapping:
+  - { skip: true }
+
+# ── Overrides ────────────────────────────────────────────────────────────────
+# Explicit per-document placement.
+
+overrides:
+  - { repo: josyn-platform, path: MAINTAINERS.md, to: start }
+  - { repo: josyn-platform, path: README.md, to: start }
+  - { repo: josyn-platform, path: ROADMAP.md, to: start }
+  - { repo: josyn-platform, path: solution-architecture/01-context/josyn-and-jobsystem.md, to: start }
+
+# ── Reading Paths ─────────────────────────────────────────────────────────────
+
+reading-paths: []
