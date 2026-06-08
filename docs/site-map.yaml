@@ -36,9 +36,9 @@ tree:
       - platform
       - solution-architecture
       - components
-  - decisions:
-      - platform
-      - backend
+      - decisions:
+          - platform
+          - backend     
   - reference
   - repos
   - guides
@@ -60,9 +60,9 @@ mapping:
   - { type: architecture-detail, to: architecture/platform }
   - { type: component-architecture, to: architecture/components }
   - { type: overview, folder-context: solution-architecture, to: architecture/solution-architecture }
-  - { type: decision, repo: josyn-platform, to: decisions/platform }
-  - { type: decision, repo: josyn-backend, to: decisions/backend }
-  - { type: decision, to: decisions/platform }
+  - { type: decision, folder-context: decisions, to: architecture/decisions/platform }
+  - { type: decision, folder-context: repos, to: architecture/decisions/backend }
+  - { type: decision, to: architecture/decisions/platform }
   - { type: reference, to: reference }
   - { type: repo-summary, to: repos }
   - { type: overview, folder-context: "", to: repos }
@@ -106,7 +106,7 @@ reading-paths:
     intro: "You design the platform and govern its decisions."
     links:
       - { repo: josyn-platform, path: architecture/overview.md }
-      - { section: decisions }
+      - { section: architecture/decisions }
       - { repo: josyn-platform, path: ROADMAP.md }
 
   - perspective: maintainer-developer
