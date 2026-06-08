@@ -8,7 +8,7 @@
 
 site:
   title: "JOSYN Guide"
-  intro: "A curated guide to JOSYN."
+  intro: "A curated guide to the JOSYN-idea..."
   docs-index: "C:/DevGit/josyn-platform/docs/docs-index.json"
   repos-root: "C:/DevGit"
   output: "C:/DevGit/josyn-guide"
