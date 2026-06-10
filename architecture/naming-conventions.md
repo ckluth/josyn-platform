@@ -73,7 +73,7 @@ Assembly names match their namespace root exactly:
 | `JOSYN.Foundation.ResultPattern` | `JOSYN.Foundation.ResultPattern` | josyn-foundation |
 | `JOSYN.Foundation.PropertyBag` | `JOSYN.Foundation.PropertyBag` | josyn-foundation |
 | `JOSYN.Foundation.JIP` | `JOSYN.Foundation.JIP` / `JOSYN.Foundation.JIP.Jip` | josyn-foundation |
-| `JOSYN.Jap.Shared.Contract` | `JOSYN.Jap.Shared.Contract` | josyn-jap |
+| `JOSYN.Jap.Contract` | `JOSYN.Jap.Contract` | josyn-jap |
 | `JOSYN.Jap.Shared.Log` | `JOSYN.Jap.Shared.Log` | josyn-jap |
 | `JOSYN.Jap.JAPServer` | `JOSYN.Jap.JAPServer` | josyn-backend (relocated from josyn-jap per ADR-004) |
 | `JOSYN.JobHost` | `JOSYN.JobHost` | josyn-job-host |

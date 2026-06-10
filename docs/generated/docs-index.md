@@ -53,7 +53,7 @@ _Semantic fields (type, perspective, state, summary) are filled by the AI enrich
 |------|------|-------|------|-------------|---------|
 | josyn-jap | README.md | settled | overview | maintainer-architect, maintainer-developer | Introduces josyn-jap as the shared protocol-contract layer. |
 | JOSYN.Jap.Shared | josyn-jap-shared/README.md | settled | overview | maintainer-developer | Introduces the shared JAP libraries used by both session parties. |
-| JOSYN.Jap.Shared.Contract | josyn-jap-shared/JOSYN.Jap.Shared.Contract/README.md | settled | component-architecture | maintainer-developer | Explains the shared application contract between JobHost and JAPServer. |
+| JOSYN.Jap.Contract | josyn-jap-shared/JOSYN.Jap.Contract/README.md | settled | component-architecture | maintainer-developer | Explains the shared application contract between JobHost and JAPServer. |
 
 ## josyn-job-host
 

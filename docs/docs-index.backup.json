@@ -1592,9 +1592,9 @@
       "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
-      "name": "JOSYN.Jap.Shared.Contract",
+      "name": "JOSYN.Jap.Contract",
       "repo": "josyn-jap",
-      "path": "josyn-jap-shared/JOSYN.Jap.Shared.Contract/README.md",
+      "path": "josyn-jap-shared/JOSYN.Jap.Contract/README.md",
       "folder-context": "josyn-jap-shared",
       "created": "2026-05-29T08:41:58+02:00",
       "touched": "2026-05-30T16:04:07+02:00",

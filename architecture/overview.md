@@ -90,7 +90,7 @@ josyn-foundation (NuGet packages)
         └── Convention: JipClient, JipServer, JipDispatcher, Request, Response
 
 josyn-jap (NuGet packages — protocol contracts only)
-└── JOSYN.Jap.Shared.Contract          ← IJosynApplicationProtocol, ErrorReport
+└── JOSYN.Jap.Contract          ← IJosynApplicationProtocol, ErrorReport
     (JOSYN.Jap.Shared.Log relocated to JOSYN.Commons.Log per ADR-008)
 
 josyn-job-host (NuGet library)
@@ -122,7 +122,7 @@ josyn-platform (this repo)
             ▲               ▲
             └───────┬───────┘
                     │
-JOSYN.Jap.Shared.Contract (+ ResultPattern)
+JOSYN.Jap.Contract (+ ResultPattern)
         ▲
         │
 JOSYN.Jap.JAPServer       JOSYN.JobHost
@@ -177,7 +177,7 @@ as before: `josyn-job-host` remains a pure library, while `josyn-jap` is now a c
 repo (the EXE was relocated to `josyn-backend` per ADR-004). They still never reference
 each other.
 
-`josyn-backend` takes a NuGet dependency on `JOSYN.Jap.Shared.Contract` and
+`josyn-backend` takes a NuGet dependency on `JOSYN.Jap.Contract` and
 `JOSYN.Jap.Shared.Log` (via `JOSYN.Jap.JAPServer`). This is intentional and downward:
 the contracts repo is a lower-layer package; taking a dependency on it from the backend is
 not a layering violation.

@@ -143,3 +143,14 @@ gate, execution steps, safety contract, and fixing violations — is defined in
 [`sanity/README.md`](sanity/README.md).
 
 Read that file before running or fixing any sanity check.
+
+---
+
+## 8. NuGet Rules
+
+- **Never increase package versions.** Version numbers are managed by the maintainer, not by
+  agents. Leave all `<Version>` values exactly as found.
+- **Always clear the user NuGet cache before re-packing.** Every repo and solution sub-folder
+  that produces a NuGet package has a `.local-build\clean.cmd`. Run it before `pack.cmd`
+  whenever a package is rebuilt, to ensure the updated `.nupkg` is picked up by consumers
+  and not shadowed by a stale cache entry.

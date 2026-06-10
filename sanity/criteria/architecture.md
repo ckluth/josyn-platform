@@ -14,7 +14,7 @@ The following NuGet dependency edges are **permitted**. Any other cross-repo NuG
 josyn-foundation   →  (nothing — zero outbound NuGet deps)
 josyn-jap          →  josyn-foundation packages only
 josyn-job-host     →  josyn-foundation packages + josyn-jap shared packages (Contract, Log)
-josyn-backend      →  josyn-foundation packages + JOSYN.Jap.Shared.Contract + JOSYN.Jap.Shared.Log
+josyn-backend      →  josyn-foundation packages + JOSYN.Jap.Contract + JOSYN.Jap.Shared.Log
                        (shared packages only — permitted because JOSYN.Jap.JAPServer lives in this repo)
                        JOSYN.Backend.SessionStarter itself: ResultPattern only
 josyn-commons      →  nothing, OR josyn-foundation ResultPattern only

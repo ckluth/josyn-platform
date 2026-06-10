@@ -15,7 +15,7 @@
 
 | Project | References | Verdict |
 |---------|-----------|---------|
-| `JOSYN.Jap.Shared.Contract` | `JOSYN.Foundation.ResultPattern` only | ✅ |
+| `JOSYN.Jap.Contract` | `JOSYN.Foundation.ResultPattern` only | ✅ |
 | `JOSYN.Jap.Shared.Log` | `JOSYN.Foundation.ResultPattern` only | ✅ |
 
 No forbidden edges. No reference to `josyn-job-host` packages. No EXE project in repo.
@@ -24,7 +24,7 @@ No forbidden edges. No reference to `josyn-job-host` packages. No EXE project in
 
 | Assembly | Namespace root | Verdict |
 |---------|---------------|---------|
-| `JOSYN.Jap.Shared.Contract` | `JOSYN.Jap.Shared.Contract` | ✅ |
+| `JOSYN.Jap.Contract` | `JOSYN.Jap.Contract` | ✅ |
 | `JOSYN.Jap.Shared.Log` | `JOSYN.Jap.Shared.Log` | ✅ |
 
 ### Structural / Runtime coupling
@@ -46,7 +46,7 @@ Test project (`Shared.Log.Test`): NuGet metadata absent. Required packages `Micr
 
 ### Directory structure
 
-✅ `josyn-jap-shared/` — assembly subdirectories `JOSYN.Jap.Shared.Contract/`, `JOSYN.Jap.Shared.Log/`, `JOSYN.Jap.Shared.Log.Test/` all match their assembly names exactly.
+✅ `josyn-jap-shared/` — assembly subdirectories `JOSYN.Jap.Contract/`, `JOSYN.Jap.Shared.Log/`, `JOSYN.Jap.Shared.Log.Test/` all match their assembly names exactly.
 
 ### `.local-build/` scripts
 
@@ -59,4 +59,4 @@ Test project (`Shared.Log.Test`): NuGet metadata absent. Required packages `Micr
 ### `Contracts/` folders
 
 - `JOSYN.Jap.Shared.Log` has `Contracts/ILocalLog.cs` for the public static `LocalLog` class. ✅
-- `JOSYN.Jap.Shared.Contract` defines interfaces directly (no static classes requiring a companion `Contracts/` folder). ✅
+- `JOSYN.Jap.Contract` defines interfaces directly (no static classes requiring a companion `Contracts/` folder). ✅

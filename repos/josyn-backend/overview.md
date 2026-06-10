@@ -153,7 +153,7 @@ Relocated from `josyn-jap` per ADR-004 — it needs backend resources (`SessionS
 `CompanyConfig`) that are owned by this repo.
 
 **Dependencies:** `JOSYN.Foundation.JIP`, `JOSYN.Foundation.PropertyBag`,
-`JOSYN.Foundation.ResultPattern`, `JOSYN.Jap.Shared.Contract`, `JOSYN.Commons.Log`,
+`JOSYN.Foundation.ResultPattern`, `JOSYN.Jap.Contract`, `JOSYN.Commons.Log`,
 `JOSYN.Backend.SessionStore`, `JOSYN.Backend.ErrorHandler`
 
 **Type:** `net10.0` Console EXE
@@ -262,7 +262,7 @@ When migrated, `josyn-backend` will contain the JOSYN-native replacements for al
 <PackageReference Include="JOSYN.Foundation.JIP"              Version="1.0.0-preview01"/>
 <PackageReference Include="JOSYN.Foundation.PropertyBag"      Version="1.0.0-preview01"/>
 <PackageReference Include="JOSYN.Foundation.ResultPattern"    Version="1.0.0-preview01"/>
-<PackageReference Include="JOSYN.Jap.Shared.Contract"         Version="1.0.0-preview01"/>
+<PackageReference Include="JOSYN.Jap.Contract"         Version="1.0.0-preview01"/>
 ```
 
 Runtime spawn relationships (not NuGet dependencies):
@@ -308,7 +308,7 @@ License: MIT | Company: HAEVG AG | Target: net10.0
 
 ### Dependency constraints
 
-- `JOSYN.Jap.JAPServer`: permitted references are `JOSYN.Foundation.JIP`, `JOSYN.Foundation.PropertyBag`, `JOSYN.Foundation.ResultPattern`, `JOSYN.Jap.Shared.Contract`, `JOSYN.Commons.Log`, `JOSYN.Backend.SessionStore`, `JOSYN.Backend.BootstrapConfig`, `JOSYN.Backend.ErrorHandler`. Any other cross-repo reference is a violation.
+- `JOSYN.Jap.JAPServer`: permitted references are `JOSYN.Foundation.JIP`, `JOSYN.Foundation.PropertyBag`, `JOSYN.Foundation.ResultPattern`, `JOSYN.Jap.Contract`, `JOSYN.Commons.Log`, `JOSYN.Backend.SessionStore`, `JOSYN.Backend.BootstrapConfig`, `JOSYN.Backend.ErrorHandler`. Any other cross-repo reference is a violation.
 - Neither current nor future projects in this repo may reference `josyn-job-host` packages.
 - Runtime spawning of `JAPServer.exe` (built within this repo) is correct — this is **not** a NuGet dependency.
 

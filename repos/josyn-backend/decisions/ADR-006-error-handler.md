@@ -140,7 +140,7 @@ and reaches `IErrorHandler`.
 
 When JAPServer receives `PutError`, the `IErrorReport` payload contains no `JobName` or
 `SessionGuid` — the job does not know its own registered name, and the IPC wire type
-(`JOSYN.Jap.Shared.Contract`) carries no backend context.
+(`JOSYN.Jap.Contract`) carries no backend context.
 
 Enrichment rule:
 

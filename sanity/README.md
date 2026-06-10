@@ -307,7 +307,7 @@ A violation looks like:
 
 ```
 josyn-jap / docs
-  ❌ JOSYN.Jap.Shared.Contract/IJosynApplicationProtocol.cs
+  ❌ JOSYN.Jap.Contract/IJosynApplicationProtocol.cs
      GetRawArguments() — <summary> missing on interface method.
   ❌ JOSYN.Jap.Shared.Log/LocalLog.cs
      WriteError(string causer, string message) — implementation duplicates

@@ -2,7 +2,7 @@
 
 **Role:** JAP protocol contracts — the single source of truth for the contract shared between
 `JOSYN.Jap.JAPServer` (server, in `josyn-backend`) and `JOSYN.JobHost` (client). Contains the
-shared protocol contract (`JOSYN.Jap.Shared.Contract`). The process-local logger has been
+shared protocol contract (`JOSYN.Jap.Contract`). The process-local logger has been
 relocated to `JOSYN.Commons.Log` per ADR-008.
 
 **Location:** `C:\DevGit\josyn-jap`
@@ -15,7 +15,7 @@ relocated to `JOSYN.Commons.Log` per ADR-008.
 ```
 josyn-jap/
 └── josyn-jap-shared/             ← NuGet library (one package)
-    └── JOSYN.Jap.Shared.Contract/
+    └── JOSYN.Jap.Contract/
 ```
 
 > `JOSYN.Jap.JAPServer` (the EXE) was relocated to `josyn-backend` per ADR-004.
@@ -23,7 +23,7 @@ josyn-jap/
 
 ---
 
-## JOSYN.Jap.Shared.Contract
+## JOSYN.Jap.Contract
 
 **Purpose:** Transport-agnostic definition of the JOSYN Application Protocol (JAP).
 Shared between JAPServer (implements it) and JobHost (calls it via JAPClient).
@@ -86,10 +86,10 @@ License: MIT | Company: HAEVG AG | Target: net10.0
 
 ### Structural specifics
 - **Single-subdirectory repo**: `josyn-jap-shared/` contains one NuGet package. Evaluated as one unit.
-- `JOSYN.Jap.Shared.Contract` is a NuGet library — must have `GenerateDocumentationFile`, NuGet metadata, `icon.png`.
+- `JOSYN.Jap.Contract` is a NuGet library — must have `GenerateDocumentationFile`, NuGet metadata, `icon.png`.
 
 ### Dependency constraints
-- `JOSYN.Jap.Shared.Contract` may only reference `JOSYN.Foundation.ResultPattern`. Any reference to `PropertyBag`, `JIP`, or any other package is a violation.
+- `JOSYN.Jap.Contract` may only reference `JOSYN.Foundation.ResultPattern`. Any reference to `PropertyBag`, `JIP`, or any other package is a violation.
 
 ### Known exceptions (not violations)
 - No EXE project in this repo — `JOSYN.Jap.JAPServer` was relocated to `josyn-backend` per ADR-004.
