@@ -26,6 +26,7 @@ Both the AI enrichment prompt and any future tag-aware tooling reference this fi
 | `decision` | Architectural decision record (ADR) or settled proposal |
 | `reference` | Coding standards, naming conventions, rules — normative |
 | `manual` | Operational or how-to guide — procedural |
+| `guide` | Narrative concept explanation — accessible, often visual, cross-repo; complements ADRs without replacing them |
 | `working-note` | Thinking, brainstorming, not settled — raw ideas |
 | `overview` | README-style entry point or index page |
 | `repo-summary` | Per-repo summary: packages, assemblies, current state |

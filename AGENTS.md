@@ -127,6 +127,7 @@ No content is duplicated here. Read the canonical source when a topic requires d
 | Coding standards, principles, Result pattern reference | `architecture/coding-standards.md` |
 | Storage realm: schema, DDL scripts, `IxxxRecord` convention, dev setup | `architecture/storage.md` |
 | Architectural decision records | `decisions/` |
+| Narrative concept guides (cross-repo, visual) | `guides/` |
 | Per-repo summaries (packages, assemblies, current state) | `repos/` |
 | Sanity check protocol, inference algorithm, execution steps | `sanity/README.md` |
 | Project status, milestones, what's done and what's next | `ROADMAP.md` |
