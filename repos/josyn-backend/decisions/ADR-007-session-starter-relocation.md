@@ -72,7 +72,7 @@ Following the `JOSYN.Jap.Contract` pattern, it lives in a dedicated contracts pa
 record SessionStartRequest
 {
     string JobTypeName          { get; init; }
-    string Arguments            { get; init; }   // serialized job arguments (INI format)
+    string Arguments            { get; init; }   // job arguments file content, base64-encoded (see §3a)
     string TechnicalUserName    { get; init; }   // resolved from JobRegistry by SessionLauncher
     string CallerUser           { get; init; }
     string CallerDomain         { get; init; }
@@ -94,7 +94,9 @@ public interface ISessionLauncher
 `SessionLauncher` owns all pre-launch preparation:
 1. Validate the job is registered in `JobRegistry` — fail fast if not.
 2. Resolve `TechnicalUserName` from `JobRegistry` and populate it in `SessionStartRequest`.
-3. Serialize `SessionStartRequest` to INI (via `PropertyBag`), write to a temp file named
+3. **Base64-encode** the raw arguments file content and store the encoded string in
+   `SessionStartRequest.Arguments` (see §3a).
+4. Serialize `SessionStartRequest` to INI (via `PropertyBag`), write to a temp file named
    `josyn-start-<throwaway-guid>.ini`, and spawn `JAPServer.exe JOSYN-START @<path>`.
 
 JAPServer **trusts the request** — it never consults `JobRegistry`. The registry is the
@@ -128,6 +130,36 @@ Orphaned file cleanup: a file that survives longer than a fixed threshold (e.g. 
 was never consumed and is safe to delete unconditionally. A trivial age-based wipe (startup
 scan or maintenance job) is sufficient — no cross-reference with SessionStore is needed or
 performed.
+
+### 3a. Arguments encoding contract
+
+`SessionStartRequest.Arguments` always carries the job arguments file content as a
+**base64-encoded string** (`Convert.ToBase64String(File.ReadAllBytes(path))`).
+
+**Why base64, not raw content:**
+`PropertyBag` uses INI as its serialization format. INI has no quoting mechanism for
+multiline values — embedding a multiline arguments file as a raw string in the temp file
+would silently truncate it at the first newline. Base64 encoding collapses any content into
+a single-line value that INI handles correctly.
+
+`PropertyBag` is intentionally not extended to support multiline values. Keeping it flat
+is a deliberate limitation. Base64 at the transport boundary is the explicit contract.
+
+**Consistency across orchestrators:**
+REST-based orchestrators (e.g. the planned `listener`) will naturally receive arguments as
+a base64 string in their JSON request body — the REST transport convention. Having
+`Arguments` always be base64 means every orchestrator encodes the same way, regardless of
+how it received the arguments.
+
+**Encoding boundary:**
+- **Orchestrators encode** before populating `SessionStartRequest.Arguments`.
+- **JAPServer decodes** (`Convert.FromBase64String`) after deserializing the request,
+  before storing the raw INI content in `SessionStore`.
+- **`GetRawArguments`** returns the raw decoded INI content to `job.exe`, unchanged.
+  `job.exe` never sees base64.
+
+The encoding/decoding is a transport-boundary concern only. It is invisible to `job.exe`
+and to anything reading the `SessionStore` database directly.
 
 ### 4. JAPServer session-start sequence (JOSYN-START mode)
 
