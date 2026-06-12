@@ -20,6 +20,10 @@ Backend-specific architectural decisions are recorded in [`decisions/`](decision
 | [ADR-003](decisions/ADR-003-global-config.md) | GlobalConfig |
 | [ADR-005](decisions/ADR-005-job-registry.md) | JobRegistry |
 | [ADR-006](decisions/ADR-006-error-handler.md) | ErrorHandler |
+| [ADR-007](decisions/ADR-007-session-starter-relocation.md) | Session-Starter Relocation into JAPServer |
+| [ADR-008](decisions/ADR-008-job-start-negotiation.md) | Job Start Negotiation (Accept / Reject) |
+| [ADR-009](decisions/ADR-009-orphaned-sessions.md) | Resolving Orphaned Sessions |
+| [ADR-010](decisions/ADR-010-credential-provider.md) | ICredentialProvider (Impersonation Extension Point) |
 
 ---
 
