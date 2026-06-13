@@ -1,7 +1,7 @@
 # ADR-018 — JAP Protocol: Separate Verb for Domain-Error Outcomes
 
-**Date:** 2026-06-12
-**Status:** Not Accepted
+**Date:** 2026-06-13
+**Status:** Accepted
 
 ---
 
@@ -110,18 +110,4 @@ consistent with the existing guard behaviour on `PutError`.
 
 ### `FinishedWithErrors` reachability
 
-Before this decision is implemented, `FinishedWithErrors` is **unreachable** at runtime.
-That is intentional — the status is defined and reserved, but the transport mechanism
-is not yet in place. The implementation of this ADR is the gating item.
-
----
-
-## Open Questions (to resolve before accepting)
-
-1. **Naming**: `PutDomainError` vs `ReportDomainFailure` vs `PutFailure`?
-   Current preference: `PutDomainError` — consistent with the `Put*` verb family already
-   in `IJosynApplicationProtocol`.
-
-2. **Payload type**: `string? description` is deliberately unstructured.
-   Should it accept a serialized PropertyBag record for richer diagnostics? Decision:
-   leave as `string?` for now — structured error payloads can be a future extension.
+`FinishedWithErrors` becomes reachable once this ADR is implemented.

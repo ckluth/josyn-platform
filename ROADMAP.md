@@ -65,6 +65,10 @@ The platform is being built incrementally, with a working round-trip already in 
 - Workflow support (multi-step jobs)
 - Migration path from old jobs to the new platform
 - Many `josyn-job-host` features beyond arguments/result basics
+- **ADR consolidation** — merge `repos/josyn-backend/decisions/` (ADR-001 to ADR-010)
+  into `josyn-platform/decisions/` as a single authoritative ADR sequence, renumbering
+  the backend ADRs as ADR-019 onwards. The two-location split has proven hard to maintain
+  in practice.
 
 ---
 

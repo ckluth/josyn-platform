@@ -23,7 +23,7 @@ The set of valid values has never been defined, documented, or enforced.
 
 ## Decision
 
-`ExecutionStatus` is a **closed string set**. The following eight values are the only
+`ExecutionStatus` is a **closed string set**. The following nine values are the only
 permitted values. No other value may be written to this column.
 
 ### Value definitions
@@ -31,13 +31,14 @@ permitted values. No other value may be written to this column.
 | Value | Kind | Description |
 |---|---|---|
 | `pending` | transient | Session record written; JAPServer and job process not yet spawned. |
+| `preparing` | transient | JAPServer is active; `job.exe` is launching, connecting pipes, and the accept/reject negotiation (ADR-008) is in progress. |
 | `running` | transient | Both processes are active; job is executing. |
 | `running-cancellation-requested` | transient | A cancellation signal has been issued; the job has not yet honoured it. |
-| `finished-successfully` | terminal | Job completed and called `PutRawResult` with a success result. |
-| `finished-with-errors` | terminal | Job ran to completion and called `PutRawResult` with a domain error result — technically clean exit, but the job itself determined something went wrong in its subject area. |
+| `finished-successfully` | terminal | Job ran to completion without error. `PutRawResult` was called if the job produces a result; void jobs complete successfully without it. |
+| `finished-with-errors` | terminal | Job ran to completion and called `PutDomainError` — technically clean exit, but the job itself determined something went wrong in its subject area. |
 | `finished-faulted` | terminal | An unhandled exception bubbled out of the job entry point; job-host called `PutError`. The job never reached a deliberate outcome. |
 | `finished-by-cancellation` | terminal | Job honoured the cancellation request and terminated. |
-| `finished-rejected` | terminal | Session was accepted by the scheduler but rejected during pre-execution negotiation (see ADR-008). |
+| `finished-rejected` | terminal | The job rejected the session during accept/reject negotiation (ADR-008) — a concurrent instance is already running and the job's parallel execution policy forbids it. |
 | `finished-abandoned` | terminal | Processes died without reporting any outcome; detected and written by an external watchdog. |
 
 ### State machine
@@ -45,20 +46,34 @@ permitted values. No other value may be written to this column.
 ```
                     ┌──────────────────────────────────────────────────────┐
                     │                                                      │
-     ┌───────────── pending ──────────────────────┐                       │
-     │                  │                          │                       │
-     │                  ▼                          ▼                       │
-     │              running ───────► running-cancellation-requested        │
-     │             /   |   \                   │                           │
-     ▼            ▼    ▼    ▼                  ▼                           ▼
-finished-   finished- finished- finished-  finished-by-         finished-
-rejected  successfully  with-  faulted    cancellation          abandoned
-                        errors
+     ┌───────────── pending                                                │
+     │                  │                                                  │
+     │                  ▼                                                  │
+     │            preparing ──────────────────────────────────────────────┤
+     │           /         \                                               │
+     │          ▼           ▼                                              │
+     │       running    finished-rejected                                  │
+     │      /   |   \                                                      │
+     │     ▼    ▼    ▼    running-cancellation-requested                   │
+     │  fin.  fin.  fin.          │                                        │
+     │  succ  with  faulted       ▼                                        │
+     │        err           finished-by-cancellation                       │
+     │                                                                     │
+     └───────────────────────────────────────────────────────► finished-   │
+                                                               abandoned ◄─┘
 ```
 
-- `finished-successfully` — `PutRawResult` called with a success result
-- `finished-with-errors` — `PutRawResult` called with a domain error result
-- `finished-faulted` — unhandled exception; `PutError` called by job-host
+Prose form:
+
+- `pending → preparing` — JAPServer enters the Turnstile start phase
+- `preparing → running` — job accepted the session (ADR-008)
+- `preparing → finished-rejected` — job rejected the session, or negotiation timed out (ADR-008)
+- `running → running-cancellation-requested` — cancellation signal issued
+- `running → finished-successfully` — `PutRawResult` called
+- `running → finished-with-errors` — `PutDomainError` called (ADR-018)
+- `running → finished-faulted` — unhandled exception; `PutError` called by job-host
+- `running-cancellation-requested → finished-by-cancellation` — job honoured cancellation
+- any state → `finished-abandoned` — watchdog detects silent process death
 
 All `finished-*` values are terminal — a session in a terminal state is never updated again.
 
@@ -72,7 +87,7 @@ WHERE ExecutionStatus LIKE 'finished-%'
 
 ### Column constraint
 
-The column definition is `VARCHAR(32)`. All eight values fit within this limit
+The column definition is `VARCHAR(32)`. All nine values fit within this limit
 (longest: `running-cancellation-requested` at 30 characters).
 
 No database `CHECK` constraint is added at this time; enforcement is at the application
@@ -102,7 +117,7 @@ stable across at least one release cycle.
    are different in nature. `finished-faulted` means an unhandled exception escaped the
    job entry point — the job never reached a deliberate outcome; job-host called `PutError`.
    `finished-with-errors` means the job ran to completion, evaluated its subject area, and
-   *decided* something was wrong — job-host called `PutRawResult` with a domain error result.
+   *decided* something was wrong — job-host called `PutDomainError` (ADR-018).
    A retry policy, alerting rule, or operator treats these differently: a fault may indicate
    a defect or infrastructure problem; a domain error is an expected, handled outcome.
 
@@ -120,13 +135,13 @@ stable across at least one release cycle.
 
 ## Consequences
 
-- All code that writes `ExecutionStatus` must use only the eight values defined above.
-  Magic string literals are replaced with constants (a `ExecutionStatusValues` static
+- All code that writes `ExecutionStatus` must use only the nine values defined above.
+  Magic string literals are replaced with constants (an `ExecutionStatusValues` static
   class or equivalent) in the implementing packages.
-- Four values (`running-cancellation-requested`, `finished-by-cancellation`,
-  `finished-rejected`, `finished-abandoned`) require features not yet built:
-  cancellation support, accept/reject negotiation (ADR-008), and a session watchdog.
-  The values are defined here so that future implementations have a governed target;
-  no new ADR is needed solely to name them.
-- The `pending → running` transition — currently missing — must be implemented when
-  JAPServer begins execution. This is the first gap to close after this ADR.
+- Five values (`preparing`, `running-cancellation-requested`, `finished-by-cancellation`,
+  `finished-abandoned`, and `finished-with-errors`) require features not yet fully built:
+  the `preparing` transition and accept/reject negotiation are specified in ADR-008;
+  `finished-with-errors` requires the `PutDomainError` verb specified in ADR-018;
+  cancellation support and a session watchdog remain future work.
+  The values are defined here so that future implementations have a governed target.
+- `finished-rejected` is reachable once ADR-008 is implemented.
