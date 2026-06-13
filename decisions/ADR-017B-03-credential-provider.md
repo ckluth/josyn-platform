@@ -1,4 +1,4 @@
-# ADR-010 — ICredentialProvider (Impersonation Extension Point)
+# ADR-017B-03 — ICredentialProvider (Impersonation Extension Point)
 
 **Date:** 2026-06-12
 **Status:** Placeholder — not yet specified
@@ -7,7 +7,7 @@
 
 ## Context
 
-ADR-007 establishes that `job.exe` is spawned under the Windows account stored as
+ADR-017B-01 establishes that `job.exe` is spawned under the Windows account stored as
 `TechnicalUserName` in `JobRegistry`. Resolving the credentials needed for impersonation
 (password, domain) is a **company concern** — it depends on the company's identity
 infrastructure and secrets management policy (Credential Manager, encrypted config,

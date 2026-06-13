@@ -1,4 +1,4 @@
-# ADR-002 — SessionStore
+# ADR-006B-01 — SessionStore
 
 **Date:** 2026-06-03
 **Status:** Accepted
@@ -8,7 +8,7 @@
 ## Context
 
 `JOSYN.Backend.SessionStore` is the first real Category A component in `josyn-backend`,
-as established by ADR-001. Every job execution requires a persistent session record: a unique
+as established by ADR-005B-01. Every job execution requires a persistent session record: a unique
 GUID, the job type name, the serialized arguments, and (after completion) the serialized result.
 This data bridges the three independent OS processes involved in a session
 (`SessionStarter` → `JAPServer` → `job.exe`).
@@ -40,7 +40,7 @@ public sealed class SessionStore(string connectionString) : ISessionStore
 
 The caller is responsible for supplying the string. This keeps `SessionStore` ignorant of
 how configuration is managed — that concern belongs to `JOSYN.Backend.GlobalConfig`
-(see ADR-003, planned).
+(see ADR-006B-02, planned).
 
 ### 3. `ISessionStore.GetSession` accepts `Guid`, not `string`
 
@@ -60,7 +60,7 @@ The `IJobSessionRecord` / `JobSessionRecord` naming follows the platform-wide
 
 The mock implementation (`MockSessionStore`) is deferred to the phase when it is first
 needed (Phase 3 of the PoC roadmap). It will live in a separate `JOSYN.Backend.SessionStore.Mock`
-NuGet package, per the ADR-001 pattern. Production assemblies must never carry test or demo
+NuGet package, per the ADR-005B-01 pattern. Production assemblies must never carry test or demo
 dependencies.
 
 ---

@@ -11,19 +11,20 @@ legacy job backend and the JOSYN platform. Also the home of `JOSYN.Jap.JAPServer
 
 ## Decisions
 
-Backend-specific architectural decisions are recorded in [`decisions/`](decisions/).
+Backend-specific architectural decisions are recorded in the consolidated
+[`decisions/`](../../decisions/) folder in `josyn-platform`.
 
 | ADR | Title |
 |-----|-------|
-| [ADR-001](decisions/ADR-001-backend-building-block-model.md) | Backend Building Block Model |
-| [ADR-002](decisions/ADR-002-session-store.md) | SessionStore |
-| [ADR-003](decisions/ADR-003-global-config.md) | GlobalConfig |
-| [ADR-005](decisions/ADR-005-job-registry.md) | JobRegistry |
-| [ADR-006](decisions/ADR-006-error-handler.md) | ErrorHandler |
-| [ADR-007](decisions/ADR-007-session-starter-relocation.md) | Session-Starter Relocation into JAPServer |
-| [ADR-008](decisions/ADR-008-job-start-negotiation.md) | Job Start Negotiation (Accept / Reject) |
-| [ADR-009](decisions/ADR-009-orphaned-sessions.md) | Resolving Orphaned Sessions |
-| [ADR-010](decisions/ADR-010-credential-provider.md) | ICredentialProvider (Impersonation Extension Point) |
+| [ADR-005B-01](../../decisions/ADR-005B-01-backend-building-block-model.md) | Backend Building Block Model |
+| [ADR-006B-01](../../decisions/ADR-006B-01-session-store.md) | SessionStore |
+| [ADR-006B-02](../../decisions/ADR-006B-02-global-config.md) | GlobalConfig |
+| [ADR-007B-02](../../decisions/ADR-007B-02-job-registry.md) | JobRegistry |
+| [ADR-011B-01](../../decisions/ADR-011B-01-error-handler.md) | ErrorHandler |
+| [ADR-017B-01](../../decisions/ADR-017B-01-session-starter-relocation.md) | Session-Starter Relocation into JAPServer |
+| [ADR-018B-01](../../decisions/ADR-018B-01-job-start-negotiation.md) | Job Start Negotiation (Accept / Reject) |
+| [ADR-017B-02](../../decisions/ADR-017B-02-orphaned-sessions.md) | Resolving Orphaned Sessions |
+| [ADR-017B-03](../../decisions/ADR-017B-03-credential-provider.md) | ICredentialProvider (Impersonation Extension Point) |
 
 ---
 
@@ -93,13 +94,13 @@ Old and new can coexist: jobs migrated to the JOSYN model are started via the ne
 
 `JOSYN.Jap.JAPServer` is a working EXE, relocated from `josyn-jap` per ADR-004.
 `JOSYN.Backend.SessionStore` is the first real Category A NuGet package, ported from the
-sandbox prototype per ADR-002. (The sandbox is now called `josyn-playground`.)
+sandbox prototype per ADR-006B-01. (The sandbox is now called `josyn-playground`.)
 `JOSYN.Backend.BootstrapConfig` is the second Category A NuGet package; provides `IBootstrapConfig`
-and `FileBootstrapConfig` (reads `josyn.bootstrap.ini`), per ADR-003.
+and `FileBootstrapConfig` (reads `josyn.bootstrap.ini`), per ADR-006B-02.
 `JOSYN.Backend.SessionStarter` is the third Category A NuGet package; provides `ISessionStarter`
-which persists the session and spawns `JAPServer.exe`, per ADR-002 Phase 3.
-`JOSYN.Backend.SessionLauncherContract` is a Category A NuGet package; provides `SessionStartRequest` — the shared contract for the `JOSYN-START` session-start protocol (ADR-007).
-`JOSYN.Backend.SessionLauncher` is a Category A NuGet package; provides `ISessionLauncher` / `SessionLauncher` — the orchestrator-side thin launcher that replaces `SessionStarter` (ADR-007).
+which persists the session and spawns `JAPServer.exe`, per ADR-006B-01 Phase 3.
+`JOSYN.Backend.SessionLauncherContract` is a Category A NuGet package; provides `SessionStartRequest` — the shared contract for the `JOSYN-START` session-start protocol (ADR-017B-01).
+`JOSYN.Backend.SessionLauncher` is a Category A NuGet package; provides `ISessionLauncher` / `SessionLauncher` — the orchestrator-side thin launcher that replaces `SessionStarter` (ADR-017B-01).
 `JOSYN.Jap.JAPServer` now supports a second invocation mode: `JOSYN-START @<path>` — reads the `SessionStartRequest` temp file, runs `Turnstile`, persists the session, and proceeds to the JAP serve loop.
 
 ```
@@ -233,10 +234,10 @@ When migrated, `josyn-backend` will contain the JOSYN-native replacements for al
 | `JOSYN.Backend.SessionStore` ✅ | `JobSystem.Database` | **Done** — EF Core, SQL Server, `josyn` schema |
 | `JOSYN.Backend.GlobalConfig` ✅ | *(new)* | **Done** — `IBootstrapConfig` contract + `FileBootstrapConfig` (file-based INI); supersedes `HardcodedGlobalConfig` |
 | `JOSYN.Backend.SessionStarter` ⚠ | `JobSystem.SessionStarter` | **Superseded** — replaced by `SessionLauncherContract` + `SessionLauncher`; retained for legacy orchestrators during transition |
-| `JOSYN.Backend.SessionLauncherContract` ✅ | *(new)* | **Done** — `SessionStartRequest` shared contract; consumed by both `SessionLauncher` and `JAPServer` (ADR-007) |
-| `JOSYN.Backend.SessionLauncher` ✅ | `JobSystem.SessionStarter` | **Done** — `ISessionLauncher`; validates job, resolves `TechnicalUserName`, serializes to temp file, spawns `JAPServer JOSYN-START @<path>` (ADR-007) |
-| `JOSYN.Backend.JobRegistry` ✅ | *(replaces implicit company config DB entries)* | **Done** — `IJobRegistry`; `josyn.JobRegistrations` table; per ADR-005 |
-| `JOSYN.Backend.ErrorHandler` ✅ | *(new)* | **Done** — `IErrorHandler`, `SqlErrorHandler`, `josyn.ErrorStore`; per ADR-006 |
+| `JOSYN.Backend.SessionLauncherContract` ✅ | *(new)* | **Done** — `SessionStartRequest` shared contract; consumed by both `SessionLauncher` and `JAPServer` (ADR-017B-01) |
+| `JOSYN.Backend.SessionLauncher` ✅ | `JobSystem.SessionStarter` | **Done** — `ISessionLauncher`; validates job, resolves `TechnicalUserName`, serializes to temp file, spawns `JAPServer JOSYN-START @<path>` (ADR-017B-01) |
+| `JOSYN.Backend.JobRegistry` ✅ | *(replaces implicit company config DB entries)* | **Done** — `IJobRegistry`; `josyn.JobRegistrations` table; per ADR-007B-02 |
+| `JOSYN.Backend.ErrorHandler` ✅ | *(new)* | **Done** — `IErrorHandler`, `SqlErrorHandler`, `josyn.ErrorStore`; per ADR-011B-01 |
 | `JOSYN.Backend.JobRepository` | `JobSystem.JobRepository` | Resolves job.exe path from job name |
 | `JOSYN.Backend.Service` | `JobSystem.Service` | Windows service host |
 | `JOSYN.Backend.WorkflowAdapter` | `JobSystem.WorkflowAdapter` | Workflow integration |

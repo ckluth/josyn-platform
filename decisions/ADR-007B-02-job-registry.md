@@ -1,4 +1,4 @@
-# ADR-005 — JobRegistry
+# ADR-007B-02 — JobRegistry
 
 **Date:** 2026-06-04
 **Status:** Accepted
@@ -15,7 +15,7 @@ global configuration database. This creates several problems:
 - Adding or modifying a job registration requires access to a proprietary external system
 - `SessionStarter` has no place to look up job metadata (e.g. which technical user
   to impersonate when spawning a JAPServer instance)
-- The planned `Ticker` (ADR-004) has no place to enumerate which jobs are schedulable
+- The planned `Ticker` (ADR-007B-01) has no place to enumerate which jobs are schedulable
 
 Making the job registry an explicit JOSYN concept — with a dedicated SQL table and a
 stable interface — closes this gap.
@@ -27,7 +27,7 @@ stable interface — closes this gap.
 ### 1. New Category A NuGet: `JOSYN.Backend.JobRegistry`
 
 `JOSYN.Backend.JobRegistry` is introduced as a Category A NuGet in `josyn-backend`,
-following the building block model established in ADR-001. It owns the
+following the building block model established in ADR-005B-01. It owns the
 `IJobRegistration` record contract, the `IJobRegistry` interface, and the
 `SqlJobRegistry` production implementation.
 
@@ -87,7 +87,7 @@ Registrations are stored in a new table `josyn.JobRegistrations` in the existing
 SQL Server database — the same database and schema already used by `SessionStore`.
 
 Constructor injection for the connection string follows the `SessionStore` precedent
-(ADR-002, Decision 2):
+(ADR-006B-01, Decision 2):
 
 ```csharp
 public sealed class SqlJobRegistry(string connectionString) : IJobRegistry

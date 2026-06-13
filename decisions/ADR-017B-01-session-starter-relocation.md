@@ -1,4 +1,4 @@
-# ADR-007 — Session-Starter Relocation into JAPServer
+# ADR-017B-01 — Session-Starter Relocation into JAPServer
 
 **Date:** 2026-06-12
 **Status:** Accepted
@@ -213,7 +213,7 @@ via constructor injection and calls it to resolve credentials for a given `Techn
 before spawning `job.exe`. The company supplies the implementation.
 
 The design of `ICredentialProvider` — contract shape, package location, stub for development
-— is deferred to a dedicated ADR (ADR-010). Until that ADR is implemented, impersonation
+— is deferred to a dedicated ADR (ADR-017B-03). Until that ADR is implemented, impersonation
 is not active; `job.exe` is spawned under the JAPServer process identity.
 
 ### 7. New NuGet dependencies in JAPServer

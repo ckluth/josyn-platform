@@ -1,4 +1,4 @@
-# ADR-006 — ErrorHandler
+  ADR-006 — ErrorHandler
 
 **Date:** 2026-06-05
 **Status:** Proposed
@@ -7,7 +7,7 @@
 
 ---
 
-## Context
+   Context
 
 When the happy path is left, operators and maintainers need to know exactly what went wrong,
 where, and why. The platform already has a stub: `JOSYN.Backend.ErrorHandler` with an
@@ -25,9 +25,9 @@ Several concerns must be resolved:
 
 ---
 
-## Decision
+   Decision
 
-### 1. Error records are a first-class Storage Realm domain
+    1. Error records are a first-class Storage Realm domain
 
 Error records are durable platform state. They belong in the JOSYN Storage Realm
 (SQL Server, `josyn` schema) — the same database and schema already used by
@@ -41,7 +41,7 @@ The new storage domain:
 
 This updates the domain table in ADR-007 and `architecture/storage.md`.
 
-### 2. Two error kinds — distinguished by nullable context fields
+    2. Two error kinds — distinguished by nullable context fields
 
 Errors are classified by the context they carry:
 
@@ -54,7 +54,7 @@ Errors are classified by the context they carry:
 There is no explicit enum column. The nullable pattern is sufficient — the kind is
 inferrable directly from the data.
 
-### 3. Error record schema — `IErrorRecord`
+    3. Error record schema — `IErrorRecord`
 
 ```csharp
 public interface IErrorRecord
@@ -76,7 +76,7 @@ Concrete type follows the platform `IxxxRecord` convention (ADR-007):
 public sealed record ErrorRecord(...) : IErrorRecord;
 ```
 
-### 4. `IErrorHandler` contract
+    4. `IErrorHandler` contract
 
 `IErrorHandler` is a fire-and-forget contract. It never throws. Callers do not inspect
 the outcome — the handler is responsible for its own fallback.
@@ -109,7 +109,7 @@ The existing `FileSystemErrorHandler` is replaced by `SqlErrorHandler`, which:
 public sealed class SqlErrorHandler(string connectionString) : IErrorHandler
 ```
 
-### 5. Where the error handler is called — placement rule
+    5. Where the error handler is called — placement rule
 
 `JOSYN.Backend.ErrorHandler` is a **backend-only component**. It cannot be referenced
 by `josyn-jap`, `josyn-job-host`, or `job.exe` — the dependency direction forbids it.
@@ -136,7 +136,7 @@ at the terminal boundary — where no further caller exists to receive the `Resu
 `PutError` is the bridge — it is the point where a job-side failure enters the backend
 and reaches `IErrorHandler`.
 
-### 5a. JobName and SessionGuid enrichment at the PutError call site
+    5a. JobName and SessionGuid enrichment at the PutError call site
 
 When JAPServer receives `PutError`, the `IErrorReport` payload contains no `JobName` or
 `SessionGuid` — the job does not know its own registered name, and the IPC wire type
@@ -153,7 +153,7 @@ construction is simpler and more resilient than looking up the session record at
 a DB lookup on a failure path adds latency and a new failure mode when the DB is the cause
 of the error.
 
-### 6. Fallback strategy — two-tier persistence
+    6. Fallback strategy — two-tier persistence
 
 | Tier | Mechanism | When used |
 |------|-----------|-----------|
@@ -166,7 +166,7 @@ becoming an error source.
 
 Note: the fallback depends on `JOSYN.Commons.Log` being available (ADR-008 prerequisite).
 
-#### No-swallow guarantee
+     No-swallow guarantee
 
 The fallback chain is closed — no error can be silently lost inside `SqlErrorHandler`:
 
@@ -183,13 +183,13 @@ This guarantee is the reason call sites must **not** duplicate `LocalLog` calls 
 `errorHandler.Handle()`. The fallback is owned entirely by `SqlErrorHandler`; adding it
 at call sites produces redundant double-logging without improving coverage.
 
-### 7. `FileSystemErrorHandler` is removed
+    7. `FileSystemErrorHandler` is removed
 
 The stub `FileSystemErrorHandler` is deleted. `SqlErrorHandler` is the sole production
 implementation. No file-based permanent implementation is retained — `LocalLog` fallback
 serves as the safety net.
 
-### 8. Deferred — propagation and access (follow-on ADR)
+    8. Deferred — propagation and access (follow-on ADR)
 
 The following concerns are explicitly out of scope for this ADR:
 
@@ -204,7 +204,7 @@ for that work.
 
 ---
 
-## Decision challenge — objections and rebuttals
+   Decision challenge — objections and rebuttals
 
 **Attacker:** Error records belong in a log file, not a SQL table. The DB is often the cause
 of backend failures — storing error records in the same database risks losing exactly the
@@ -270,7 +270,7 @@ where the error was observed and handed to the handler. These are complementary,
 
 ---
 
-## Consequences
+   Consequences
 
 - Error information survives process restarts and is queryable by job, session,
   time range, and causer

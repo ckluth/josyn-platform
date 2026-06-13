@@ -1,4 +1,4 @@
-# ADR-001 — Backend Building Block Model
+# ADR-005B-01 — Backend Building Block Model
 
 **Date:** 2026-06-02
 **Status:** Accepted
@@ -49,7 +49,7 @@ All backend building blocks belong to exactly one of two categories:
 executable in this repo that is also a JAP protocol implementation. It:
 
 - Lives in `josyn-backend` (not `josyn-jap`) because it requires direct access to backend
-  resources (`SessionStore`, `CompanyConfig`) — per ADR-004
+  resources (`SessionStore`, `CompanyConfig`) — per ADR-007B-01
 - Is spawned by `SessionStarter`; not by any other executable in this repo
 - Is the single point where the JAP protocol meets backend state
 

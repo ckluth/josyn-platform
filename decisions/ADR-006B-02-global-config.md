@@ -1,4 +1,4 @@
-# ADR-003 — GlobalConfig
+# ADR-006B-02 — GlobalConfig
 
 **Date:** 2026-06-03
 **Status:** Accepted
@@ -8,7 +8,7 @@
 ## Context
 
 `JOSYN.Backend.GlobalConfig` is the second Category A component in `josyn-backend`,
-as established by ADR-001. Multiple backend components — starting with `SessionStore` and
+as established by ADR-005B-01. Multiple backend components — starting with `SessionStore` and
 the planned `SessionStarter` — require shared runtime configuration: at minimum a database
 connection string and the path to the `JAPServer.exe` binary.
 

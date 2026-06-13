@@ -1,4 +1,4 @@
-# ADR-008 — Job Start Negotiation (Accept / Reject)
+# ADR-018B-01 — Job Start Negotiation (Accept / Reject)
 
 **Date:** 2026-06-13
 **Status:** Accepted
@@ -7,10 +7,10 @@
 
 ## Context
 
-ADR-007 establishes that after `JAPServer` spawns `job.exe` and the named pipes are
+ADR-017B-01 establishes that after `JAPServer` spawns `job.exe` and the named pipes are
 connected, a first JAP exchange takes place in which the job either **accepts** or
 **rejects** the session. This negotiation must complete inside the Turnstile-protected
-start phase (see ADR-007, section 4, step 6).
+start phase (see ADR-017B-01, section 4, step 6).
 
 The purpose of this negotiation is **parallel execution control**: only the job itself
 can define whether and when multiple instances of the same job type may run simultaneously.

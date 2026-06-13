@@ -1,4 +1,4 @@
-# ADR-004 — Backend Restructuring: Trigger Executables, ErrorHandler, and SessionStarter Fire-and-Forget Correction
+# ADR-007B-01 — Backend Restructuring: Trigger Executables, ErrorHandler, and SessionStarter Fire-and-Forget Correction
 
 **Date:** 2026-06-04
 **Status:** Proposed
@@ -222,7 +222,7 @@ there is real logic to ship.*
 **Rebuttal:** The contract, not the implementation, is what needs to exist now. Every
 executable and JAPServer needs an error reporting destination. Without `IErrorHandler`,
 each component will invent its own mechanism — the same antipattern that `IGlobalConfig`
-was introduced to prevent (ADR-003 Context). The minimal first implementation is
+was introduced to prevent (ADR-006B-02 Context). The minimal first implementation is
 intentional: it establishes the seam while adding no risk. Replacing `FileSystemErrorHandler`
 with a real notification and storage implementation later requires only a change at the
 composition root. Deferring the NuGet means that when real error handling logic is finally
