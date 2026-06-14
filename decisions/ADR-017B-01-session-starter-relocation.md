@@ -1,7 +1,7 @@
 # ADR-017B-01 — Session-Starter Relocation into JAPServer
 
 **Date:** 2026-06-12
-**Status:** Accepted
+**Status:** Superseded in part — JOSYN-IPC start mode removed 2026-06-14 (see closing note)
 
 ---
 
@@ -244,3 +244,16 @@ the old package is removed.
 - `JOSYN.Backend.SessionStarter` is replaced by `JOSYN.Backend.SessionLauncher`;
   the planned-components table in `overview.md` and `architecture/overview.md` will be
   updated when the implementation is complete.
+
+---
+
+## Closing note (2026-06-14)
+
+The transition period is complete. `JOSYN.Backend.SessionStarter` had zero consumers outside
+its own assembly — the `cli` orchestrator (the only live entry point) already used
+`SessionLauncher`. The JOSYN-IPC **start mode** has therefore been removed from
+`JOSYN.Jap.JAPServer` and the `josyn-backend-session-starter` sub-folder has been deleted.
+
+`JAPServer` now accepts only `JOSYN-START @<path>`. The `JOSYN-IPC` string is retained as
+`IPipesProtocol.MagicToken` — its role as the named-pipe protocol prefix passed to job
+executables is unaffected.

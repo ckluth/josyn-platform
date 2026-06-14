@@ -79,14 +79,14 @@ enforced by code conventions.
 
 | | Old | New |
 |---|-----|-----|
-| What backend spawns | `JobHost.exe <sessionUID>` | `JAPServer.exe JOSYN-IPC <guid>` |
+| What backend spawns | `JobHost.exe <sessionUID>` | `JAPServer.exe JOSYN-START @<path>` |
 | What JAPServer spawns | *(n/a — JobHost loaded job via reflection)* | `job.exe JOSYN-IPC <guid>` |
 | Job loading | Reflection into JobHost process space | job.exe is an independent process |
 | .NET versioning | One JobHost per .NET version | Each job.exe targets its own .NET version freely |
 | Backend coupling | JobHost knew the session-store schema | JAPServer owns the protocol; job.exe knows nothing of the backend |
 
 Old and new can coexist: jobs migrated to the JOSYN model are started via the new
-`SessionStarter`; legacy jobs continue to be started via the old `SessionStarter` in parallel.
+`SessionLauncher`; legacy jobs continue to be started via the old `SessionStarter` in parallel.
 
 ---
 
@@ -97,11 +97,9 @@ Old and new can coexist: jobs migrated to the JOSYN model are started via the ne
 sandbox prototype per ADR-006B-01. (The sandbox is now called `josyn-playground`.)
 `JOSYN.Backend.BootstrapConfig` is the second Category A NuGet package; provides `IBootstrapConfig`
 and `FileBootstrapConfig` (reads `josyn.bootstrap.ini`), per ADR-006B-02.
-`JOSYN.Backend.SessionStarter` is the third Category A NuGet package; provides `ISessionStarter`
-which persists the session and spawns `JAPServer.exe`, per ADR-006B-01 Phase 3.
 `JOSYN.Backend.SessionLauncherContract` is a Category A NuGet package; provides `SessionStartRequest` — the shared contract for the `JOSYN-START` session-start protocol (ADR-017B-01).
-`JOSYN.Backend.SessionLauncher` is a Category A NuGet package; provides `ISessionLauncher` / `SessionLauncher` — the orchestrator-side thin launcher that replaces `SessionStarter` (ADR-017B-01).
-`JOSYN.Jap.JAPServer` now supports a second invocation mode: `JOSYN-START @<path>` — reads the `SessionStartRequest` temp file, runs `Turnstile`, persists the session, and proceeds to the JAP serve loop.
+`JOSYN.Backend.SessionLauncher` is a Category A NuGet package; provides `ISessionLauncher` / `SessionLauncher` — the orchestrator-side thin launcher (ADR-017B-01).
+`JOSYN.Jap.JAPServer` supports a single invocation mode: `JOSYN-START @<path>` — reads the `SessionStartRequest` temp file, runs `Turnstile`, persists the session, and proceeds to the JAP serve loop.
 
 ```
 josyn-backend/
@@ -125,7 +123,7 @@ josyn-backend/
 │   ├── JOSYN.Backend.BootstrapConfig.slnx
 │   ├── .local-build/                       ← solution-local build + pack scripts
 │   └── JOSYN.Backend.BootstrapConfig/
-├── josyn-backend-session-starter/          ← Pattern B sub-folder (legacy — superseded by SessionLauncher)
+├── josyn-backend-session-starter/          ← REMOVED (superseded by SessionLauncher per ADR-017B-01)
 │   ├── nuget.config
 │   ├── JOSYN.Backend.SessionStarter.slnx
 │   ├── .local-build/                       ← solution-local build + pack scripts
@@ -174,7 +172,7 @@ Relocated from `josyn-jap` per ADR-004 — it needs backend resources (`SessionS
 ### CLI contract
 
 ```
-JOSYN.Jap.JAPServer.exe JOSYN-IPC <sessionGUID>
+JOSYN.Jap.JAPServer.exe JOSYN-START @<path>
 ```
 
 Exit codes:
@@ -233,7 +231,7 @@ When migrated, `josyn-backend` will contain the JOSYN-native replacements for al
 | `JOSYN.Backend.Scheduling` | `JobSystem.Scheduling` | Time-scheduling logic |
 | `JOSYN.Backend.SessionStore` ✅ | `JobSystem.Database` | **Done** — EF Core, SQL Server, `josyn` schema |
 | `JOSYN.Backend.GlobalConfig` ✅ | *(new)* | **Done** — `IBootstrapConfig` contract + `FileBootstrapConfig` (file-based INI); supersedes `HardcodedGlobalConfig` |
-| `JOSYN.Backend.SessionStarter` ⚠ | `JobSystem.SessionStarter` | **Superseded** — replaced by `SessionLauncherContract` + `SessionLauncher`; retained for legacy orchestrators during transition |
+| `JOSYN.Backend.SessionStarter` ❌ | `JobSystem.SessionStarter` | **Removed** — replaced by `SessionLauncherContract` + `SessionLauncher` (ADR-017B-01) |
 | `JOSYN.Backend.SessionLauncherContract` ✅ | *(new)* | **Done** — `SessionStartRequest` shared contract; consumed by both `SessionLauncher` and `JAPServer` (ADR-017B-01) |
 | `JOSYN.Backend.SessionLauncher` ✅ | `JobSystem.SessionStarter` | **Done** — `ISessionLauncher`; validates job, resolves `TechnicalUserName`, serializes to temp file, spawns `JAPServer JOSYN-START @<path>` (ADR-017B-01) |
 | `JOSYN.Backend.JobRegistry` ✅ | *(replaces implicit company config DB entries)* | **Done** — `IJobRegistry`; `josyn.JobRegistrations` table; per ADR-007B-02 |
@@ -259,10 +257,7 @@ When migrated, `josyn-backend` will contain the JOSYN-native replacements for al
 <PackageReference Include="JOSYN.Foundation.PropertyBag"            Version="1.0.0-preview01"/>
 <PackageReference Include="JOSYN.Foundation.ResultPattern"          Version="1.0.0-preview01"/>
 
-<!-- JOSYN.Backend.SessionStarter: depends on SessionStore + BootstrapConfig + ResultPattern -->
-<PackageReference Include="JOSYN.Backend.BootstrapConfig"  Version="1.0.0-preview01"/>
-<PackageReference Include="JOSYN.Backend.SessionStore"     Version="1.0.0-preview01"/>
-<PackageReference Include="JOSYN.Foundation.ResultPattern" Version="1.0.0-preview01"/>
+<!-- JOSYN.Backend.SessionStarter removed (ADR-017B-01) -->
 
 <!-- JOSYN.Backend.ErrorHandler: foundation + EF Core + Commons.Log -->
 <PackageReference Include="JOSYN.Foundation.ResultPattern"          Version="1.0.0-preview01"/>
@@ -298,17 +293,16 @@ Runtime spawn relationships (not NuGet dependencies):
 
 ---
 
-## Build & Package
+### Build & Package
 
 ```
 .local-build\build.cmd [Release|Debug]               ← builds ALL solutions in the repo
 josyn-backend-jap-server\.local-build\build.cmd      ← builds JAPServer only
 josyn-backend-bootstrap-config\.local-build\build.cmd ← builds BootstrapConfig only
-josyn-backend-session-starter\.local-build\build.cmd ← builds SessionStarter only
 josyn-backend-job-registry\.local-build\build.cmd    ← builds JobRegistry only
 ```
 
-`pack.cmd` at the repo root packs `SessionStore`, `BootstrapConfig`, `SessionStarter`, `JobRegistry`, and `ErrorHandler` to the local feed.
+`pack.cmd` at the repo root packs `SessionStore`, `BootstrapConfig`, `SessionLauncher`, `JobRegistry`, and `ErrorHandler` to the local feed.
 `JAPServer` is not packed.
 
 License: MIT | Company: HAEVG AG | Target: net10.0
@@ -322,9 +316,8 @@ License: MIT | Company: HAEVG AG | Target: net10.0
 - No test project for `JOSYN.Jap.JAPServer` — known gap, not a violation.
 - No test project for `JOSYN.Backend.SessionStore` — known gap, not a violation.
 - No test project for `JOSYN.Backend.GlobalConfig` (`BootstrapConfig`) — known gap, not a violation.
-- No test project for `JOSYN.Backend.SessionStarter` — known gap, not a violation.
 - `HardcodedGlobalConfig` uses compile-time developer-machine constants — superseded by `FileBootstrapConfig`; no longer present.
-- `SessionStarter`: on `Process.Start` failure after session is saved, an orphaned row with empty `Result` remains in the store — known limitation; requires a session status column to fix.
+- `SessionStarter` has been removed — no orphaned-row concern applies (ADR-017B-01).
 - The planned components (`TriggerAgent`, `Scheduling`, etc.) do not exist yet — expected.
 
 ### Structural specifics
