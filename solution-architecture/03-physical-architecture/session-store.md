@@ -32,7 +32,7 @@ A production implementation will use a push signal.)*
 ## Known Limitations
 
 - No **session status column** — orphaned rows from failed process spawns are
-  indistinguishable from running sessions. A `status` field (pending / running /
+  indistinguishable from running sessions. A `status` field (preparing / running /
   complete / failed) is needed for production.
 - No separated **start / end timestamps**.
 - No explicit **job identity** column linking the session to a registered job name.

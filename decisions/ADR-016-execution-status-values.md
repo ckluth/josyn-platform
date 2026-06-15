@@ -10,11 +10,8 @@
 `IJobSessionRecord.ExecutionStatus` is a `string` column in `josyn.SessionStore`
 (`VARCHAR(32) NOT NULL`). It tracks where a job session is in its lifecycle.
 
-Currently the field is assigned exactly one value — `"pending"` — at session creation,
-in two places:
-
-- `JOSYN.Backend.SessionStarter` (`SessionStarter.cs`)
-- `JOSYN.Jap.JAPServer` (`Host.HandleSessionStart`)
+Currently the field is assigned exactly one value — `"preparing"` — at session creation
+by `JOSYN.Jap.JAPServer` (`Host.Starter.cs`) inside the Turnstile start phase.
 
 No transitions are implemented. Once a session is saved, the status never changes.
 The set of valid values has never been defined, documented, or enforced.
@@ -23,15 +20,14 @@ The set of valid values has never been defined, documented, or enforced.
 
 ## Decision
 
-`ExecutionStatus` is a **closed string set**. The following nine values are the only
+`ExecutionStatus` is a **closed string set**. The following eight values are the only
 permitted values. No other value may be written to this column.
 
 ### Value definitions
 
 | Value | Kind | Description |
 |---|---|---|
-| `pending` | transient | Session record written; JAPServer and job process not yet spawned. |
-| `preparing` | transient | JAPServer is active; `job.exe` is launching, connecting pipes, and the accept/reject negotiation (ADR-008) is in progress. |
+| `preparing` | transient | Session record written; JAPServer is active; `job.exe` is launching, connecting pipes, and the accept/reject negotiation (ADR-008) is in progress. |
 | `running` | transient | Both processes are active; job is executing. |
 | `running-cancellation-requested` | transient | A cancellation signal has been issued; the job has not yet honoured it. |
 | `finished-successfully` | terminal | Job ran to completion without error. `PutRawResult` was called if the job produces a result; void jobs complete successfully without it. |
@@ -46,26 +42,22 @@ permitted values. No other value may be written to this column.
 ```
                     ┌──────────────────────────────────────────────────────┐
                     │                                                      │
-     ┌───────────── pending                                                │
-     │                  │                                                  │
-     │                  ▼                                                  │
-     │            preparing ──────────────────────────────────────────────┤
-     │           /         \                                               │
-     │          ▼           ▼                                              │
-     │       running    finished-rejected                                  │
-     │      /   |   \                                                      │
-     │     ▼    ▼    ▼    running-cancellation-requested                   │
-     │  fin.  fin.  fin.          │                                        │
-     │  succ  with  faulted       ▼                                        │
-     │        err           finished-by-cancellation                       │
-     │                                                                     │
-     └───────────────────────────────────────────────────────► finished-   │
-                                                               abandoned ◄─┘
+            preparing ──────────────────────────────────────────────────┤
+           /         \                                                    │
+          ▼           ▼                                                   │
+       running    finished-rejected                                       │
+      /   |   \                                                           │
+     ▼    ▼    ▼    running-cancellation-requested                        │
+  fin.  fin.  fin.          │                                             │
+  succ  with  faulted       ▼                                             │
+        err           finished-by-cancellation                            │
+                                                                          │
+                                                ──────────────────────► finished-   │
+                                                                       abandoned ◄─┘
 ```
 
 Prose form:
 
-- `pending → preparing` — JAPServer enters the Turnstile start phase
 - `preparing → running` — job accepted the session (ADR-008)
 - `preparing → finished-rejected` — job rejected the session, or negotiation timed out (ADR-008)
 - `running → running-cancellation-requested` — cancellation signal issued
@@ -87,7 +79,7 @@ WHERE ExecutionStatus LIKE 'finished-%'
 
 ### Column constraint
 
-The column definition is `VARCHAR(32)`. All nine values fit within this limit
+The column definition is `VARCHAR(32)`. All eight values fit within this limit
 (longest: `running-cancellation-requested` at 30 characters).
 
 No database `CHECK` constraint is added at this time; enforcement is at the application
@@ -135,12 +127,11 @@ stable across at least one release cycle.
 
 ## Consequences
 
-- All code that writes `ExecutionStatus` must use only the nine values defined above.
+- All code that writes `ExecutionStatus` must use only the eight values defined above.
   Magic string literals are replaced with constants (an `ExecutionStatusValues` static
   class or equivalent) in the implementing packages.
-- Five values (`preparing`, `running-cancellation-requested`, `finished-by-cancellation`,
+- Four values (`running-cancellation-requested`, `finished-by-cancellation`,
   `finished-abandoned`, and `finished-with-errors`) require features not yet fully built:
-  the `preparing` transition and accept/reject negotiation are specified in ADR-008;
   `finished-with-errors` requires the `PutDomainError` verb specified in ADR-018;
   cancellation support and a session watchdog remain future work.
   The values are defined here so that future implementations have a governed target.

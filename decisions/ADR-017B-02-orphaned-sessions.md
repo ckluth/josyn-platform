@@ -8,7 +8,7 @@
 ## Context
 
 Several failure paths in the session lifecycle can leave a `SessionStore` record in a
-terminal-pending state with no running job process:
+terminal-preparing state with no running job process:
 
 - `JAPServer` spawns `job.exe` but the process fails to start (OS error).
 - `job.exe` starts but the named pipes never connect (timeout / crash before IPC).
@@ -16,9 +16,9 @@ terminal-pending state with no running job process:
 - `JAPServer` itself crashes after persisting the session but before spawning `job.exe`.
 - The host machine loses power or is rebooted mid-session.
 
-In all these cases the session record remains with `ExecutionStatus = "pending"` and no
+In all these cases the session record remains with `ExecutionStatus = "preparing"` and no
 `Result`, no exit codes, and no error report — an orphan. The current schema has no
-status column expressive enough to distinguish a live pending session from a dead one.
+status column expressive enough to distinguish a live preparing session from a dead one.
 
 This is a known limitation explicitly noted in the sanity notes for
 `JOSYN.Backend.SessionStarter` and referenced in ADR-017B-01.

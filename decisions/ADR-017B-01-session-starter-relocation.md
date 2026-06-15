@@ -169,7 +169,7 @@ JAPServer.exe receives JOSYN-START @<path>
     ├─ 1. Read and delete temp file; deserialise SessionStartRequest
     ├─ 2. Turnstile.Run(lockId: jobTypeName, worker: ...)   ◄─── lock acquired
     │       ├─ 3. Allocate Guid sessionGuid = Guid.NewGuid()
-    │       ├─ 4. SessionStore.SaveNewSession(...)  ← persists record with ExecutionStatus = "pending"
+    │       ├─ 4. SessionStore.SaveNewSession(...)  ← persists record with ExecutionStatus = "preparing"
     │       ├─ 5. Spawn job.exe JOSYN-IPC <sessionGuid>
     │       │         under TechnicalUserName credentials via ICredentialProvider
     │       │         (TechnicalUserName is carried in SessionStartRequest — resolved by SessionLauncher)
@@ -193,7 +193,7 @@ dedicated ADR. This ADR only establishes the boundary constraint: **negotiation 
 inside the Turnstile-protected start phase**.
 
 If any step within the Turnstile fails, the session record is left with
-`ExecutionStatus = "pending"` and no running job process — the same known limitation
+`ExecutionStatus = "preparing"` and no running job process — the same known limitation
 documented in the `SessionStarter` sanity notes. Resolving orphaned sessions requires a
 separate status-column ADR.
 

@@ -140,7 +140,7 @@ definitively closed (`finished-rejected`).
 - `JAPServer` adds a negotiation wait phase (30-second timeout) between process spawn and
   the JAP serve loop.
 - `JAPServer` implements `GetConcurrentSessionArguments` by querying `SessionStore`.
-- The `preparing` ExecutionStatus (see ADR-016) covers the entire negotiation window:
-  `pending → preparing` on Turnstile entry, `preparing → running` on accept,
-  `preparing → finished-rejected` on reject or timeout.
+- The `preparing` ExecutionStatus (see ADR-016) covers the entire session lifetime from
+record creation through the negotiation window:
+`preparing → running` on accept, `preparing → finished-rejected` on reject or timeout.
 - `josyn-jap` and `josyn-job-host` packages require a version bump (contract change).
