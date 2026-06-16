@@ -1,7 +1,7 @@
 # ADR-020 Implementation Plan — Company Adapter Model (Out-of-Process)
 
 **Created:** 2026-06-16  
-**Last updated:** 2026-06-16 (end-of-session checkpoint)  
+**Last updated:** 2026-06-16 (Phase 8 complete — ADR-020 fully implemented)  
 **ADR:** `josyn-platform/decisions/ADR-020-company-adapter-model.md`  
 **ADR-017B-03:** `josyn-platform/decisions/ADR-017B-03-credential-provider.md`
 
@@ -17,9 +17,9 @@
 | 3 | ADR-017B-03 decision | ✅ Done |
 | 4 | IdentityAdapter contract package | ✅ Done |
 | 5 | JAPServer IdentityAdapter call site | ✅ Done |
-| 6 | Contoso IdentityAdapter stub EXE | ⬜ Not started |
+| 6 | Contoso IdentityAdapter stub EXE | ✅ Done |
 | 7 | HAEVG IdentityAdapter EXE | ⏸ Deferred |
-| 8 | Documentation updates | ⬜ Not started |
+| 8 | Documentation updates | ✅ Done |
 
 ---
 
@@ -125,32 +125,41 @@ etc.) and is out of scope for ADR-020.
 
 ---
 
-## ⬜ Phase 6 — Contoso IdentityAdapter stub EXE
+## ✅ Phase 6 — Contoso IdentityAdapter stub EXE (complete)
 
 **Repo:** `josyn-contoso`
 
-**Goal:** Contoso provides a stub `IdentityAdapter.exe` that satisfies the contract for
-standalone/dev deployments.
+New folder: `josyn-contoso/contoso-identity-adapter/` (Pattern B structure)
 
-**Agreed design:**
-- Console EXE: `Contoso.IdentityAdapter.exe JOSYN-ADAPTER <guid>`
-- Reads passwords from a local INI file (e.g. `contoso.credentials.ini`) — flat key-value,
-  username → password
-- References `JOSYN.Backend.IdentityAdapter.Contract` and the JIP server-side infrastructure
-- Pattern B structure: own `.slnx`, own `nuget.config`, own `.local-build/`
+Files created:
+- `Contoso.IdentityAdapter.slnx`
+- `nuget.config` → `..\..\local-packages` (= `C:\DevGit\local-packages`)
+- `.local-build/build.cmd`, `clean.cmd`
+- `Contoso.IdentityAdapter/Contoso.IdentityAdapter.csproj` — EXE, net10.0
+- `Contoso.IdentityAdapter/Program.cs` — parses `JOSYN-ADAPTER <guid>`, registers handler, runs `PipesServer.RunAsync`
+- `Contoso.IdentityAdapter/PasswordStore.cs` — loads flat INI, implements `IIdentityAdapter`
+- `Contoso.IdentityAdapter/contoso.credentials.ini` — sample credentials (copied to output)
 
-**Work:**
-- [ ] Create `josyn-contoso/contoso-identity-adapter/` subfolder with Pattern B structure
-- [ ] Console EXE project `Contoso.IdentityAdapter`
-- [ ] `IIdentityAdapter` JIP dispatcher: parses `username` from `data`, looks up in INI, returns password
-- [ ] `contoso.credentials.ini` — example/template credential file (gitignored in real deployments)
-- [ ] `.local-build/build.cmd`, `pack.cmd` (if distributable), `clean.cmd`
-- [ ] Add `contoso.credentials.ini` template to `josyn-contoso` root (or next to EXE in output)
+Dependencies: `JOSYN.Foundation.JIP` + `JOSYN.Backend.IdentityAdapter.Contract`.
 
-**Entry point pattern** (consistent with JAPServer adapter CLI convention):
-```csharp
-// args[0] = "JOSYN-ADAPTER", args[1] = <session-guid>
-// Start JipServer with that guid, register IIdentityAdapter dispatcher, block until pipe closes
+**Note:** `IIdentityAdapter.GetPassword(string)→Task<Result<string>>` is not in `JipDispatcher.RegisterAll`'s
+supported signatures (it handles zero-param or `string`-in/`Result`-out, not `string`-in/`Result<string>`-out).
+Handler is registered manually via `dispatcher.Register(name, Func<string?, Task<Result<string?>>>)`.
+
+Also packed `JOSYN.Backend.IdentityAdapter.Contract` to `C:\DevGit\local-packages` (Phase 4's pack.cmd had
+not been run against the shared feed).
+
+Root `.local-build` updated:
+- `build.cmd` — `contoso-adapter` → `contoso-identity-adapter`
+- `clean.cmd` — `contoso-adapter` → `contoso-identity-adapter`
+- `pack.cmd` — removed dead `contoso-adapter` call (EXE produces no NuGet package)
+
+Build clean, 0 warnings.
+
+**Bootstrap config required for Contoso/dev deployments:**
+```ini
+[Adapters]
+IdentityAdapter = Contoso.IdentityAdapter.exe
 ```
 
 ---
@@ -162,26 +171,39 @@ Repo TBD. Blocked on HAEVG-specific credential storage design.
 
 ---
 
-## ⬜ Phase 8 — Documentation updates
+## ⬜ Phase 8 — Documentation updates (complete)
 
-- [ ] `repos/josyn-backend/overview.md` — add `IdentityAdapter.Contract`; add `AdapterManager`,
-  `AdapterProcess`, `Host.Adapters`; remove stale ALC/ConfigSource entries
-- [ ] `architecture/overview.md` — update component map to show adapter EXEs under JAPServer
-- [ ] `ROADMAP.md` — mark ADR-020 phases complete
+- `repos/josyn-backend/overview.md`:
+  - Added ADR-017B-03 (renamed title) and ADR-020 to decisions table
+  - Added `josyn-backend-identity-adapter-contract/` to repo file tree
+  - Updated JAPServer purpose/dependencies to include `JOSYN.Backend.IdentityAdapter.Contract`
+  - Replaced outdated Host.cs pseudocode with current partial-class structure:
+    `Host.Entrypoint`, `Host.Adapters`, `Host.Prepare`, `AdapterManager`, `AdapterProcess`
+  - Replaced JIP dispatcher wiring section with new "Adapter protocol (ADR-020)" section
+  - Added `IdentityAdapter.Contract` to planned components table (Done)
+  - Updated JAPServer dependencies XML block
+  - Updated runtime spawn relationships (adapters added)
+  - Updated sanity notes permitted references
+- `architecture/overview.md`:
+  - Updated component map: added `JOSYN.Backend.IdentityAdapter.Contract`, split
+    JAPServer internals, added `Adapters/` deployment folder
+  - Updated spawn relationships: `JOSYN-START`, adapter spawn, job spawn
+- `ROADMAP.md`:
+  - Updated "What's done": ADR-020, IdentityAdapter.Contract, Contoso stub
+  - Removed `JOSYN.Backend.AdapterContracts` from undocumented components list
+    (renamed/replaced by `IdentityAdapter.Contract`, now documented)
 
 ---
 
 ## Next session starting point
 
-**Start here:** Phase 6 — Contoso IdentityAdapter stub EXE (see above for full spec).
+**Start here:** Phase 8 — Documentation updates (see above for full spec).
 
-After Phase 6 is complete and tested end-to-end, do Phase 8 (docs).
-Phase 7 (HAEVG) remains deferred indefinitely.
+Phase 6 is complete and builds clean. Phase 7 (HAEVG) remains deferred indefinitely.
 
 **Key files to load at session start:**
 - This file
 - `josyn-platform/decisions/ADR-020-company-adapter-model.md`
 - `josyn-platform/decisions/ADR-017B-03-credential-provider.md`
-- `josyn-backend/josyn-backend-jap-server/JOSYN.Jap.JAPServer/Host.Prepare.cs`
-- `josyn-backend/josyn-backend-jap-server/JOSYN.Jap.JAPServer/Host.Adapters.cs`
-- `josyn-backend/josyn-backend-identity-adapter-contract/JOSYN.Backend.IdentityAdapter.Contract/IIdentityAdapter.cs`
+- `josyn-contoso/contoso-identity-adapter/Contoso.IdentityAdapter/Program.cs`
+- `josyn-contoso/contoso-identity-adapter/Contoso.IdentityAdapter/PasswordStore.cs`

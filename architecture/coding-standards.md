@@ -144,6 +144,57 @@ A type should expose only what is needed. Internal types stay internal.
 Be as strict as possible. Expose only what must be exposed.
 Prefer `internal` over `public` wherever the wider API surface is not required.
 
+### 9. Readable structure — short methods, named groups, partial classes
+
+**The overview and flow must be graspable at a glance.** This is the dimension that is most
+often sacrificed when code is generated — technically correct structure that is opaque to a
+human reader is a maintenance liability from the first commit.
+
+**Short methods.** No method should be so long that its internal structure is not immediately
+apparent. If a method contains distinct logical phases — parse, validate, execute, return —
+each phase is a candidate for extraction.
+
+**Named logical groups.** When extracting, prefer pure functions and immutable intermediates.
+Name extracted methods for *what they do*, not *how they do it*.
+
+**Nested helpers.** If a helper only has meaning inside one super-method, place it as a
+nested local function *after the `return`* in that method. The happy path stays on top; the
+mechanics go below — out of the way, but right where they belong.
+
+```csharp
+private static async Task<int> Main(string[] args)
+{
+    if (!TryParseSessionGuid(args, out var guid))
+        return FailWith("Usage: ...");
+
+    var result = await RunServer(guid);
+    return result.Succeeded ? 0 : 1;
+
+    // ── helpers ───────────────────────────────────────────────────────
+    static bool TryParseSessionGuid(string[] args, out Guid guid) { ... }
+    static int  FailWith(string message) { ... }
+}
+```
+
+**Partial classes for logical steps.** When a class contains many methods that naturally
+group into lifecycle phases or responsibility areas, split them into partial class files
+using a `.`-separated naming pattern:
+
+```
+Host.Entrypoint.cs
+Host.Adapters.cs
+Host.Prepare.cs
+Host.Negotiation.cs
+```
+
+Each file owns one coherent concern. A reader opening any one file immediately knows its
+scope — and the full picture emerges from the file listing alone.
+
+**Comments.** A short comment on anything that is not crystal-clear is more than
+appreciated. Comments explain *why*, not *what*. A comment that restates the code adds
+noise; a comment that explains a non-obvious constraint or a tradeoff saves the next reader
+from having to reconstruct the reasoning from scratch.
+
 ---
 
 ## Agent Application Guide
@@ -156,6 +207,11 @@ Prefer `internal` over `public` wherever the wider API surface is not required.
 - When a failure path exists: return `Result.Error(...)` or `return ex;` — never `throw`.
 - When propagating a failure upward: use `Result.Propagate(inner)` — never re-wrap.
 - When choosing an access modifier: default to `internal`; escalate to `public` only when the member is part of the intended public API.
+- When writing any method: keep it short enough that its structure is apparent at a glance. If distinct logical phases exist (parse / validate / execute / return), extract each phase into a named helper.
+- When extracting helpers: prefer pure functions and immutable intermediates. Name for *what*, not *how*.
+- When a helper only serves one super-method: place it as a nested local function *after the `return`* in that method — happy path first, mechanics below.
+- When a class grows several methods that cluster into lifecycle phases or responsibility areas: split into partial class files with a `.`-separated naming pattern (`Host.Entrypoint.cs`, `Host.Adapters.cs`, …). Each file owns one coherent concern.
+- When anything in the code is not crystal-clear: add a short inline comment explaining *why*. Never comment what the code already says.
 - When calling `IErrorHandler.Handle()` and a failed `Result` is in scope at the call site: use the `Handle(Result, ...)` overload — it extracts all diagnostic context automatically. The raw `Handle(string, string?, string?, ...)` overload is for paths where no `Result` exists; passing `null, null` there is correct and deliberate. Using the raw overload when a `Result` is available is a violation.
 - When calling `IErrorHandler.Handle()`: do not also call `LocalLog` at the same site. The handler's own fallback writes to `LocalLog` if SQL fails — calling both unconditionally makes `LocalLog` a co-primary, not a fallback. The only legitimate `LocalLog` call sites outside `SqlErrorHandler` itself are bootstrap paths that execute before the error handler is constructed.
 

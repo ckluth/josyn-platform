@@ -24,7 +24,8 @@ Backend-specific architectural decisions are recorded in the consolidated
 | [ADR-017B-01](../../decisions/ADR-017B-01-session-starter-relocation.md) | Session-Starter Relocation into JAPServer |
 | [ADR-018B-01](../../decisions/ADR-018B-01-job-start-negotiation.md) | Job Start Negotiation (Accept / Reject) |
 | [ADR-017B-02](../../decisions/ADR-017B-02-orphaned-sessions.md) | Resolving Orphaned Sessions |
-| [ADR-017B-03](../../decisions/ADR-017B-03-credential-provider.md) | ICredentialProvider (Impersonation Extension Point) |
+| [ADR-017B-03](../../decisions/ADR-017B-03-credential-provider.md) | IdentityAdapter (Impersonation Extension Point) |
+| [ADR-020](../../decisions/ADR-020-company-adapter-model.md) | Company Adapter Model (Out-of-Process) |
 
 ---
 
@@ -153,6 +154,11 @@ josyn-backend/
 │   ├── JOSYN.Jap.JAPServer.slnx
 │   ├── .local-build/                       ← solution-local build + launch scripts
 │   └── JOSYN.Jap.JAPServer/
+├── josyn-backend-identity-adapter-contract/ ← Pattern B sub-folder (ADR-020 / ADR-017B-03)
+│   ├── nuget.config
+│   ├── JOSYN.Backend.IdentityAdapter.Contract.slnx
+│   ├── .local-build/                       ← solution-local build + pack scripts
+│   └── JOSYN.Backend.IdentityAdapter.Contract/
 ```
 
 ## JOSYN.Jap.JAPServer
@@ -160,12 +166,14 @@ josyn-backend/
 **Purpose:** Per-session JAP protocol server executable. Listens on named pipes (JIP), receives
 JAP requests from job executables, dispatches to the `IJosynApplicationProtocol` implementation.
 Relocated from `josyn-jap` per ADR-004 — it needs backend resources (`SessionStore`,
-`CompanyConfig`) that are owned by this repo.
+`CompanyConfig`) that are owned by this repo. Also manages out-of-process adapter EXEs
+(ADR-020): spawns them at startup, communicates over JIP, and disposes them when the session ends.
 
 **Dependencies:** `JOSYN.Foundation.JIP`, `JOSYN.Foundation.PropertyBag`,
 `JOSYN.Foundation.ResultPattern`, `JOSYN.Jap.Contract`, `JOSYN.Commons.Log`,
 `JOSYN.Commons.Helpers`, `JOSYN.Backend.SessionStore`, `JOSYN.Backend.ErrorHandler`,
-`JOSYN.Backend.SessionLauncherContract`
+`JOSYN.Backend.BootstrapConfig`, `JOSYN.Backend.SessionLauncherContract`,
+`JOSYN.Backend.IdentityAdapter.Contract`
 
 **Type:** `net10.0` Console EXE
 
@@ -185,25 +193,49 @@ Exit codes:
 // Program.cs — thin entry point
 static async Task<int> Main(string[] args) => await Host.Run(args);
 
-// Host.cs — lifecycle and dispatch
-static class Host
+// Host.Entrypoint.cs — lifecycle, config wiring, turnstile loop
+static partial class Host
 {
     static Task<int> Run(string[] args)
     {
-        // 1. Parse session key from args
-        // 2. Construct HardcodedGlobalConfig + SessionStore
-        // 3. Create JAPServer(sessionStore, sessionKey)
-        // 4. Register all IJosynApplicationProtocol methods with JipDispatcher
-        // 5. Start PipesServer — blocking until ESC or fatal error
+        // 1. Parse JOSYN-START @<path> from args
+        // 2. Load FileBootstrapConfig from josyn.bootstrap.ini
+        // 3. using var adapterManager = await SpawnAdapters(config)   ← ADR-020
+        // 4. Construct SessionStore + SessionLauncher
+        // 5. Enter Turnstile loop: Prepare → Serve (repeated per session)
     }
 }
 
+// Host.Adapters.cs — out-of-process adapter lifecycle (ADR-020)
+static partial class Host
+{
+    // SpawnAdapters: iterates config.Adapters, spawns each EXE with
+    //   "JOSYN-ADAPTER <guid>", connects JIP pipes → AdapterManager
+    // IdentityAdapterConcern = "IdentityAdapter"
+}
+
+// Host.Prepare.cs — per-session preparation phase
+static partial class Host
+{
+    // Prepare():
+    //   CreateSessionRecord → BuildJapInfrastructure →
+    //   ResolveCredentials (calls IdentityAdapter.GetPassword) →
+    //   LaunchJobAndStorePid → RunNegotiation
+}
+
+// AdapterManager.cs — holds spawned AdapterProcess instances; IDisposable
+// AdapterProcess.cs  — wraps Process + ClientPipes + session Guid; IDisposable
+
 // JAPServer.cs — IJosynApplicationProtocol implementation
-sealed class JAPServer(ISessionStore sessionStore, Guid sessionGuid) : IJosynApplicationProtocol
+sealed class JAPServer(
+    ISessionStore sessionStore, Guid sessionGuid, string jobName,
+    IErrorHandler errorHandler, ConfigStore configStore,
+    AdapterManager adapterManager) : IJosynApplicationProtocol
 {
     Task<Result<string>> GetRawArguments();        // reads Arguments from SessionStore
     Task<Result> PutRawResult(string result);      // writes Result back to SessionStore
     Task<Result> PutError(string serializedError); // deserializes ErrorReport → LocalLog
+    // + AcceptSession / RejectSession (negotiation protocol)
 }
 ```
 
@@ -215,9 +247,24 @@ _jipDispatcher.RegisterAll<IJosynApplicationProtocol>(jAPServer);
 
 `RegisterAll` auto-discovers all methods on `IJosynApplicationProtocol` via reflection and maps them to `what` strings matching method names.
 
-### Known limitations
+### Adapter protocol (ADR-020)
 
-- Demo session key: `dea5611d-d740-437f-ad93-7a5dc5ae4299` in `launchSettings.json`
+```csharp
+// Bootstrap config declares adapters:
+// [Adapters]
+// IdentityAdapter = Contoso.IdentityAdapter.exe
+
+// At startup, for each entry:
+//   Process.Start("Adapters/Contoso.IdentityAdapter.exe", "JOSYN-ADAPTER <guid>")
+//   PipesClient.ConnectAsync(guid)  →  ClientPipes stored in AdapterManager
+
+// During Prepare phase, before spawning job.exe:
+//   JipClient.SendAsync(pipes, "GetPassword", technicalUserName)  →  password
+```
+
+Adapter EXEs are mandatory — a missing or unresponsive adapter is a hard startup failure.
+Stub adapters (e.g. `josyn-contoso` / `Contoso.IdentityAdapter.exe`) satisfy the contract
+for dev and standalone deployments.
 
 ---
 
@@ -236,6 +283,7 @@ When migrated, `josyn-backend` will contain the JOSYN-native replacements for al
 | `JOSYN.Backend.SessionLauncher` ✅ | `JobSystem.SessionStarter` | **Done** — `ISessionLauncher`; validates job, resolves `TechnicalUserName`, serializes to temp file, spawns `JAPServer JOSYN-START @<path>` (ADR-017B-01) |
 | `JOSYN.Backend.JobRegistry` ✅ | *(replaces implicit company config DB entries)* | **Done** — `IJobRegistry`; `josyn.JobRegistrations` table; per ADR-007B-02 |
 | `JOSYN.Backend.ErrorHandler` ✅ | *(new)* | **Done** — `IErrorHandler`, `SqlErrorHandler`, `josyn.ErrorStore`; per ADR-011B-01 |
+| `JOSYN.Backend.IdentityAdapter.Contract` ✅ | *(new)* | **Done** — `IIdentityAdapter` JIP contract; single method `GetPassword(string)→Result<string>`; ADR-017B-03 / ADR-020 |
 | `JOSYN.Backend.JobRepository` | `JobSystem.JobRepository` | Resolves job.exe path from job name |
 | `JOSYN.Backend.Service` | `JobSystem.Service` | Windows service host |
 | `JOSYN.Backend.WorkflowAdapter` | `JobSystem.WorkflowAdapter` | Workflow integration |
@@ -274,21 +322,26 @@ When migrated, `josyn-backend` will contain the JOSYN-native replacements for al
 <PackageReference Include="JOSYN.Foundation.PropertyBag"           Version="1.0.0-preview01"/>
 <PackageReference Include="JOSYN.Foundation.ResultPattern"         Version="1.0.0-preview01"/>
 
+<!-- JOSYN.Backend.IdentityAdapter.Contract: ResultPattern only (ADR-020) -->
+<PackageReference Include="JOSYN.Foundation.ResultPattern"         Version="1.0.0-preview01"/>
+
 <!-- JOSYN.Jap.JAPServer: foundation + josyn-jap shared packages + backend packages -->
-<PackageReference Include="JOSYN.Backend.SessionStore"        Version="1.0.0-preview02"/>
-<PackageReference Include="JOSYN.Backend.BootstrapConfig"     Version="1.0.0-preview01"/>
-<PackageReference Include="JOSYN.Backend.ErrorHandler"        Version="1.0.0-preview01"/>
-<PackageReference Include="JOSYN.Backend.SessionLauncherContract" Version="1.0.0-preview01"/>
-<PackageReference Include="JOSYN.Commons.Log"                 Version="1.0.0-preview01"/>
-<PackageReference Include="JOSYN.Commons.Helpers"             Version="1.0.0-preview01"/>
-<PackageReference Include="JOSYN.Foundation.JIP"              Version="1.0.0-preview01"/>
-<PackageReference Include="JOSYN.Foundation.PropertyBag"      Version="1.0.0-preview01"/>
-<PackageReference Include="JOSYN.Foundation.ResultPattern"    Version="1.0.0-preview01"/>
-<PackageReference Include="JOSYN.Jap.Contract"         Version="1.0.0-preview01"/>
+<PackageReference Include="JOSYN.Backend.SessionStore"             Version="1.0.0-preview02"/>
+<PackageReference Include="JOSYN.Backend.BootstrapConfig"          Version="1.0.0-preview01"/>
+<PackageReference Include="JOSYN.Backend.ErrorHandler"             Version="1.0.0-preview01"/>
+<PackageReference Include="JOSYN.Backend.SessionLauncherContract"  Version="1.0.0-preview01"/>
+<PackageReference Include="JOSYN.Backend.IdentityAdapter.Contract" Version="1.0.0-preview01"/>
+<PackageReference Include="JOSYN.Commons.Log"                      Version="1.0.0-preview01"/>
+<PackageReference Include="JOSYN.Commons.Helpers"                  Version="1.0.0-preview01"/>
+<PackageReference Include="JOSYN.Foundation.JIP"                   Version="1.0.0-preview01"/>
+<PackageReference Include="JOSYN.Foundation.PropertyBag"           Version="1.0.0-preview01"/>
+<PackageReference Include="JOSYN.Foundation.ResultPattern"         Version="1.0.0-preview01"/>
+<PackageReference Include="JOSYN.Jap.Contract"                     Version="1.0.0-preview01"/>
 ```
 
 Runtime spawn relationships (not NuGet dependencies):
 - `josyn-backend` **spawns** `JOSYN.Jap.JAPServer` (built within this repo)
+- `JOSYN.Jap.JAPServer` **spawns** adapter EXEs (e.g. `Contoso.IdentityAdapter.exe`) with `JOSYN-ADAPTER <guid>`
 - `JOSYN.Jap.JAPServer` **spawns** `job.exe` (resolved from job repository by JAPServer)
 
 ---
@@ -328,7 +381,7 @@ License: MIT | Company: HAEVG AG | Target: net10.0
 
 ### Dependency constraints
 
-- `JOSYN.Jap.JAPServer`: permitted references are `JOSYN.Foundation.JIP`, `JOSYN.Foundation.PropertyBag`, `JOSYN.Foundation.ResultPattern`, `JOSYN.Jap.Contract`, `JOSYN.Commons.Log`, `JOSYN.Commons.Helpers`, `JOSYN.Backend.SessionStore`, `JOSYN.Backend.BootstrapConfig`, `JOSYN.Backend.ErrorHandler`, `JOSYN.Backend.SessionLauncherContract`. Any other cross-repo reference is a violation.
+- `JOSYN.Jap.JAPServer`: permitted references are `JOSYN.Foundation.JIP`, `JOSYN.Foundation.PropertyBag`, `JOSYN.Foundation.ResultPattern`, `JOSYN.Jap.Contract`, `JOSYN.Commons.Log`, `JOSYN.Commons.Helpers`, `JOSYN.Backend.SessionStore`, `JOSYN.Backend.BootstrapConfig`, `JOSYN.Backend.ErrorHandler`, `JOSYN.Backend.SessionLauncherContract`, `JOSYN.Backend.IdentityAdapter.Contract`. Any other cross-repo reference is a violation.
 - Neither current nor future projects in this repo may reference `josyn-job-host` packages.
 - Runtime spawning of `JAPServer.exe` (built within this repo) is correct — this is **not** a NuGet dependency.
 

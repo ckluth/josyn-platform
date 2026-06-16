@@ -38,7 +38,9 @@ The platform is being built incrementally, with a working round-trip already in 
 - `josyn-jap` — JAP protocol contracts and logging
 - `josyn-job-host` — job execution runtime with arguments and result as basic features
 - `josyn-backend` — growing: session store, error handler, job registry, session starter, backend CLI (first working implementation)
-- `josyn-contoso` — Contoso adapter in place (no real data population yet)
+- ADR-009 ALC adapter model superseded by ADR-020 out-of-process adapter model; ALC artifacts removed
+- `JOSYN.Backend.IdentityAdapter.Contract` in place; `Contoso.IdentityAdapter.exe` stub in `josyn-contoso`
+- `josyn-contoso` — demo job in place; Contoso IdentityAdapter stub EXE replaces old ALC-based adapter
 - Working end-to-end round-trip: a Contoso job spawned, executed, and reported by a deployed system
 - Database in place
 
@@ -74,13 +76,12 @@ The platform is being built incrementally, with a working round-trip already in 
 Things that exist in the codebase but are not yet properly documented.
 Work these off before a public release.
 
-- **`josyn-backend` undocumented components** — five packages exist with no entry in
+- **`josyn-backend` undocumented components** — four packages exist with no entry in
   `repos/josyn-backend/overview.md`:
   - `JOSYN.Backend.CLI` (`josyn-backend-cli`)
   - `JOSYN.Backend.Listener` (`josyn-backend-listener`)
   - `JOSYN.Backend.Ticker` (`josyn-backend-ticker`)
   - `JOSYN.Backend.ConfigStore` (`josyn-backend-config-store`)
-  - `JOSYN.Backend.AdapterContracts` (`josyn-backend-adapter-contracts`)
   Each needs a component description, dependency list, and sanity notes entry.
 
 - **`josyn-contoso`** — exists and works; no `repos/josyn-contoso.md` yet.

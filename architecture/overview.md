@@ -69,9 +69,18 @@ josyn-backend (NuGet packages + EXEs)
 ├── JOSYN.Backend.SessionStore         ← session persistence: EF Core, SQL Server
 ├── JOSYN.Backend.SessionStarter       ← session lifecycle: GUID, store write, process spawn
 ├── JOSYN.Backend.JobRegistry          ← job registration: Name, TechnicalUserName; josyn.JobRegistrations table
+├── JOSYN.Backend.IdentityAdapter.Contract ← JIP contract: IIdentityAdapter.GetPassword (ADR-017B-03)
 ├── JOSYN.Jap.JAPServer (EXE)          ← relocated from josyn-jap; backed by SessionStore
-│       ├── Host.cs                        ← lifecycle, config + store wiring, JipDispatcher
+│       ├── Host.Entrypoint.cs             ← lifecycle, bootstrap config, adapter + session wiring
+│       ├── Host.Adapters.cs               ← SpawnAdapters: launches adapter EXEs, manages ClientPipes
+│       ├── Host.Prepare.cs                ← per-session: credentials, job spawn, negotiation
+│       ├── AdapterManager.cs              ← holds AdapterProcess instances; IDisposable
+│       ├── AdapterProcess.cs              ← wraps Process + ClientPipes + session Guid; IDisposable
 │       └── JAPServer.cs                   ← IJosynApplicationProtocol: reads/writes SessionStore
+│
+├── Adapters/ (deployment folder — not a NuGet package)
+│       └── Contoso.IdentityAdapter.exe    ← stub adapter (josyn-contoso); satisfies IdentityAdapter
+│                                             concern for dev/standalone deployments (ADR-020)
 │
 └── ── Future (placeholders) ───────────────────────────────────
     ├── JOSYN.Backend.TriggerAgent     ← replaces JobSystem.TriggerAgent
@@ -167,8 +176,9 @@ Consumers of the backend packages:
 ### Runtime (spawn) relationships — not code imports
 
 ```
-josyn-backend ──spawns──► JOSYN.Jap.JAPServer.exe  (JOSYN-IPC <guid>)
-JOSYN.Jap.JAPServer  ──spawns──► job.exe           (JOSYN-IPC <guid>)
+josyn-backend ──spawns──► JOSYN.Jap.JAPServer.exe  (JOSYN-START @<path>)
+JOSYN.Jap.JAPServer  ──spawns──► adapter EXEs       (JOSYN-ADAPTER <guid>, one per concern)
+JOSYN.Jap.JAPServer  ──spawns──► job.exe            (JOSYN-IPC <guid>)
 ```
 
 `josyn-jap` (shared contracts and logger packages) and `josyn-job-host` speak the same

@@ -155,3 +155,58 @@ Read that file before running or fixing any sanity check.
   that produces a NuGet package has a `.local-build\clean.cmd`. Run it before `pack.cmd`
   whenever a package is rebuilt, to ensure the updated `.nupkg` is picked up by consumers
   and not shadowed by a stale cache entry.
+
+---
+
+## 9. Code Generation Principles
+
+> Canonical detail: `architecture/coding-standards.md` § Principle 9.
+
+The overview and flow must be graspable at a glance. This is the dimension most often
+sacrificed when code is generated. Apply these rules on every file produced or edited:
+
+**Short methods.**
+No method should be so long that its structure is not immediately apparent. If distinct
+logical phases exist — parse, validate, execute, return — each phase is a candidate for
+extraction into a named helper.
+
+**Named logical groups.**
+When extracting, prefer pure functions and immutable intermediates. Name for *what* the
+method does, not *how* it does it.
+
+**Nested helpers.**
+If a helper only has meaning inside one super-method, place it as a nested local function
+*after the `return`* in that method. The happy path stays on top; the mechanics go below.
+
+```csharp
+private static async Task<int> Main(string[] args)
+{
+    if (!TryParseSessionGuid(args, out var guid))
+        return FailWith("Usage: ...");
+
+    var result = await RunServer(guid);
+    return result.Succeeded ? 0 : 1;
+
+    // ── helpers ───────────────────────────────────────────────────────
+    static bool TryParseSessionGuid(string[] args, out Guid guid) { ... }
+    static int  FailWith(string message) { ... }
+}
+```
+
+**Partial classes for logical steps.**
+When a class contains many methods that cluster into lifecycle phases or responsibility
+areas, split them into partial class files with a `.`-separated naming pattern:
+
+```
+Host.Entrypoint.cs    ← startup, arg parsing, bootstrap
+Host.Adapters.cs      ← adapter spawn and lifecycle
+Host.Prepare.cs       ← per-session preparation phase
+Host.Negotiation.cs   ← accept/reject handshake
+```
+
+Each file owns one coherent concern. The full picture emerges from the file listing alone.
+
+**Comments.**
+A short comment on anything not crystal-clear is more than appreciated. Explain *why*, not
+*what*. A comment that restates the code adds noise; one that explains a non-obvious
+constraint or tradeoff saves the next reader from reconstructing the reasoning from scratch.
