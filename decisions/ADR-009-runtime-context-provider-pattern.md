@@ -1,7 +1,7 @@
 # ADR-009 — Runtime Context Provider Pattern for External Integrations
 
 **Date:** 2026-06-05
-**Status:** Accepted
+**Status:** Accepted — under revision; see ADR-020
 
 ---
 
