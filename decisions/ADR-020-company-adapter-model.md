@@ -1,7 +1,7 @@
 # ADR-020 — Company Adapter Model (Out-of-Process)
 
 **Date:** 2026-06-16
-**Status:** Proposal — supersedes ADR-009
+**Status:** Accepted — supersedes ADR-009
 
 ---
 
@@ -183,37 +183,107 @@ well-known local endpoint.
 
 ---
 
-## Open questions (to resolve before accepting)
+## Decision
 
-1. **Who is the caller?** josyn-backend only (pre-session, consistent with ADR-009
-   Decision 2), or may JAPServer also spawn adapters mid-session? Since adapters are
-   stateless this is safe either way, but the answer shapes which processes need to know
-   the adapter spawn mechanics.
+### 1. Adapter model: B1 — session-scoped out-of-process EXE
 
-2. **Deployment convention:** Does the `Adapters/` folder from ADR-009 carry over?
-   Adapter EXEs (and their own dependency trees) would live there alongside the calling
-   process.
+Each adapter concern is a standalone EXE. JAPServer spawns it once per session (or eagerly at
+startup) and communicates over JIP named-pipe protocol calls. No `AssemblyLoadContext`, no
+in-process loading, no reflection-based instantiation.
 
-3. **Bootstrap config format:** ADR-009 uses a fully-qualified type name
-   (`FullTypeName, AssemblyName`) to name the adapter. For EXEs the natural equivalent
-   is an EXE file name or path. Does each adapter type get its own config key, or is
-   there a discovery mechanism?
+### 2. JAPServer is the exclusive adapter caller
 
-4. **Contract package model:** Does each adapter type ship its own minimal JIP contract
-   package (one per concern), or is there a shared thin adapter-protocol infrastructure
-   package that all adapters build on?
+JAPServer is the only process that spawns and communicates with adapter EXEs. Orchestrators
+(`listener`, `ticker`, `cli`, `workflow-runner`) have no adapter knowledge. This is the
+natural consequence of ADR-017B-01: session lifecycle — including all adapter calls required
+to prepare a session — now lives inside JAPServer's startup path.
 
-5. **No-op / stub adapters:** Does the platform ship built-in stub implementations for
-   each adapter interface (standalone path), or does the caller gracefully handle
-   "no adapter configured" for each concern independently?
+### 3. Deployment: `Adapters/` subfolder of JAPServer's binary directory
+
+Adapter EXEs and their own dependency trees are deployed to an `Adapters/` folder relative
+to `JAPServer.exe`. This folder is present in every deployment — standalone or company —
+populated with whatever adapters that deployment requires.
+
+### 4. Bootstrap config: per-concern key → EXE filename
+
+Each adapter concern is registered via a dedicated key in `josyn.bootstrap.ini` under an
+`[Adapters]` section. The value is the EXE filename within the `Adapters/` folder:
+
+```ini
+[Adapters]
+ConfigurationAdapter = ConfigurationAdapter.exe
+IdentityAdapter      = IdentityAdapter.exe
+```
+
+No assembly scanning. No discovery. Explicit and traceable — consistent with ADR-009's
+explicit naming principle, adapted for EXE-based delivery.
+
+### 5. Contract packages: one per adapter concern
+
+Each adapter concern ships a dedicated JIP contract package defining its request/response
+protocol. No shared adapter-protocol infrastructure package is introduced at this stage.
+Adapter EXEs build directly on `JOSYN.Foundation.JIP`. If common scaffolding accumulates
+across multiple adapter EXEs, a shared adapter-host library may be extracted at that point.
+
+### 6. Adapters are mandatory — no graceful degradation
+
+JAPServer's code has no conditional adapter logic. Every adapter call site unconditionally
+requires a working adapter. A deployment without a configured adapter for a required concern
+is a misconfigured deployment — JAPServer fails at startup.
+
+Stub implementations (provided by `josyn-contoso` or equivalent) satisfy this requirement
+in standalone and development deployments. Stubs implement the same JIP protocol contracts
+as production adapters; they differ only in behavior (e.g. returning hardcoded or
+filesystem-backed values rather than querying live company infrastructure).
+
+---
+
+## Consequences
+
+- ADR-009's ALC-based adapter model is fully superseded and removed.
+- `AdapterLoadContext` and `Host.ConfigSource.cs` are deleted from JAPServer.
+- The `IConfigSource` / `SqlConfigSource` / `ConfigStore` naming is discarded. These
+  components are replaced: each adapter concern gets a new JIP contract package; any
+  SQL-backed config reading retained for internal use becomes JAPServer-internal logic
+  under a name that reflects its actual role.
+- `ContosoConfigSource` (`Contoso.Josyn.Adapter`) is replaced by a proper adapter EXE with
+  a JIP protocol implementation and stub behavior.
+- `josyn-backend-adapter-contracts/` (currently an empty placeholder) is the designated
+  home for the first adapter contract package.
+- Each adapter concern introduced in a future ADR follows this pattern: dedicated contract
+  package + JAPServer call site + company adapter EXE + Contoso stub EXE.
+- ADR-017B-03 (`ICredentialProvider`) is the first concrete adapter concern to be
+  implemented under this model.
+
+---
+
+## Resolved questions
+
+1. **Who is the caller?** ✅ **Resolved — JAPServer exclusively.**
+   Orchestrators are thin launchers with no adapter knowledge. All adapter calls required
+   to prepare a session belong to JAPServer's startup path (per ADR-017B-01).
+
+2. **Deployment convention:** ✅ **Resolved — `Adapters/` subfolder of JAPServer's binary
+   directory.** Carries over from ADR-009 but relocated to JAPServer's own directory,
+   since JAPServer is now the caller.
+
+3. **Bootstrap config format:** ✅ **Resolved — per-concern config key → EXE filename.**
+   Each concern has its own key in `josyn.bootstrap.ini` under `[Adapters]`. The value
+   names the EXE file within `Adapters/`. No discovery mechanism.
+
+4. **Contract package model:** ✅ **Resolved — one contract package per adapter concern.**
+   No shared adapter-protocol infrastructure package at this stage.
+
+5. **No-op / stub adapters:** ✅ **Resolved — no platform-side fallbacks.**
+   JAPServer fails at startup if a required adapter is absent or fails to start.
+   Contoso (or equivalent) provides stub adapters for standalone and development deployments.
 
 ---
 
 ## Relation to other ADRs
 
 - **ADR-009** (Runtime Context Provider Pattern): the ALC-based model described there is
-  the starting point this ADR revises. ADR-009 is superseded by this ADR once a decision
-  is reached here.
+  the starting point this ADR revises. ADR-009 is superseded by this ADR.
 - **ADR-010** (Environment Separation): unaffected — the `josyn.bootstrap.ini`
   single-file-per-installation model applies regardless of which option is chosen.
 - **ADR-017B-03** (ICredentialProvider): a concrete adapter use case; its design will
