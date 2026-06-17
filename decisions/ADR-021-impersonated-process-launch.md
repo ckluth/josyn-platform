@@ -97,8 +97,8 @@ public static class ImpersonatedProcess
 
 | Property | Value | Rationale |
 |---|---|---|
-| `UserName` | `credential.Upn` | UPN logon; `Domain` not needed (see § 3) |
-| `Domain` | `null` | UPN format subsumes the domain |
+| `UserName` | `credential.Username` | Account name — part before `@` |
+| `Domain` | `credential.Domain` | Domain or machine name — part after `@`; works for both AD and local accounts |
 | `PasswordInClearText` | `password` | Windows-only string variant; `SecureString` is deprecated in .NET 6+ |
 | `UseShellExecute` | `false` | Required for credential-based launch |
 | `CreateNoWindow` | `true` | Service context; no interactive desktop |
@@ -110,9 +110,10 @@ Returns the process ID on success.
 
 `SessionStartSpec.TechnicalUserName` is defined as a UPN string: `username@domain`.
 
-`ProcessStartInfo.UserName` accepts a UPN directly when `Domain` is `null` — this is the
-documented `CreateProcessWithLogonW` logon path for domain accounts. No splitting of the
-string is required.
+This works for both Active Directory domain accounts (`svc_job@corp.local`) and local machine
+accounts (`svc_job@MACHINENAME`). `ImpersonatedProcess` splits the UPN into `UserName` and
+`Domain` parts for `ProcessStartInfo` internally — this is an implementation detail.
+Callers always deal with the whole UPN string.
 
 The `IIdentityAdapter.GetPassword` contract receives the full UPN string unchanged.
 
@@ -189,7 +190,7 @@ and safe to use.
 
 - **Where does the impersonation logic live?** ✅ `Host.Prepare.cs` via `ImpersonatedProcess` in commons
 - **`TechnicalUserName` format?** ✅ UPN (`username@domain`)
-- **`Domain` field on `ProcessStartInfo`?** ✅ `null` — UPN in `UserName` subsumes it
+- **`Domain` field on `ProcessStartInfo`?** ✅ Explicit domain/machinename split from UPN — hidden inside `ImpersonatedProcess`, not visible to callers
 - **`SecureString` vs `PasswordInClearText`?** ✅ `PasswordInClearText` — `SecureString` is deprecated in .NET 6+
 - **`LoadUserProfile`?** ✅ `false` — no local profile exists; job.exe must not rely on one
 - **Bare local usernames?** ✅ Not supported — domain accounts only
