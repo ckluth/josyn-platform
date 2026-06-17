@@ -1,7 +1,7 @@
 # ADR-021 — Impersonated Process Launch for job.exe
 
 **Date:** 2026-06-17
-**Status:** Accepted — implements ADR-017B-03 § credential usage
+**Status:** Accepted — implements ADR-017B-03 § credential usage; amended by ADR-022 (interactive launch)
 
 ---
 
@@ -86,10 +86,11 @@ A static launcher that builds and starts a `ProcessStartInfo` with Windows crede
 public static class ImpersonatedProcess
 {
     public static Result<int> Start(
-        string           exePath,
-        string           arguments,
-        string           password,
-        WindowsCredential credential);
+        string            exePath,
+        string            arguments,
+        string            password,
+        WindowsCredential credential,
+        bool              headless = true);   // true = CreateNoWindow (default/production)
 }
 ```
 
@@ -101,7 +102,7 @@ public static class ImpersonatedProcess
 | `Domain` | `credential.Domain` | Domain or machine name — part after `@`; works for both AD and local accounts |
 | `PasswordInClearText` | `password` | Windows-only string variant; `SecureString` is deprecated in .NET 6+ |
 | `UseShellExecute` | `false` | Required for credential-based launch |
-| `CreateNoWindow` | `true` | Service context; no interactive desktop |
+| `CreateNoWindow` | `headless` (`true` by default) | `true` = service context; `false` = attach to caller's console (interactive/dev — see ADR-022) |
 | `LoadUserProfile` | `false` | Technical user has no local profile |
 
 Returns the process ID on success.
@@ -240,4 +241,4 @@ via `sc.exe` or the Services MMC snap-in. If the JAP server runs as `LocalSystem
 - **`LoadUserProfile`?** ✅ `false` — no local profile exists; job.exe must not rely on one
 - **Bare local usernames?** ✅ Not supported — domain accounts only
 - **Linux readiness?** ✅ Explicit OS gate; no abstraction; cost documented; deferred
-- **Window station / desktop ACL grants (service context)?** ✅ Not needed — `CreateNoWindow = true` + headless job.exe
+- **Window station / desktop ACL grants (service context)?** ✅ Not needed — headless launch is the default; `CreateNoWindow = false` (interactive mode, ADR-022) requires no additional ACLs

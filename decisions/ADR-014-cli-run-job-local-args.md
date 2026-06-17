@@ -55,6 +55,14 @@ does not wait for the job to complete. Errors that occur during job execution (i
 argument deserialisation failures) surface in the `ErrorStore` and `LocalLog`, not on the
 terminal. This is the CLI's intended character — it is a session trigger, not a job monitor.
 
+> **Console output (ADR-022):** Although the CLI exits immediately, `job.exe` is launched with
+> `CreateNoWindow = false` when the session originates from the CLI (`Interactive = true`).
+> JAPServer inherits the CLI's console; `job.exe` is attached to the same console via
+> `CreateProcessWithLogonW`. Any output the job writes to stdout/stderr appears in the
+> operator's terminal window, interleaved with the shell prompt, while the job runs.
+> This is intentional — CLI sessions are dev/debug/maintenance runs where output visibility
+> matters. It is not a guarantee of ordered or capturable output.
+
 **Exit codes** (inherit from the current pattern):
 
 | Code | Meaning |

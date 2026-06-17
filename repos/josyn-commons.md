@@ -58,6 +58,8 @@ would pull `josyn-commons` out of its bottom-of-DAG position.
 | Package | Sub-folder | Status |
 |---------|-----------|--------|
 | `JOSYN.Commons.Log` | `josyn-commons-log/` | Existing |
+| `JOSYN.Commons.Helpers` | `josyn-commons-helpers/` | Existing — `Turnstile` only |
+| `JOSYN.Commons.IdentityHelpers` | `josyn-commons-identity-helpers/` | Existing — `WindowsCredential`, `ImpersonatedProcess` |
 
 Each package follows the naming pattern:
 
@@ -86,6 +88,8 @@ License: MIT | Company: HAEVG AG | Target: net10.0
 ### Current state
 
 - `JOSYN.Commons.Log` — process-local file logger; migrated from `JOSYN.Jap.Shared.Log` per ADR-008.
+- `JOSYN.Commons.Helpers` — `Turnstile`; introduced by ADR-019. `WindowsCredential` and `ImpersonatedProcess` were extracted into `JOSYN.Commons.IdentityHelpers`.
+- `JOSYN.Commons.IdentityHelpers` — `WindowsCredential` (validated UPN value type) and `ImpersonatedProcess` (Windows process launch under a domain account); extracted from `JOSYN.Commons.Helpers` after ADR-021/ADR-022.
 
 ### Admission criteria (for any new package)
 Before any new package is added, verify it meets **all three** criteria:

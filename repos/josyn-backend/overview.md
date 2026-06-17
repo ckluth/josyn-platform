@@ -26,6 +26,8 @@ Backend-specific architectural decisions are recorded in the consolidated
 | [ADR-017B-02](../../decisions/ADR-017B-02-orphaned-sessions.md) | Resolving Orphaned Sessions |
 | [ADR-017B-03](../../decisions/ADR-017B-03-credential-provider.md) | IdentityAdapter (Impersonation Extension Point) |
 | [ADR-020](../../decisions/ADR-020-company-adapter-model.md) | Company Adapter Model (Out-of-Process) |
+| [ADR-021](../../decisions/ADR-021-impersonated-process-launch.md) | Impersonated Process Launch for job.exe |
+| [ADR-022](../../decisions/ADR-022-interactive-job-launch.md) | Headless / Interactive Distinction for job.exe Launch |
 
 ---
 
