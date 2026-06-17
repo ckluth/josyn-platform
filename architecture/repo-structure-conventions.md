@@ -96,6 +96,7 @@ organizational setup, use Pattern B.
 | `josyn-jap` | **B** | JAP shared layer groups multiple packages (Contract, Log) that are released independently but share the same protocol domain. |
 | `josyn-job-host` | **A** | A single consumer-facing library (`JOSYN.JobHost`) with its test project. One deliverable, one release. |
 | `josyn-backend` | **B** | `JOSYN.Jap.JAPServer` (relocated from `josyn-jap` per ADR-004) and future solutions (`SessionStarter`, `SessionStarter.Mock`) are each independent deliverables with separate deployment identities. |
+| `josyn-adapter-contracts` | **B** | Multiple independently releasable adapter contract packages (ADR-023). Each adapter concern is a separate solution and NuGet identity. |
 | `josyn-commons` | **A** *(future)* | Utility helper library. A single growable assembly. When projects are added, Pattern A applies. |
 | `josyn-playground` | **B** | Explicitly a playground for multiple independent experiments. Each experiment is a self-contained solution that evolves on its own. |
 | `josyn-toolbox` | **B** | Multiple independently maintained tools (scripts, .NET utilities) that share the same operational domain but have distinct purposes and lifecycles. |

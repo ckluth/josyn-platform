@@ -10,6 +10,7 @@
 | **Foundation** | Cross-cutting infrastructure primitives | `josyn-foundation` repo, `JOSYN.Foundation.*` namespace |
 | **Job Host** | The job execution runtime | `josyn-job-host` repo, `JOSYN.JobHost` namespace |
 | **Commons** | Generic utility helpers — domain-agnostic, open for growth | `josyn-commons` repo, `JOSYN.Commons.*` namespace |
+| **Adapter** | The boundary layer between the platform and company adapter EXEs | `josyn-adapter-contracts` repo, `JOSYN.Adapter.*` namespace |
 
 > **Note:** "JAP" does **not** mean "backend" in this codebase. `josyn-jap` is the per-session JAP server, not the scheduler. The scheduler role belongs exclusively to `josyn-backend`. See [../decisions/ADR-002-josyn-backend.md](../decisions/ADR-002-josyn-backend.md).
 
@@ -25,6 +26,7 @@ josyn-jap               ← per-session JAP protocol server
 josyn-job-host          ← job execution runtime  
 josyn-backend           ← scheduler and session-orchestration layer
 josyn-commons           ← generic utility helpers — domain-agnostic, open for growth
+josyn-adapter-contracts ← JIP protocol contracts for company adapter EXEs (ADR-023)
 josyn-platform          ← this repo; architecture + decisions + docs
 ```
 
@@ -51,6 +53,11 @@ JOSYN
 │   │   ├── Contract               ← IJosynApplicationProtocol, ErrorReport
 │   │   └── Log                    ← LocalLog
 │   └── JAPServer                  ← per-session JAP server EXE (lives in josyn-backend)
+├── Adapter                        ← josyn-adapter-contracts (ADR-023)
+│   ├── ConfigurationAdapter
+│   │   └── Contract               ← IConfigurationAdapter
+│   └── IdentityAdapter
+│       └── Contract               ← IIdentityAdapter
 ├── JobHost                        ← josyn-job-host (consumer-facing API — see note below)
 │   └── Attributes                 ← [JobEntryPoint], [BeforeJobEntryPoint], etc.
 ├── Backend                        ← josyn-backend

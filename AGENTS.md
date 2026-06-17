@@ -18,6 +18,7 @@ All repos are siblings under a common parent directory:
 |------|------|---------------|
 | `josyn-foundation` | Infrastructure primitives — Result pattern, serialization, IPC transport | `../josyn-foundation` |
 | `josyn-jap` | JAP protocol contracts — shared contracts and logging | `../josyn-jap` |
+| `josyn-adapter-contracts` | JIP protocol contracts for company adapter EXEs — the platform/company boundary layer (ADR-023) | `../josyn-adapter-contracts` |
 | `josyn-job-host` | Job execution runtime — library linked by each job executable | `../josyn-job-host` |
 | `josyn-backend` | Scheduler and session-orchestration layer | `../josyn-backend` |
 | `josyn-commons` | Generic utility helpers — domain-agnostic, never referenced by Foundation | `../josyn-commons` |
