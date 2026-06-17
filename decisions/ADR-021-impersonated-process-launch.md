@@ -173,7 +173,52 @@ and safe to use.
 
 ---
 
-## Consequences
+## Windows deployment prerequisites
+
+`CreateProcessWithLogonW` — which is what `ProcessStartInfo` with credentials invokes — requires
+specific Windows privileges to be granted before impersonated launch will succeed.
+
+### 1. Technical user account — "Log on as a batch job"
+
+The technical user account (`TechnicalUserName`) must hold the
+**"Log on as a batch job"** right (`SeBatchLogonPrivilege`) on the execution machine.
+
+Grant via `secpol.msc`:
+> Security Settings → Local Policies → User Rights Assignment → **Log on as a batch job**
+
+Or via an elevated command prompt:
+```
+secedit /export /cfg %TEMP%\secpol.cfg
+# add the account to SeBatchLogonPrivilege in the file, then:
+secedit /configure /db secedit.sdb /cfg %TEMP%\secpol.cfg /areas USER_RIGHTS
+```
+
+In a domain environment this is typically pushed via Group Policy.
+
+### 2. JAP server service account — token privileges
+
+When the JAP server runs as a Windows service (non-interactive), the service account must
+hold two additional privileges to spawn processes under a different identity:
+
+| Privilege | Display name |
+|---|---|
+| `SeAssignPrimaryTokenPrivilege` | Replace a process-level token |
+| `SeIncreaseQuotaPrivilege` | Adjust memory quotas for a process |
+
+These are granted automatically to accounts configured as a Windows service logon identity
+via `sc.exe` or the Services MMC snap-in. If the JAP server runs as `LocalSystem` or
+`NetworkService`, both privileges are already present.
+
+### 3. Error signatures
+
+| Error message | Root cause | Fix |
+|---|---|---|
+| `Der Benutzername oder das Kennwort ist falsch` | Wrong credentials or UPN format | Verify password and `username@domain` format |
+| `Der Benutzer besitzt nicht den benötigten Anmeldetyp` | Missing `SeBatchLogonPrivilege` | Grant "Log on as a batch job" to the technical user |
+| `Access is denied` when spawning | Missing `SeAssignPrimaryTokenPrivilege` | Check service account privileges |
+
+---
+
 
 - `JOSYN.Commons.Helpers` gains two new types: `WindowsCredential` and `ImpersonatedProcess`.
   The package version is bumped; all consumers must update their reference.
