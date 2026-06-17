@@ -195,6 +195,32 @@ appreciated. Comments explain *why*, not *what*. A comment that restates the cod
 noise; a comment that explains a non-obvious constraint or a tradeoff saves the next reader
 from having to reconstruct the reasoning from scratch.
 
+### 10. No mutation of reference-type parameters
+
+Never modify an object that was passed into a method as a reference-type parameter.
+A caller who passes a reference does not expect the callee to alter its state.
+If a modified version is needed, produce and return a new instance.
+
+This rule reinforces Principle 2 (Immutability by default) at the method-boundary level.
+Immutability is not just about field declarations — every method signature is a contract,
+and mutating an incoming reference silently violates that contract from the caller's perspective.
+
+```csharp
+// ❌ Wrong — mutates the caller's object without any indication in the signature
+private static void EnrichContext(ExecutionContext ctx)
+{
+    ctx.StartedAt = DateTimeOffset.UtcNow;   // caller's object is silently changed
+}
+
+// ✅ Correct — return a new instance; the caller decides what to do with it
+private static ExecutionContext WithStartTime(ExecutionContext ctx) =>
+    ctx with { StartedAt = DateTimeOffset.UtcNow };
+```
+
+When a reference-type parameter genuinely must carry a mutation (e.g., a builder or
+accumulator pattern), that intent must be explicit in the method name and documented
+in the XML summary. Even then, prefer returning a new value over mutating the input.
+
 ---
 
 ## Agent Application Guide
@@ -212,6 +238,7 @@ from having to reconstruct the reasoning from scratch.
 - When a helper only serves one super-method: place it as a nested local function *after the `return`* in that method — happy path first, mechanics below.
 - When a class grows several methods that cluster into lifecycle phases or responsibility areas: split into partial class files with a `.`-separated naming pattern (`Host.Entrypoint.cs`, `Host.Adapters.cs`, …). Each file owns one coherent concern.
 - When anything in the code is not crystal-clear: add a short inline comment explaining *why*. Never comment what the code already says.
+- When writing a method that receives a reference-type parameter: never mutate it. If a modified version is needed, construct and return a new instance. Name the method to reflect the transformation (e.g., `WithStartTime`, not `EnrichContext`).
 - When calling `IErrorHandler.Handle()` and a failed `Result` is in scope at the call site: use the `Handle(Result, ...)` overload — it extracts all diagnostic context automatically. The raw `Handle(string, string?, string?, ...)` overload is for paths where no `Result` exists; passing `null, null` there is correct and deliberate. Using the raw overload when a `Result` is available is a violation.
 - When calling `IErrorHandler.Handle()`: do not also call `LocalLog` at the same site. The handler's own fallback writes to `LocalLog` if SQL fails — calling both unconditionally makes `LocalLog` a co-primary, not a fallback. The only legitimate `LocalLog` call sites outside `SqlErrorHandler` itself are bootstrap paths that execute before the error handler is constructed.
 
@@ -223,6 +250,7 @@ from having to reconstruct the reasoning from scratch.
 - Write defensive `try/catch` blocks outside the lowest-layer boundary.
 - Use `public` where `internal` is sufficient.
 - Use the null-forgiving operator (`!`) without an inline comment that proves the value cannot be null — prefer eliminating it via Result propagation entirely.
+- Mutate a reference-type parameter passed into a method — create a new instance instead.
 - Call `LocalLog.WriteError(...)` and `errorHandler.Handle(...)` at the same error site — that is double-logging. `LocalLog` is the fallback *inside* the handler; call sites must not duplicate it. The no-swallow guarantee in ADR-006 §6 proves the fallback chain is closed without call-site involvement.
 
 ---

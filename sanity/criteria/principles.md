@@ -76,6 +76,18 @@ Evaluate each item for every type and method in scope.
 | `async void` method (outside event handler) | ❌ violation |
 | `.Result` property or `.GetAwaiter().GetResult()` call on a `Task` | ❌ violation |
 
+### 9. No mutation of reference-type parameters
+
+Never assign to a property of, or call a mutating method on, a reference-type parameter
+inside a method. Produce a new instance instead.
+
+| Signal | Verdict |
+|--------|---------|
+| Method assigns to a property of a reference-type parameter (`param.Field = value`) | ❌ violation |
+| Method calls a mutating method on a reference-type parameter (`param.Add(...)`, `param.Clear()`) | ❌ violation |
+| Method returns a new instance derived from the input parameter | ✅ pass |
+| Mutating intent is explicit in the method name and documented in XML `<summary>` | ⚠️ candidate — review whether a non-mutating alternative is feasible |
+
 ### 10. Null-forgiving operator (`!`)
 
 `Nullable=enable` is mandatory everywhere. The null-forgiving operator `!` suppresses a

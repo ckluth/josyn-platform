@@ -206,6 +206,12 @@ Host.Negotiation.cs   ← accept/reject handshake
 
 Each file owns one coherent concern. The full picture emerges from the file listing alone.
 
+**No mutation of reference-type parameters.**
+Never modify a reference-type object that was passed into a method as a parameter.
+Produce and return a new instance instead. Principle 2 (immutability) applies at every
+method boundary — not just to field and property declarations. Mutating an incoming
+reference silently violates the caller's contract even when the type itself allows it.
+
 **Comments.**
 A short comment on anything not crystal-clear is more than appreciated. Explain *why*, not
 *what*. A comment that restates the code adds noise; one that explains a non-obvious
