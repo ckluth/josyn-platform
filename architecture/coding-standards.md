@@ -221,6 +221,24 @@ When a reference-type parameter genuinely must carry a mutation (e.g., a builder
 accumulator pattern), that intent must be explicit in the method name and documented
 in the XML summary. Even then, prefer returning a new value over mutating the input.
 
+### 11. `job.exe` must not rely on a user profile (ADR-021)
+
+`job.exe` is launched with `LoadUserProfile = false` — the technical user account has no
+local profile on the execution machine. The following environment variables are
+**not available** to a running job:
+
+| Unavailable | Use instead |
+|---|---|
+| `%APPDATA%` | — |
+| `%LOCALAPPDATA%` | — |
+| `%USERPROFILE%` | — |
+| `%TEMP%` (user-scoped) | `%TEMP%` (machine-scoped, set by the OS for services) |
+
+System-scoped paths are safe: `%ProgramData%`, `%SystemRoot%`, `%WINDIR%`.
+
+Any job that reads or writes files must use absolute paths, paths derived from arguments,
+or system-scoped environment variables — never profile-relative paths.
+
 ---
 
 ## Agent Application Guide
