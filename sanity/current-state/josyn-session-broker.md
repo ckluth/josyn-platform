@@ -1,6 +1,6 @@
 # Sanity State — josyn-session-broker
 
-**Last checked:** 2026-06-18T19:27 UTC
+**Last checked:** 2026-06-18T19:58 UTC
 
 ## Summary
 
@@ -8,9 +8,9 @@
 |----------|--------|
 | architecture | ✅ |
 | standards | ✅ |
-| docs | ❌ 1 violation |
+| docs | ✅ |
 | tests | ⚠️ known gap |
-| principles | ❌ 3 violations + 1 minor |
+| principles | ✅ |
 
 ---
 
@@ -53,17 +53,14 @@
 
 ## docs
 
-❌ `JOSYN.SessionBroker/AdapterManager.cs`
-   Class `<summary>` says "JAPServer session" — stale post-ADR-025 rename.
-   Should read "SessionBroker session".
-
+✅ `AdapterManager.cs` — class `<summary>` corrected to "SessionBroker session".
 ✅ `AdapterProcess.cs` — class `<summary>` present and accurate.
 ✅ `AdapterManager.GetPipes` — `<summary>` present and accurate.
 ✅ `Host.Adapters.cs` — `SpawnAdapters` has full `<summary>` with `<paramref>` and `<see cref>`.
 ✅ All partial-class `Host.*` methods with non-obvious behaviour have inline `//` comments.
 ✅ `PrepareContext`, `JapInfrastructure`, `NegotiationOutcome` records all commented.
 ✅ `TerminalStatusSet` — has inline block comment explaining the double-write guard.
-✅ `ServerTask!` null-forgiving usage has a justification block comment.
+✅ `ServerTask!` and `SessionBroker!` null-forgiving usages have a shared justification block comment.
 ✅ `README.md` at repo root — present and accurate.
 
 ---
@@ -78,28 +75,7 @@
 
 ## principles
 
-❌ P1 — `JOSYN.SessionBroker/Program.cs` line 3
-   `internal class Program` has no instance members — only a `static Main` method.
-   Must be `internal static class Program` per P1 (static wins).
-
-❌ P8 — `JOSYN.SessionBroker/AdapterProcess.cs` line 18
-   `PipesClient.DisconnectAsync(...).GetAwaiter().GetResult()` in `Dispose()`.
-   `.GetAwaiter().GetResult()` on a Task is a P8 violation.
-   Fix: implement `IAsyncDisposable` on `AdapterProcess` and `AdapterManager`;
-   update `Host.Run` to `await using var adapterManager`.
-
-❌ P10 — `JOSYN.SessionBroker/Host.Entrypoint.cs` lines 120 and 126
-   `ctx.SessionBroker!` used twice without an inline justification comment.
-   `ctx.ServerTask!` at line 111 has a justification block comment; `SessionBroker!` does not.
-   Fix: extend the existing block comment (lines 105–110) to also explain why `SessionBroker`
-   is non-null at that point (it is set in `BuildJapInfrastructure`, which must have succeeded
-   for `NegotiationAccepted` to be true — the guard at line 102 ensures this).
-
-ℹ️ Minor P8 — `JOSYN.SessionBroker/Host.Server.cs` line 21
-   `HandleHandlerError` is declared `async Task` but only calls `errorHandler.Handle` (sync)
-   and then `await Task.CompletedTask` (no-op). The `async` state machine is unnecessary.
-   Fix: remove `async`, return `Task.CompletedTask` directly.
-
+✅ P1 — `Program.cs` corrected to `internal static class Program`.
 ✅ P2 — `PrepareContext`, `JapInfrastructure`, `NegotiationOutcome` are immutable `sealed record`s.
   `AdapterProcess` properties are init-only (`{ get; }`). No unjustified mutable fields.
 ✅ P3 — No `throw` outside catch boundaries. All failure paths return `Result` / `Result<T>`.
@@ -109,5 +85,10 @@
 ✅ P5 — No DI containers, no reflection-based dispatch, no attribute magic.
 ✅ P6 — All types are `internal` (except `IDisposable.Dispose()` required by interface).
 ✅ P7 — Predictable control flow throughout. Early returns at each failure point.
+✅ P8 — `AdapterProcess` and `AdapterManager` implement `IAsyncDisposable`; `Host.Run` uses
+  `await using var adapterManager`. No `.GetAwaiter().GetResult()` remaining.
+  `HandleHandlerError` de-asynced; returns `Task.CompletedTask` directly.
 ✅ P9 — Methods are short and well-named. Each partial file owns one coherent concern.
   Nested helpers placed after `return`, happy path on top.
+✅ P10 — `ctx.ServerTask!` and `ctx.SessionBroker!` both covered by the same justification
+  block comment in `Host.Entrypoint.cs`.
