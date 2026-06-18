@@ -1,5 +1,5 @@
 {
-  "generated": "2026-06-08T20:12:44.5824196+02:00",
+  "generated": "2026-06-18T21:20:00+02:00",
   "documents": [
     {
       "name": "AGENTS.md — JOSYN Platform",
@@ -457,6 +457,21 @@
       "summary": "Defines the Ticker as a periodic process launcher (not an orchestrator) that fires TimeScheduler.exe and WorkflowRunner.exe on a configurable timer schedule read from josyn.bootstrap.ini [Ticker-Targets]. Corrects ADR-017B-01's misclassification of ticker as an orchestrator."
     },
     {
+      "name": "ADR-025 — SessionBroker: Rename JAPServer and Extract to Dedicated Repo",
+      "repo": "josyn-platform",
+      "path": "decisions/ADR-025-session-broker.md",
+      "folder-context": "decisions",
+      "created": "2026-06-18T20:00:00+02:00",
+      "touched": "2026-06-18T20:00:00+02:00",
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Renames JOSYN.Jap.JAPServer to JOSYN.SessionBroker and extracts it into a dedicated josyn-session-broker repo. Supersedes ADR-004's location decision. Establishes the two-worlds model in repo topology and extends the two-segment namespace rule."
+    },
+    {
       "name": "Enrich docs-index — AI enrichment prompt",
       "repo": "josyn-platform",
       "path": "docs/enrich-docs-index-prompt.md",
@@ -590,7 +605,7 @@
       "path": "repos/josyn-backend/overview.md",
       "folder-context": "repos",
       "created": "2026-05-29T10:53:10+02:00",
-      "touched": "2026-06-07T22:09:59+02:00",
+      "touched": "2026-06-18T21:20:00+02:00",
       "type": "repo-summary",
       "perspective": [
         "maintainer-architect",
@@ -1746,21 +1761,6 @@
       "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
-      "name": "JOSYN.Jap.JAPServer",
-      "repo": "josyn-backend",
-      "path": "josyn-backend-jap-server/JOSYN.Jap.JAPServer/README.md",
-      "folder-context": "josyn-backend-jap-server",
-      "created": "2026-06-01T21:58:21+02:00",
-      "touched": "2026-06-07T22:10:08+02:00",
-      "type": "component-architecture",
-      "perspective": [
-        "maintainer-developer"
-      ],
-      "state": "settled",
-      "summary": "Explains the backend server executable for JAP sessions.",
-      "enriched-at": "2026-06-07T10:26:00Z"
-    },
-    {
       "name": "JOSYN.Backend.JobRegistry",
       "repo": "josyn-backend",
       "path": "josyn-backend-job-registry/JOSYN.Backend.JobRegistry/README.md",
@@ -1774,21 +1774,6 @@
       ],
       "state": "settled",
       "summary": "Explains the storage-backed registry of runnable jobs.",
-      "enriched-at": "2026-06-07T10:26:00Z"
-    },
-    {
-      "name": "JOSYN.Backend.SessionStarter",
-      "repo": "josyn-backend",
-      "path": "josyn-backend-session-starter/JOSYN.Backend.SessionStarter/README.md",
-      "folder-context": "josyn-backend-session-starter",
-      "created": "2026-06-04T00:22:32+02:00",
-      "touched": "2026-06-07T22:10:08+02:00",
-      "type": "component-architecture",
-      "perspective": [
-        "maintainer-developer"
-      ],
-      "state": "settled",
-      "summary": "Explains the component that allocates sessions and spawns JAPServer.",
       "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
@@ -2019,6 +2004,38 @@
       "state": "settled",
       "summary": "Introduces the demo company adapter repo used for ADR-009.",
       "enriched-at": "2026-06-07T10:26:00Z"
+    },
+    {
+      "name": "josyn-session-broker",
+      "repo": "josyn-platform",
+      "path": "repos/josyn-session-broker.md",
+      "folder-context": "repos",
+      "created": "2026-06-18T21:20:00+02:00",
+      "touched": "2026-06-18T21:20:00+02:00",
+      "type": "repo-summary",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer",
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Summarizes josyn-session-broker, the per-session boundary EXE bridging backend and job developer worlds.",
+      "enriched-at": "2026-06-18T19:20:00Z"
+    },
+    {
+      "name": "JOSYN.SessionBroker",
+      "repo": "josyn-session-broker",
+      "path": "README.md",
+      "folder-context": "",
+      "created": "2026-06-18T21:20:00+02:00",
+      "touched": "2026-06-18T21:20:00+02:00",
+      "type": "component-architecture",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Describes the SessionBroker EXE, its two-worlds boundary role, CLI contract, and dependencies.",
+      "enriched-at": "2026-06-18T19:20:00Z"
     }
   ]
 }
