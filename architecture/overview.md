@@ -82,13 +82,22 @@ josyn-backend (NuGet packages + EXEs)
 │       └── Contoso.IdentityAdapter.exe    ← stub adapter (josyn-contoso); satisfies IdentityAdapter
 │                                             concern for dev/standalone deployments (ADR-020)
 │
+├── JOSYN.Backend.Ticker (EXE)         ← periodic process launcher: fires orchestrators (TimeScheduler,
+│       │                                  WorkflowRunner) on a configurable minute-based schedule;
+│       │                                  runs as a Windows service or console process (ADR-024)
+│       │                                  deployed to $BackendRoot\Orchestrators\Ticker\
+│       ├── BootstrapReader.cs             ← reads [Ticker-Targets] from josyn.bootstrap.ini; derives BackendRoot
+│       ├── TickerLoop.cs                  ← async 1-min tick loop: fire-rule evaluation, single-instance guard
+│       ├── ProcessSpawner.cs              ← spawns target EXEs; interactive → own console window, service → headless
+│       ├── ConsoleHost.cs                 ← console mode: per-tick status output, keypress stop
+│       └── ServiceHost.cs                 ← Windows service mode: SCM lifecycle (ServiceBase)
+│
 └── ── Future (placeholders) ───────────────────────────────────
     ├── JOSYN.Backend.TriggerAgent     ← replaces JobSystem.TriggerAgent
     ├── JOSYN.Backend.Scheduling       ← replaces JobSystem.Scheduling
     ├── JOSYN.Backend.Service          ← replaces JobSystem.Service (Windows service host)
     ├── JOSYN.Backend.WorkflowAdapter  ← replaces JobSystem.WorkflowAdapter
     ├── listener-service (EXE)         ← future: receives "start job" requests
-    ├── ticker-service   (EXE)         ← future: periodic launcher of orchestrators (ADR-024)
     └── cli-exe          (EXE)         ← future: operator CLI
 
 josyn-foundation (NuGet packages)

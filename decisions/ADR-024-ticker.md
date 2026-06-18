@@ -67,23 +67,43 @@ or directly from a terminal, and behaves accordingly.
 | Mode | How started | Behaviour |
 |---|---|---|
 | **Service** | SCM (`net start`, Task Scheduler, etc.) | No console; lifecycle managed by SCM; stops on SCM stop signal. |
-| **Console** | Direct invocation from a terminal | Prints `Polling... press any key to quit.`; stops cleanly on any keypress. |
+| **Console** | Direct invocation from a terminal | Prints status lines every tick; stops cleanly on any keypress. |
 
 No command-line flag selects the mode. The Ticker detects service context via
 `Environment.UserInteractive` (or the equivalent Windows API). The default — and the only
 production mode — is service.
 
-### 4. Fire-and-forget spawn semantics
+The mode also governs how target processes are spawned:
 
-When a target is due, the Ticker spawns it as a new process and does not wait for it to exit.
-The spawned process is fully independent. The Ticker does not:
+| Mode | Target spawn | Console output |
+|---|---|---|
+| **Service** | `UseShellExecute = false`, `CreateNoWindow = true` — headless | Silent |
+| **Console** | `UseShellExecute = true` — each target opens in its own console window | Per-tick status line; one action line per due target |
 
-- track whether the spawned process succeeded or failed
-- prevent the same target from being spawned again if it is still running when the next tick fires
+Console-mode output format per tick:
+```
+[HH:mm:ss]  running: TimeScheduler (PID 12345)
+  WorkflowRunner       fired    — PID 12400
+  TimeScheduler        skipped  — PID 12345 still running
+```
+The header line lists all targets currently alive. Action lines appear only when a target is due.
+
+### 4. Single-instance guard — skip if previous run is still active
+
+When a target is due, the Ticker checks whether the previous instance of that target is still
+running before spawning a new one.
+
+- **Previous instance exited**: dispose the process handle and spawn a new instance.
+- **Previous instance still running**: skip this tick for that target. Log a "skipped" line in
+  console mode. No second instance is started.
+
+The Ticker does not:
+- wait for the spawned process to exit
 - pass arguments to the spawned process
+- track exit codes or error output from spawned processes
 
-Each spawned executable is responsible for its own concurrency guard (e.g. a named mutex)
-if overlapping instances would be harmful.
+The Ticker retains a `Process` handle per target solely to read `HasExited`. It disposes the
+handle as soon as the process is confirmed exited and a new instance is about to start.
 
 ### 5. Schedule configuration in `josyn.bootstrap.ini`
 
@@ -105,18 +125,19 @@ Format per entry:
 |---|---|
 | `Name` | Logical name for the target (used in logs; must be unique within the section). |
 | `ExeName` | The executable file name, without path. |
-| `offset` | Minute-of-hour at which the first fire occurs (0–59). |
-| `period` | How often to fire, in minutes (1–60). |
+| `offset` | Second within a minute at which the first fire occurs (0–59). |
+| `period` | How often to fire, in seconds (1–60). |
 
-**Fire rule:** the target fires when `currentMinute % period == offset % period` and the
-wall-clock minute has not yet triggered a fire in the current period. The Ticker evaluates
-this on a one-minute internal tick.
+**Fire rule:** the target fires when `currentSecond % period == offset % period`. The Ticker
+evaluates this on a one-second internal tick. Prevention of double-firing within the same
+period is handled by the single-instance guard (§4): a just-spawned process will not have
+exited yet, so the next tick — even if it satisfies the formula — will be skipped.
 
 Examples:
-- `0, 30` → fires at :00 and :30 of every hour.
-- `15, 30` → fires at :15 and :45 of every hour.
-- `0, 60` → fires once per hour, on the hour.
-- `5, 15` → fires at :05, :20, :35, :50 of every hour.
+- `0, 30` → fires at second :00 and :30 of every minute.
+- `15, 30` → fires at second :15 and :45 of every minute.
+- `0, 60` → fires once per minute, on the minute.
+- `5, 15` → fires at second :05, :20, :35, :50 of every minute.
 
 **Why `josyn.bootstrap.ini` and not the database:**
 The Ticker must know what to spawn before it can establish a DB connection (or even before a
@@ -124,42 +145,57 @@ DB connection is healthy). Deployment-time target configuration belongs in boots
 not in operational data. The section is read once at startup; a restart is required to pick
 up changes, which is acceptable for deployment-level configuration.
 
-### 6. EXE path resolution by BackendRoot convention
+### 6. EXE path resolution — `Orchestrators\<Name>\<ExeName>`
 
-The Ticker resolves the full path to a target executable using the BackendRoot convention
-(ADR-012):
+The Ticker resolves the full path to a target executable under the `Orchestrators` sub-folder
+of `BackendRoot` (ADR-012):
 
 ```
-BackendRoot\<Name>\<ExeName>
+BackendRoot\Orchestrators\<Name>\<ExeName>
 ```
 
 where `BackendRoot` is the directory of `josyn.bootstrap.ini` and `Name` is the logical name
 from the config entry.
+
+Although the Ticker is not itself an orchestrator, it lives alongside the orchestrators it
+manages. All scheduler-related executables share the `Orchestrators\` folder for a cleaner
+deployment layout.
 
 Example deployment layout:
 
 ```
 $BackendRoot\
     josyn.bootstrap.ini
-    Ticker\
-        JOSYN.Backend.Ticker.exe
-    TimeScheduler\
-        TimeScheduler.exe
-    WorkflowRunner\
-        WorkflowRunner.exe
+    Orchestrators\
+        Ticker\
+            JOSYN.Backend.Ticker.exe
+        TimeScheduler\
+            TimeScheduler.exe
+        WorkflowRunner\
+            WorkflowRunner.exe
+        CLI\
+            JOSYN.Backend.CLI.exe
+        Listener\
+            JOSYN.Backend.Listener.exe (future)
     JAPServer\
         JOSYN.Jap.JAPServer.exe
-    CLI\
-        JOSYN.Backend.CLI.exe
+    Adapters\
+        IdentityAdapter\
+            Contoso.IdentityAdapter.exe
+        ConfigurationAdapter\
+            Contoso.ConfigurationAdapter.exe
+    JobRepository\
+        <JobName>\
+            <job>.exe
 ```
 
-The `<Name>` key in `[Ticker-Targets]` therefore doubles as the sub-folder name. Names must
-be chosen to match the deployment directory.
+The `<Name>` key in `[Ticker-Targets]` doubles as the sub-folder name under `Orchestrators\`.
+Names must be chosen to match the deployment directory.
 
 ### 7. `deploy-maintainer.ps1` gains a Ticker publish step
 
 `josyn-toolbox\deploy\deploy-maintainer.ps1` gains an `Invoke-Publish` call that publishes
-`JOSYN.Backend.Ticker` to `$BackendRoot\Ticker\`.
+`JOSYN.Backend.Ticker` to `$BackendRoot\Orchestrators\Ticker\`.
 
 ---
 
@@ -176,11 +212,15 @@ immediately — it cannot query a database that may itself require a healthy bac
 The target list is a deployment concern (which orchestrators exist), not an operational concern
 (when a specific job should run). The latter belongs to the orchestrators themselves.
 
-**Why fire-and-forget?**
-The Ticker's only responsibility is to wake up the orchestrators on time. Tracking their
-outcomes would require the Ticker to understand session semantics — the exact coupling this
-design avoids. If an orchestrator crashes silently, that is an observability concern for the
-orchestrator and the session store, not for the Ticker.
+**Why not pure fire-and-forget?**
+A pure fire-and-forget model is simple but produces a footgun: if an orchestrator run takes
+longer than its period (e.g., a TimeScheduler that queries a slow database or waits on a hung
+job), the next tick would spawn a second instance, which would query the same schedules and
+potentially launch duplicate job sessions. Tracking the PID and guarding against overlap
+eliminates this risk at the Ticker layer. Targets do not need to implement their own concurrency
+guard for overlapping-tick protection — the Ticker will not spawn a second instance until the
+first has exited. Exit-code and error-output tracking is deliberately excluded: the Ticker's
+responsibility ends at spawn-time.
 
 **Why no flag for service vs. console mode?**
 The mode is a property of the host environment, not of the caller's intent. A service running
@@ -213,8 +253,8 @@ no documentation.
    developer machine and in production? (installer, `sc.exe`, NSSM, or a built-in
    `IHostedService` bootstrap?) This ADR does not decide.
 
-2. **Sub-period precision** — the one-minute internal tick is the minimum granularity. If a
-   sub-minute period ever becomes necessary, the schedule format and evaluation rule would
+2. **Sub-second precision** — the one-second internal tick is the minimum granularity. If a
+   sub-second period ever becomes necessary, the schedule format and evaluation rule would
    need extension. Not anticipated; noted for completeness.
 
 3. **Missed-fire semantics** — if the Ticker is stopped and restarted, should it fire
