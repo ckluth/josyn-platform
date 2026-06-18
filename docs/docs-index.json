@@ -426,6 +426,37 @@
       "summary": "Introduces the Interactive flag so CLI-launched jobs show console output; headless remains the production default."
     },
     {
+      "name": "ADR-023 — Introduce `josyn-adapter-contracts` as the Dedicated Adapter Contract Repo",
+      "repo": "josyn-platform",
+      "path": "decisions/ADR-023-adapter-contracts-repo.md",
+      "folder-context": "decisions",
+      "created": "2026-06-17T00:00:00+02:00",
+      "touched": "2026-06-17T00:00:00+02:00",
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Introduces josyn-adapter-contracts as the dedicated home for JIP adapter contract packages, relocating and renaming JOSYN.Backend.ConfigurationAdapter.Contract and JOSYN.Backend.IdentityAdapter.Contract to JOSYN.Adapter.*."
+    },
+    {
+      "name": "ADR-024 — The Ticker: Periodic Process Launcher",
+      "repo": "josyn-platform",
+      "path": "decisions/ADR-024-ticker.md",
+      "folder-context": "decisions",
+      "created": "2026-06-18T00:00:00+02:00",
+      "touched": "2026-06-18T00:00:00+02:00",
+      "type": "decision",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer",
+        "maintainer-operator"
+      ],
+      "state": "settled",
+      "summary": "Defines the Ticker as a periodic process launcher (not an orchestrator) that fires TimeScheduler.exe and WorkflowRunner.exe on a configurable timer schedule read from josyn.bootstrap.ini [Ticker-Targets]. Corrects ADR-017B-01's misclassification of ticker as an orchestrator."
+    },
+    {
       "name": "Enrich docs-index — AI enrichment prompt",
       "repo": "josyn-platform",
       "path": "docs/enrich-docs-index-prompt.md",

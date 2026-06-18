@@ -88,7 +88,7 @@ josyn-backend (NuGet packages + EXEs)
     ├── JOSYN.Backend.Service          ← replaces JobSystem.Service (Windows service host)
     ├── JOSYN.Backend.WorkflowAdapter  ← replaces JobSystem.WorkflowAdapter
     ├── listener-service (EXE)         ← future: receives "start job" requests
-    ├── ticker-service   (EXE)         ← future: polls for scheduled executions
+    ├── ticker-service   (EXE)         ← future: periodic launcher of orchestrators (ADR-024)
     └── cli-exe          (EXE)         ← future: operator CLI
 
 josyn-foundation (NuGet packages)

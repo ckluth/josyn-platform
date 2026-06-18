@@ -23,7 +23,8 @@ flowchart TD
     subgraph Orchestrators["Orchestrators (thin launchers)"]
         CLI["CLI\nrun-job DemoJob args.ini"]
         REST["REST listener\n(future)"]
-        Ticker["Ticker\n(future)"]
+        TimeSched["TimeScheduler\n(future)"]
+        WfRunner["WorkflowRunner\n(future)"]
     end
 
     subgraph Launcher["JOSYN.Backend.SessionLauncher (library)"]
@@ -47,7 +48,8 @@ flowchart TD
 
     CLI -->|SessionStartRequest| L1
     REST -->|SessionStartRequest| L1
-    Ticker -->|SessionStartRequest| L1
+    TimeSched -->|SessionStartRequest| L1
+    WfRunner -->|SessionStartRequest| L1
     L1 --> L2 --> L3 --> L4 --> L5
 
     L5 -->|temp INI file| J1

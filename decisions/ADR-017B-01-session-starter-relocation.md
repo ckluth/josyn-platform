@@ -3,6 +3,12 @@
 **Date:** 2026-06-12
 **Status:** Superseded in part — JOSYN-IPC start mode removed 2026-06-14 (see closing note)
 
+> **Correction (ADR-024, 2026-06-18):** This ADR listed `ticker` as one of four orchestrator
+> executables. That is wrong. The Ticker is not an orchestrator — it does not call
+> `SessionLauncher`. It is a periodic process launcher that fires orchestrators on a timer.
+> `TimeScheduler` and `WorkflowRunner` are the orchestrators that replaced `ticker` in this
+> role. See ADR-024.
+
 ---
 
 ## Context
