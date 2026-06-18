@@ -9,20 +9,20 @@ josyn-backend (SessionStarter)
     │
     │  1. Detect scheduled execution (TriggerAgent / Service / WorkflowAdapter)
     │  2. Assign fresh session GUID; write session record to session store
-    │  3. Spawn: JAPServer.exe JOSYN-IPC <sessionGUID>
+    │  3. Spawn: SessionBroker.exe JOSYN-START @<path>
     ▼
-JOSYN.Jap.JAPServer (in josyn-backend)
+JOSYN.SessionBroker (josyn-session-broker)
     │
     │  4. Spawn: job.exe JOSYN-IPC <sessionGUID>
     ▼
 job.exe  ──► Core.Run(args)
     │
     │  5. Parse sessionGUID from args
-    │  6. Connect to JAPServer via Named Pipes (session-isolated by GUID)
+    │  6. Connect to SessionBroker via Named Pipes (session-isolated by GUID)
     ▼
 JAPClient  ──► IJosynApplicationProtocol
     │
-    │  7. GetRawArguments()  ◄─── JAPServer returns serialized INI/JSON
+    │  7. GetRawArguments()  ◄─── SessionBroker returns serialized INI/JSON
     ▼
 JobInvoker
     │
@@ -37,7 +37,7 @@ JobInvoker
 JobInvoker
     │
     │  12. PropertyBag.Serialize(result, IniSerializer)
-    │  13. PutRawResult(serialized)  ──► JAPServer stores result
+    │  13. PutRawResult(serialized)  ──► SessionBroker stores result
     ▼
 job.exe exits with code 0
     │
@@ -55,7 +55,7 @@ Any step fails
     │
     └─ Job failed (steps 8–13)
             LocalLog.Error(...)
-            PutError(ErrorReport)  ──► JAPServer.LocalLog.Error(causer, ...)
+            PutError(ErrorReport)  ──► SessionBroker.LocalLog.Error(causer, ...)
             exit -2
 ```
 
@@ -70,17 +70,6 @@ josyn-backend (NuGet packages + EXEs)
 ├── JOSYN.Backend.SessionStarter       ← session lifecycle: GUID, store write, process spawn
 ├── JOSYN.Backend.JobRegistry          ← job registration: Name, TechnicalUserName; josyn.JobRegistrations table
 ├── JOSYN.Backend.IdentityAdapter.Contract ← JIP contract: IIdentityAdapter.GetPassword (ADR-017B-03)
-├── JOSYN.Jap.JAPServer (EXE)          ← relocated from josyn-jap; backed by SessionStore
-│       ├── Host.Entrypoint.cs             ← lifecycle, bootstrap config, adapter + session wiring
-│       ├── Host.Adapters.cs               ← SpawnAdapters: launches adapter EXEs, manages ClientPipes
-│       ├── Host.Prepare.cs                ← per-session: credentials, job spawn, negotiation
-│       ├── AdapterManager.cs              ← holds AdapterProcess instances; IDisposable
-│       ├── AdapterProcess.cs              ← wraps Process + ClientPipes + session Guid; IDisposable
-│       └── JAPServer.cs                   ← IJosynApplicationProtocol: reads/writes SessionStore
-│
-├── Adapters/ (deployment folder — not a NuGet package)
-│       └── Contoso.IdentityAdapter.exe    ← stub adapter (josyn-contoso); satisfies IdentityAdapter
-│                                             concern for dev/standalone deployments (ADR-020)
 │
 ├── JOSYN.Backend.Ticker (EXE)         ← periodic process launcher: fires orchestrators (TimeScheduler,
 │       │                                  WorkflowRunner) on a configurable minute-based schedule;
@@ -106,6 +95,19 @@ josyn-foundation (NuGet packages)
 └── JOSYN.Foundation.JIP                  ← Named Pipe transport + JIP convention layer
         ├── Transport:  PipesClient, PipesServer, PipesProtocol
         └── Convention: JipClient, JipServer, JipDispatcher, Request, Response
+
+josyn-session-broker (EXE — josyn-session-broker)
+└── JOSYN.SessionBroker
+        ├── Host.Entrypoint.cs            ← lifecycle, bootstrap config, adapter + session wiring
+        ├── Host.Adapters.cs              ← SpawnAdapters: launches adapter EXEs, manages ClientPipes
+        ├── Host.Prepare.cs               ← per-session: credentials, job spawn, negotiation
+        ├── AdapterManager.cs             ← holds AdapterProcess instances; IDisposable
+        ├── AdapterProcess.cs             ← wraps Process + ClientPipes + session Guid; IDisposable
+        └── SessionBroker.cs              ← IJosynApplicationProtocol: reads/writes SessionStore
+        │
+        └── Adapters/ (deployment folder — not a NuGet package)
+                └── Contoso.IdentityAdapter.exe    ← stub adapter (josyn-contoso); satisfies IdentityAdapter
+                                                      concern for dev/standalone deployments (ADR-020)
 
 josyn-jap (NuGet packages — protocol contracts only)
 └── JOSYN.Jap.Contract          ← IJosynApplicationProtocol, ErrorReport
@@ -143,11 +145,11 @@ josyn-platform (this repo)
 JOSYN.Jap.Contract (+ ResultPattern)
         ▲
         │
-JOSYN.Jap.JAPServer       JOSYN.JobHost
-(in josyn-backend          (+ JIP + PropertyBag
+JOSYN.SessionBroker        JOSYN.JobHost
+(josyn-session-broker      (+ JIP + PropertyBag
  + JIP + PropertyBag        + Contract)
  + SessionStore            [protocol client]
- + GlobalConfig
+ + BootstrapConfig
  + Contract)
         │                         │
         └── IJosynApplicationProtocol ──┘
@@ -165,7 +167,7 @@ Backend.SessionStore     (+ ResultPattern)
 Backend.SessionStarter  (+ ResultPattern)
 
 Consumers of the backend packages:
-  JOSYN.Jap.JAPServer (EXE)                → + SessionStore + BootstrapConfig  (see above)
+  JOSYN.SessionBroker (EXE, josyn-session-broker) → + SessionStore + BootstrapConfig  (see above)
 
 ────────────────────────────────────────────────────────────────────────
 ```
@@ -185,21 +187,19 @@ Consumers of the backend packages:
 ### Runtime (spawn) relationships — not code imports
 
 ```
-josyn-backend ──spawns──► JOSYN.Jap.JAPServer.exe  (JOSYN-START @<path>)
-JOSYN.Jap.JAPServer  ──spawns──► adapter EXEs       (JOSYN-ADAPTER <guid>, one per concern)
-JOSYN.Jap.JAPServer  ──spawns──► job.exe            (JOSYN-IPC <guid>)
+josyn-backend ──spawns──► JOSYN.SessionBroker.exe    (JOSYN-START @<path>)
+JOSYN.SessionBroker  ──spawns──► adapter EXEs         (JOSYN-ADAPTER <guid>, one per concern)
+JOSYN.SessionBroker  ──spawns──► job.exe              (JOSYN-IPC <guid>)
 ```
 
-`josyn-jap` (shared contracts and logger packages) and `josyn-job-host` speak the same
-protocol and consume the same foundation packages — but are not symmetric in the same sense
-as before: `josyn-job-host` remains a pure library, while `josyn-jap` is now a contracts-only
-repo (the EXE was relocated to `josyn-backend` per ADR-004). They still never reference
-each other.
+`josyn-jap` (protocol contracts) and `josyn-job-host` share the same protocol contract
+(`JOSYN.Jap.Contract`) — but are not symmetric peers: `josyn-job-host` is a consumer-facing
+library; `josyn-jap` is a contracts-only repo. They never reference each other.
 
-`josyn-backend` takes a NuGet dependency on `JOSYN.Jap.Contract` and
-`JOSYN.Jap.Shared.Log` (via `JOSYN.Jap.JAPServer`). This is intentional and downward:
-the contracts repo is a lower-layer package; taking a dependency on it from the backend is
-not a layering violation.
+`josyn-session-broker` takes NuGet dependencies on `JOSYN.Jap.Contract` (from `josyn-jap`)
+and on `josyn-backend` library packages (`SessionStore`, `BootstrapConfig`, etc.). Both
+dependencies are downward and intentional — the contracts and backend packages are lower-layer;
+taking a dependency on them from `josyn-session-broker` is not a layering violation.
 
 ---
 
@@ -259,7 +259,7 @@ Supported property types: `string`, `char`, `bool`, `byte`/`sbyte`/`short`/`usho
 Three-tier error handling across the platform:
 
 ```
-job.exe                           JAPServer
+job.exe                           SessionBroker
   │                                   │
   ├─ IPC fails                        │
   │   └─ LocalLog.Error (local)       │

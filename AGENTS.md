@@ -20,7 +20,8 @@ All repos are siblings under a common parent directory:
 | `josyn-jap` | JAP protocol contracts — shared contracts and logging | `../josyn-jap` |
 | `josyn-adapter-contracts` | JIP protocol contracts for company adapter EXEs — the platform/company boundary layer (ADR-023) | `../josyn-adapter-contracts` |
 | `josyn-job-host` | Job execution runtime — library linked by each job executable | `../josyn-job-host` |
-| `josyn-backend` | Scheduler and session-orchestration layer | `../josyn-backend` |
+| `josyn-session-broker` | Per-session boundary EXE — brokers between the backend world and the job developer's world (ADR-025) | `../josyn-session-broker` |
+| `josyn-backend` | Scheduler and session-orchestration layer — NuGet library packages consumed by `josyn-session-broker` | `../josyn-backend` |
 | `josyn-commons` | Generic utility helpers — domain-agnostic, never referenced by Foundation | `../josyn-commons` |
 | `josyn-platform` | Architecture, decisions, docs — **this repo** | `../josyn-platform` |
 | `josyn-playground` | Consumer playground — demos, experiments, non-platform code | `../josyn-playground` |
