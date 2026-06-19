@@ -1648,7 +1648,7 @@
         "maintainer-developer"
       ],
       "state": "settled",
-      "summary": "Documents the INI-based time-schedule parser, serializer, and semantic validator; implements the schedule definition language from ADR-026."
+      "summary": "Documents the JSONC-based time-schedule parser, serializer, and semantic validator; implements the schedule definition language from ADR-026."
     },
     {
       "name": "josyn-jap",
