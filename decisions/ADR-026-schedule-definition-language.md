@@ -19,9 +19,8 @@ definition language.
 - Expressive enough for edge cases without resorting to a general-purpose language.
 - Able to combine regular execution rules with explicit date-based exceptions.
 - No external tooling required to author or read a schedule file.
-- All keywords and vocabulary in German — the platform's operator audience.
 
-### Format choice: INI
+### Format choice: INI-inspired
 
 INI was chosen over JSON, YAML, and TOML:
 
@@ -32,8 +31,8 @@ INI was chosen over JSON, YAML, and TOML:
 | YAML | Indentation-sensitive; whitespace errors produce silent misbehaviour; hostile to operators |
 | JSON | No comments; verbose; not human-authoring-friendly |
 
-`#` and `;` both serve as comment characters (standard INI). Multi-value fields wrap with
-leading whitespace (standard INI continuation).
+`#` and `;` both serve as comment characters. Multi-value fields wrap with leading whitespace
+(standard INI continuation).
 
 All time values are compared against the **server's local machine date and time**. No
 timezone configuration is supported or necessary — the server is always the reference clock.
@@ -42,24 +41,22 @@ timezone configuration is supported or necessary — the server is always the re
 
 ## Decision
 
-### Sections
+### Rule blocks
 
 A schedule file is a sequence of **rule blocks**, separated by blank lines. A rule block is
-a set of `key = value` lines. `#` and `;` serve as comment characters anywhere in the file.
+a set of `key = value` lines. There are no named section headers — INI-style `[name]` syntax
+is not used. The `type` key is the only structural discriminator. Operators use comments to
+label blocks for their own readability; the parser ignores them.
 
-There are no named section headers — INI-style `[name]` syntax is not used. The `typ` key
-is the only structural discriminator. Operators use comments to label blocks for their own
-readability; the parser ignores them.
-
-### Rule types (`typ`)
+### Rule types (`type`)
 
 | Value | Purpose |
 |-------|---------|
-| `intervall` | Repeat every N minutes or hours within a time window on specified days |
-| `fest` | Fire at one or more specific times on specified days |
-| `nth_wochentag` | Fire on the Nth (or last) occurrence of a named weekday within a calendar period |
-| `einmalig` | Fire exactly once at a specific date and time |
-| `ausschluss` | Declare dates on which no rule in this file may fire |
+| `interval` | Repeat every N minutes or hours within a time window on specified days |
+| `fixed` | Fire at one or more specific times on specified days |
+| `nth_weekday` | Fire on the Nth (or last) occurrence of a named weekday within a calendar period |
+| `once` | Fire exactly once at a specific date and time |
+| `exclude` | Declare dates on which no rule in this file may fire |
 
 ---
 
@@ -68,42 +65,42 @@ readability; the parser ignores them.
 This section is the authoritative reference for every keyword and abbreviation the language
 accepts. No other values are valid.
 
-### Day abbreviations (`tage`, `wochentag`)
+### Day abbreviations (`days`, `weekday`)
 
-| Keyword | Meaning |
-|---------|---------|
-| `mo` | Montag |
-| `di` | Dienstag |
-| `mi` | Mittwoch |
-| `do` | Donnerstag |
-| `fr` | Freitag |
-| `sa` | Samstag |
-| `so` | Sonntag |
+| Keyword | Day |
+|---------|-----|
+| `mon` | Monday |
+| `tue` | Tuesday |
+| `wed` | Wednesday |
+| `thu` | Thursday |
+| `fri` | Friday |
+| `sat` | Saturday |
+| `sun` | Sunday |
 
 ### Day keywords (aliases)
 
 | Keyword | Expands to |
 |---------|-----------|
-| `wochentage` | `mo..fr` |
-| `wochenende` | `sa, so` |
-| `täglich` | `mo..so` |
+| `weekdays` | `mon..fri` |
+| `weekend` | `sat, sun` |
+| `daily` | `mon..sun` |
 
 ### Day expression syntax
 
 | Form | Example | Meaning |
 |------|---------|---------|
-| Single abbreviation | `mi` | One specific day |
-| Inclusive range | `mo..fr` | All days from Monday through Friday |
-| Comma list | `mo, mi, fr` | Explicit set |
-| Mix | `mo..mi, fr` | Range combined with individual day |
+| Single abbreviation | `wed` | One specific day |
+| Inclusive range | `mon..fri` | All days from Monday through Friday |
+| Comma list | `mon, wed, fri` | Explicit set |
+| Mix | `mon..wed, fri` | Range combined with individual day |
 
-### Period values (`periode`)
+### Period values (`period`)
 
 | Keyword | Meaning |
 |---------|---------|
-| `monat` | Calendar month |
-| `quartal` | Calendar quarter — Q1 = Januar, Q2 = April, Q3 = Juli, Q4 = Oktober |
-| `jahr` | Calendar year |
+| `month` | Calendar month |
+| `quarter` | Calendar quarter — Q1 = January, Q2 = April, Q3 = July, Q4 = October |
+| `year` | Calendar year |
 
 "Nth weekday of a quarter" means the Nth occurrence in the **first month** of that quarter.
 
@@ -112,14 +109,14 @@ accepts. No other values are valid.
 | Value | Meaning |
 |-------|---------|
 | `1` … `5` | First through fifth occurrence within the period |
-| `letzte` | Last occurrence of that weekday within the period (not the last calendar day) |
+| `last` | Last occurrence of that weekday within the period (not the last calendar day) |
 
-### Duration suffixes (`alle`)
+### Duration suffixes (`every`)
 
 | Suffix | Unit |
 |--------|------|
-| `m` | Minuten |
-| `h` | Stunden |
+| `m` | minutes |
+| `h` | hours |
 
 Compound forms (e.g. `1h30m`) are not accepted. Use the smallest unit: `90m`, not `1h30m`.
 
@@ -127,101 +124,100 @@ Compound forms (e.g. `1h30m`) are not accepted. Use the smallest unit: `90m`, no
 
 | Key | Used by | Description |
 |-----|---------|-------------|
-| `typ` | all | Rule type — one of the values in the type table above |
-| `tage` | `intervall`, `fest` | Day expression |
-| `start` | `intervall` | Window open time — `HH:mm`, 24-hour |
-| `ende` | `intervall` | Window close time — `HH:mm`, 24-hour |
-| `alle` | `intervall` | Repetition interval — integer + duration suffix |
-| `zeit` | `fest`, `nth_wochentag` | One or more `HH:mm` values, comma-separated |
-| `wochentag` | `nth_wochentag` | Single day abbreviation |
-| `nth` | `nth_wochentag` | Ordinal value (`1`–`5` or `letzte`) |
-| `periode` | `nth_wochentag` | Period value |
-| `datum` | `einmalig` | Exact fire moment — `YYYY-MM-DD HH:mm` |
-| `daten` | `ausschluss` | Comma-separated ISO dates and/or date ranges |
+| `type` | all | Rule type — one of the values in the type table above |
+| `days` | `interval`, `fixed` | Day expression |
+| `start` | `interval` | Window open time — `HH:mm`, 24-hour |
+| `end` | `interval` | Window close time — `HH:mm`, 24-hour |
+| `every` | `interval` | Repetition interval — integer + duration suffix |
+| `time` | `fixed`, `nth_weekday` | One or more `HH:mm` values, comma-separated |
+| `weekday` | `nth_weekday` | Single day abbreviation |
+| `nth` | `nth_weekday` | Ordinal value (`1`–`5` or `last`) |
+| `period` | `nth_weekday` | Period value |
+| `datetime` | `once` | Exact fire moment — `YYYY-MM-DD HH:mm` |
+| `dates` | `exclude` | Comma-separated ISO dates and/or date ranges |
 
 ---
 
 ## Type reference
 
-### `intervall`
+### `interval`
 
 Repeat every fixed duration within a bounded time window on specified days.
 
-The first fire is at `start`. Subsequent fires are at `start + N × alle`. A computed slot
-that falls after `ende` is dropped silently — the window is never overrun. `ende` itself is
+The first fire is at `start`. Subsequent fires are at `start + N × every`. A computed slot
+that falls after `end` is dropped silently — the window is never overrun. `end` itself is
 a permitted fire time if it aligns exactly.
 
 ```
-typ   = intervall
-tage  = wochentage
+type  = interval
+days  = weekdays
 start = 08:00
-ende  = 17:00
-alle  = 30m
+end   = 17:00
+every = 30m
 ```
 
-### `fest`
+### `fixed`
 
 Fire at one or more explicit times on specified days. Each time value is an independent fire
 trigger. Order within the list is irrelevant.
 
 ```
-typ  = fest
-tage = mo, mi, fr
-zeit = 06:00, 06:30
+type = fixed
+days = mon, wed, fri
+time = 06:00, 06:30
 ```
 
-### `nth_wochentag`
+### `nth_weekday`
 
 Fire on the Nth — or last — occurrence of a named weekday within a calendar period.
 
 **Exclusion collision:** if the computed date falls on an excluded date, that occurrence is
 skipped entirely. No near-miss adjustment is performed. Silent date-shifting can produce
-wrong business semantics; operators who need a fallback define an `einmalig` section
-explicitly.
+wrong business semantics; operators who need a fallback define an `once` block explicitly.
 
 ```
-typ       = nth_wochentag
-wochentag = di
-nth       = 2
-periode   = monat
-zeit      = 09:00
+type    = nth_weekday
+weekday = tue
+nth     = 2
+period  = month
+time    = 09:00
 
-typ       = nth_wochentag
-wochentag = mo
-nth       = 1
-periode   = quartal
-zeit      = 12:00
+type    = nth_weekday
+weekday = mon
+nth     = 1
+period  = quarter
+time    = 12:00
 
-typ       = nth_wochentag
-wochentag = fr
-nth       = letzte
-periode   = monat
-zeit      = 16:00
+type    = nth_weekday
+weekday = fri
+nth     = last
+period  = month
+time    = 16:00
 ```
 
-### `einmalig`
+### `once`
 
-Fire exactly once at a specified date and time. `TimeScheduler` marks the rule as
-consumed after it fires. The entry remains in the file but is not re-evaluated on subsequent
-runs. Restarting the service does not re-fire it.
+Fire exactly once at a specified date and time. `TimeScheduler` marks the rule as consumed
+after it fires. The entry remains in the file but is not re-evaluated on subsequent runs.
+Restarting the service does not re-fire it.
 
 ```
-typ   = einmalig
-datum = 2026-12-26 10:00
+type     = once
+datetime = 2026-12-26 10:00
 ```
 
-### `ausschluss`
+### `exclude`
 
 Declares dates on which **no rule in this file may fire**. Exclusions always win — no other
-`typ` can override them.
+`type` can override them.
 
-The `daten` key accepts ISO dates (`YYYY-MM-DD`), inclusive date ranges
+The `dates` key accepts ISO dates (`YYYY-MM-DD`), inclusive date ranges
 (`YYYY-MM-DD..YYYY-MM-DD`), and comma-separated combinations of both. Multi-line
-continuation is permitted. Multiple `ausschluss` blocks are allowed; their date sets are merged.
+continuation is permitted. Multiple `exclude` blocks are allowed; their date sets are merged.
 
 ```
-typ   = ausschluss
-daten = 2026-12-24, 2026-12-25,
+type  = exclude
+dates = 2026-12-24, 2026-12-25,
         2026-12-27..2026-12-31
 ```
 
@@ -242,46 +238,46 @@ regardless of how many blocks are simultaneously satisfied.
 ## Complete example
 
 ```
-# Alle 30 Minuten während der Arbeitszeit, Mo–Fr
-typ   = intervall
-tage  = wochentage
+# Every 30 min during business hours, Mon–Fri
+type  = interval
+days  = weekdays
 start = 08:00
-ende  = 17:00
-alle  = 30m
+end   = 17:00
+every = 30m
 
-# Feste Zeiten an ausgewählten Tagen
-typ  = fest
-tage = mo, mi, fr
-zeit = 06:00, 06:30
+# Fixed times on selected days
+type = fixed
+days = mon, wed, fri
+time = 06:00, 06:30
 
-# 2. Dienstag im Monat
-typ       = nth_wochentag
-wochentag = di
-nth       = 2
-periode   = monat
-zeit      = 09:00
+# 2nd Tuesday of each month
+type    = nth_weekday
+weekday = tue
+nth     = 2
+period  = month
+time    = 09:00
 
-# 1. Montag im Quartal
-typ       = nth_wochentag
-wochentag = mo
-nth       = 1
-periode   = quartal
-zeit      = 12:00
+# 1st Monday of each quarter
+type    = nth_weekday
+weekday = mon
+nth     = 1
+period  = quarter
+time    = 12:00
 
-# Letzter Freitag im Monat
-typ       = nth_wochentag
-wochentag = fr
-nth       = letzte
-periode   = monat
-zeit      = 16:00
+# Last Friday of each month
+type    = nth_weekday
+weekday = fri
+nth     = last
+period  = month
+time    = 16:00
 
-# Einmalige Sonderausführung
-typ   = einmalig
-datum = 2026-12-26 10:00
+# One-off
+type     = once
+datetime = 2026-12-26 10:00
 
-# Ausschlüsse
-typ   = ausschluss
-daten = 2026-12-24, 2026-12-25,
+# Exclusions
+type  = exclude
+dates = 2026-12-24, 2026-12-25,
         2026-12-27..2026-12-31
 ```
 
@@ -300,9 +296,9 @@ audience of this platform.
 ### Special reserved section names
 
 An earlier version of this design used `[exclude]` and `[meta]` as magic reserved section
-names treated differently by the parser. Rejected: the uniform approach (`typ = ausschluss`
-like any other section) is simpler to parse, simpler to document, and removes an invisible
-special case. Multiple exclusion sections are a natural consequence of this choice.
+names treated differently by the parser. Rejected: the uniform approach (`type = exclude`
+like any other block) is simpler to parse, simpler to document, and removes an invisible
+special case. Multiple exclusion blocks are a natural consequence of this choice.
 
 ### Per-rule exclusions
 
@@ -321,7 +317,7 @@ unambiguous and equally readable.
 
 - `TimeScheduler.exe` consumes this format. The parser must handle: blank-line-delimited
   rule blocks, the four rule types, the day expression syntax (abbreviations, ranges, lists,
-  keywords), duration suffixes, the `..` range operator in `daten` values, and `einmalig`
+  keywords), duration suffixes, the `..` range operator in `dates` values, and `once`
   consumed-state tracking.
 - The file naming convention and storage location (per-job file vs. platform registry) are
   **not decided here**. That is a `TimeScheduler` implementation concern and will be
@@ -331,10 +327,11 @@ unambiguous and equally readable.
 
 ## Open questions
 
-1. **`einmalig` state storage** — where is the "consumed" flag persisted? In the schedule
-   file itself (a `verarbeitet = true` line written back), in the session store, or in a
-   sidecar file? Not decided here; deferred to `TimeScheduler` implementation.
+1. **`once` state storage** — where is the "consumed" flag persisted? In the schedule file
+   itself (a `consumed = true` line written back), in the session store, or in a sidecar
+   file? Not decided here; deferred to `TimeScheduler` implementation.
 
 2. **Validation tooling** — should `josyn-toolbox` gain a `validate-schedule` command that
    parses and reports errors in a schedule file without running it? Anticipated as useful;
    not a prerequisite.
+
