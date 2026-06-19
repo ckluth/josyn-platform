@@ -27,7 +27,7 @@ INI was chosen over JSON, YAML, and TOML:
 
 | Format | Assessment |
 |--------|-----------|
-| **INI** | Operator-familiar; no quoting rules; already parsed by `BootstrapConfig`; sections serve as natural grouping constructs for rule keys |
+| **INI-inspired** | Operator-familiar `key = value` syntax; no quoting rules; comments with `#`/`;`; blank lines delimit rule blocks; already parsed by `BootstrapConfig` in a compatible form |
 | TOML | Richer types, but introduces array and inline-table syntax that adds cognitive load for non-developer operators |
 | YAML | Indentation-sensitive; whitespace errors produce silent misbehaviour; hostile to operators |
 | JSON | No comments; verbose; not human-authoring-friendly |
@@ -44,14 +44,12 @@ timezone configuration is supported or necessary — the server is always the re
 
 ### Sections
 
-A schedule file is a collection of sections. Section names are structurally required by the
-INI format to delimit one rule's keys from the next — the parser treats them as opaque.
-Operators may choose descriptive names for their own readability; the language assigns no
-meaning to them.
+A schedule file is a sequence of **rule blocks**, separated by blank lines. A rule block is
+a set of `key = value` lines. `#` and `;` serve as comment characters anywhere in the file.
 
-Every section must contain a `typ` key. The `typ` value determines which other keys are
-valid for that section. There is no distinction between "rule sections" and "special
-sections": exclusions are declared using `typ = ausschluss`, exactly like any other section.
+There are no named section headers — INI-style `[name]` syntax is not used. The `typ` key
+is the only structural discriminator. Operators use comments to label blocks for their own
+readability; the parser ignores them.
 
 ### Rule types (`typ`)
 
@@ -153,8 +151,7 @@ The first fire is at `start`. Subsequent fires are at `start + N × alle`. A com
 that falls after `ende` is dropped silently — the window is never overrun. `ende` itself is
 a permitted fire time if it aligns exactly.
 
-```ini
-[tagespoll]
+```
 typ   = intervall
 tage  = wochentage
 start = 08:00
@@ -167,8 +164,7 @@ alle  = 30m
 Fire at one or more explicit times on specified days. Each time value is an independent fire
 trigger. Order within the list is irrelevant.
 
-```ini
-[morgenverarbeitung]
+```
 typ  = fest
 tage = mo, mi, fr
 zeit = 06:00, 06:30
@@ -183,22 +179,19 @@ skipped entirely. No near-miss adjustment is performed. Silent date-shifting can
 wrong business semantics; operators who need a fallback define an `einmalig` section
 explicitly.
 
-```ini
-[monatsabschluss]
+```
 typ       = nth_wochentag
 wochentag = di
 nth       = 2
 periode   = monat
 zeit      = 09:00
 
-[quartalskick]
 typ       = nth_wochentag
 wochentag = mo
 nth       = 1
 periode   = quartal
 zeit      = 12:00
 
-[letzter-freitag]
 typ       = nth_wochentag
 wochentag = fr
 nth       = letzte
@@ -208,12 +201,11 @@ zeit      = 16:00
 
 ### `einmalig`
 
-Fire exactly once at a specified date and time. `TimeScheduler` marks the section as
+Fire exactly once at a specified date and time. `TimeScheduler` marks the rule as
 consumed after it fires. The entry remains in the file but is not re-evaluated on subsequent
 runs. Restarting the service does not re-fire it.
 
-```ini
-[jahreswechsel-sonderverarbeitung]
+```
 typ   = einmalig
 datum = 2026-12-26 10:00
 ```
@@ -225,11 +217,9 @@ Declares dates on which **no rule in this file may fire**. Exclusions always win
 
 The `daten` key accepts ISO dates (`YYYY-MM-DD`), inclusive date ranges
 (`YYYY-MM-DD..YYYY-MM-DD`), and comma-separated combinations of both. Multi-line
-continuation is permitted. Multiple `ausschluss` sections are allowed; their date sets are
-merged.
+continuation is permitted. Multiple `ausschluss` blocks are allowed; their date sets are merged.
 
-```ini
-[feiertage]
+```
 typ   = ausschluss
 daten = 2026-12-24, 2026-12-25,
         2026-12-27..2026-12-31
@@ -239,64 +229,57 @@ daten = 2026-12-24, 2026-12-25,
 
 ## Composition semantics
 
-Multiple sections in one file are **OR'd**: if any rule is satisfied at the current
+Multiple rule blocks in one file are **OR'd**: if any rule is satisfied at the current
 evaluation moment, the job is triggered. Exclusions are applied after rule evaluation and
 always win.
 
 **Evaluation order does not matter** — two rules firing at the same moment do not produce
 two launches. `TimeScheduler` emits one launch request per evaluation cycle per job,
-regardless of how many sections are simultaneously satisfied.
+regardless of how many blocks are simultaneously satisfied.
 
 ---
 
 ## Complete example
 
-```ini
-# ── Alle 30 Minuten während der Arbeitszeit, Mo–Fr ───────────────────────────
-[tagespoll]
+```
+# Alle 30 Minuten während der Arbeitszeit, Mo–Fr
 typ   = intervall
 tage  = wochentage
 start = 08:00
 ende  = 17:00
 alle  = 30m
 
-# ── Feste Zeiten an ausgewählten Tagen ───────────────────────────────────────
-[morgenverarbeitung]
+# Feste Zeiten an ausgewählten Tagen
 typ  = fest
 tage = mo, mi, fr
 zeit = 06:00, 06:30
 
-# ── 2. Dienstag im Monat ─────────────────────────────────────────────────────
-[monatsabschluss]
+# 2. Dienstag im Monat
 typ       = nth_wochentag
 wochentag = di
 nth       = 2
 periode   = monat
 zeit      = 09:00
 
-# ── 1. Montag im Quartal ─────────────────────────────────────────────────────
-[quartalskick]
+# 1. Montag im Quartal
 typ       = nth_wochentag
 wochentag = mo
 nth       = 1
 periode   = quartal
 zeit      = 12:00
 
-# ── Letzter Freitag im Monat ─────────────────────────────────────────────────
-[letzter-freitag]
+# Letzter Freitag im Monat
 typ       = nth_wochentag
 wochentag = fr
 nth       = letzte
 periode   = monat
 zeit      = 16:00
 
-# ── Einmalige Sonderausführung ───────────────────────────────────────────────
-[jahreswechsel]
+# Einmalige Sonderausführung
 typ   = einmalig
 datum = 2026-12-26 10:00
 
-# ── Ausschlüsse ──────────────────────────────────────────────────────────────
-[feiertage]
+# Ausschlüsse
 typ   = ausschluss
 daten = 2026-12-24, 2026-12-25,
         2026-12-27..2026-12-31
@@ -336,9 +319,9 @@ unambiguous and equally readable.
 
 ## Consequences
 
-- `TimeScheduler.exe` consumes this format. The parser must handle: INI section parsing,
-  the four rule types, the day expression syntax (abbreviations, ranges, lists, keywords),
-  duration suffixes, the `..` range operator in `daten` values, and `einmalig`
+- `TimeScheduler.exe` consumes this format. The parser must handle: blank-line-delimited
+  rule blocks, the four rule types, the day expression syntax (abbreviations, ranges, lists,
+  keywords), duration suffixes, the `..` range operator in `daten` values, and `einmalig`
   consumed-state tracking.
 - The file naming convention and storage location (per-job file vs. platform registry) are
   **not decided here**. That is a `TimeScheduler` implementation concern and will be
