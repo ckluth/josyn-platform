@@ -60,6 +60,7 @@ would pull `josyn-commons` out of its bottom-of-DAG position.
 | `JOSYN.Commons.Log` | `josyn-commons-log/` | Existing |
 | `JOSYN.Commons.Helpers` | `josyn-commons-helpers/` | Existing — `Turnstile` only |
 | `JOSYN.Commons.IdentityHelpers` | `josyn-commons-identity-helpers/` | Existing — `WindowsCredential`, `ImpersonatedProcess` |
+| `JOSYN.Commons.Schedule` | `josyn-commons-schedule/` | Existing — INI-based time-schedule parser, serializer, validator (ADR-026) |
 
 Each package follows the naming pattern:
 
@@ -90,11 +91,15 @@ License: MIT | Company: HAEVG AG | Target: net10.0
 - `JOSYN.Commons.Log` — process-local file logger; migrated from `JOSYN.Jap.Shared.Log` per ADR-008.
 - `JOSYN.Commons.Helpers` — `Turnstile`; introduced by ADR-019. `WindowsCredential` and `ImpersonatedProcess` were extracted into `JOSYN.Commons.IdentityHelpers`.
 - `JOSYN.Commons.IdentityHelpers` — `WindowsCredential` (validated UPN value type) and `ImpersonatedProcess` (Windows process launch under a domain account); extracted from `JOSYN.Commons.Helpers` after ADR-021/ADR-022.
+- `JOSYN.Commons.Schedule` — INI-based time-schedule parser (`ScheduleParser`), serializer (`ScheduleSerializer`), and semantic validator (`ScheduleValidator`); implements the schedule definition language from ADR-026. Consumed by `TimeScheduler.exe`. The package is generic (no session/job/IPC knowledge) and carries only the ability to read and write the schedule notation.
 
 ### Admission criteria (for any new package)
 Before any new package is added, verify it meets **all three** criteria:
 1. Reusable across ≥ 2 josyn repos.
-2. Carries no JOSYN domain knowledge — no sessions, no jobs, no IPC, no scheduling.
+2. Carries no JOSYN domain knowledge — no sessions, no jobs, no IPC, no platform-scheduling
+   logic. A library that parses or formats a generic notation (such as a time-schedule
+   format) is not "scheduling" in this sense; it has no awareness of how jobs are
+   orchestrated or executed.
 3. Could live in any C# project, not just JOSYN.
 
 A package that fails any criterion must stay in the consuming repo instead.

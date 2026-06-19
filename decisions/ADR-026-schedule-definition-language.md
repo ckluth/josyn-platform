@@ -54,7 +54,9 @@ label blocks for their own readability; the parser ignores them.
 |-------|---------|
 | `interval` | Repeat every N minutes or hours within a time window on specified days |
 | `fixed` | Fire at one or more specific times on specified days |
-| `nth_weekday` | Fire on the Nth (or last) occurrence of a named weekday within a calendar period |
+| `nth_weekday` | Fire on the Nth (or last, or last-N) occurrence of a named weekday within a calendar period |
+| `monthly_date` | Fire on a specific calendar day each month, with optional month filter |
+| `week_interval` | Fire on specified days at specified times, repeating every N weeks |
 | `once` | Fire exactly once at a specific date and time |
 | `exclude` | Declare dates on which no rule in this file may fire |
 
@@ -94,6 +96,26 @@ accepts. No other values are valid.
 | Comma list | `mon, wed, fri` | Explicit set |
 | Mix | `mon..wed, fri` | Range combined with individual day |
 
+### Month abbreviations (`months`)
+
+| Keyword | Month |
+|---------|-------|
+| `jan` | January |
+| `feb` | February |
+| `mar` | March |
+| `apr` | April |
+| `may` | May |
+| `jun` | June |
+| `jul` | July |
+| `aug` | August |
+| `sep` | September |
+| `oct` | October |
+| `nov` | November |
+| `dec` | December |
+
+The `months` key uses the same expression syntax as `days`: single abbreviation, inclusive range
+(`jan..jun`), comma list, or a mix. Default when omitted is all months.
+
 ### Period values (`period`)
 
 | Keyword | Meaning |
@@ -110,6 +132,8 @@ accepts. No other values are valid.
 |-------|---------|
 | `1` … `5` | First through fifth occurrence within the period |
 | `last` | Last occurrence of that weekday within the period (not the last calendar day) |
+| `last-1` | Second-to-last occurrence |
+| `last-2` | Third-to-last occurrence |
 
 ### Duration suffixes (`every`)
 
@@ -125,16 +149,22 @@ Compound forms (e.g. `1h30m`) are not accepted. Use the smallest unit: `90m`, no
 | Key | Used by | Description |
 |-----|---------|-------------|
 | `type` | all | Rule type — one of the values in the type table above |
-| `days` | `interval`, `fixed` | Day expression |
+| `days` | `interval`, `fixed`, `week_interval` | Day expression |
 | `start` | `interval` | Window open time — `HH:mm`, 24-hour |
 | `end` | `interval` | Window close time — `HH:mm`, 24-hour |
 | `every` | `interval` | Repetition interval — integer + duration suffix |
-| `time` | `fixed`, `nth_weekday` | One or more `HH:mm` values, comma-separated |
+| `every` | `week_interval` | Repetition interval — plain integer (whole weeks, no suffix) |
+| `anchor` | `week_interval` | ISO date (`YYYY-MM-DD`) that establishes the week-parity phase |
+| `time` | `fixed`, `nth_weekday`, `week_interval` | One or more `HH:mm` values, comma-separated |
 | `weekday` | `nth_weekday` | Single day abbreviation |
-| `nth` | `nth_weekday` | Ordinal value (`1`–`5` or `last`) |
+| `nth` | `nth_weekday` | Ordinal value (`1`–`5`, `last`, or `last-N`) |
 | `period` | `nth_weekday` | Period value |
+| `day` | `monthly_date` | Calendar day — integer `1`–`31`, `last`, or `last_business` |
+| `months` | `monthly_date` | Month expression — same syntax as `days`; default is all months |
 | `datetime` | `once` | Exact fire moment — `YYYY-MM-DD HH:mm` |
 | `dates` | `exclude` | Comma-separated ISO dates and/or date ranges |
+| `active_from` | any rule except `exclude` | Inclusive window start — `YYYY-MM-DD` (one-time) or `MM-DD` (annual) |
+| `active_until` | any rule except `exclude` | Inclusive window end — `YYYY-MM-DD` (one-time) or `MM-DD` (annual) |
 
 ---
 
@@ -169,7 +199,7 @@ time = 06:00, 06:30
 
 ### `nth_weekday`
 
-Fire on the Nth — or last — occurrence of a named weekday within a calendar period.
+Fire on the Nth — or last, or last-N — occurrence of a named weekday within a calendar period.
 
 **Exclusion collision:** if the computed date falls on an excluded date, that occurrence is
 skipped entirely. No near-miss adjustment is performed. Silent date-shifting can produce
@@ -193,13 +223,120 @@ weekday = fri
 nth     = last
 period  = month
 time    = 16:00
+
+# Second-to-last Friday of each month
+type    = nth_weekday
+weekday = fri
+nth     = last-1
+period  = month
+time    = 09:00
+```
+
+### `monthly_date`
+
+Fire on a specific calendar day each month. The `months` key restricts which months are
+active; when omitted, the rule fires every month.
+
+`day = last` fires on the last calendar day of the applicable months. `day = last_business`
+scans backward from the last calendar day, skipping weekends and any date covered by an
+`exclude` block in this file, and fires on the first valid day found. If no valid day exists
+in the month (e.g. the entire final week is excluded), that month is skipped silently.
+
+If `day` is a number that exceeds the length of a given month (e.g. `day = 31` in February),
+the rule fires on the last calendar day of that month.
+
+```
+# 15th of every month
+type = monthly_date
+day  = 15
+time = 08:00
+
+# Last calendar day of each month
+type = monthly_date
+day  = last
+time = 17:30
+
+# Last business day of each month
+type = monthly_date
+day  = last_business
+time = 17:00
+
+# Semi-annual — 1st of January and July
+type   = monthly_date
+day    = 1
+time   = 09:00
+months = jan, jul
+
+# Bi-monthly — 1st of every other month
+type   = monthly_date
+day    = 1
+time   = 09:00
+months = jan, mar, may, jul, sep, nov
+```
+
+### `week_interval`
+
+Fire on specified days at specified times, repeating every N weeks. The `anchor` key is a
+past ISO date that was a valid fire date (i.e. a day matching the `days` expression); it
+establishes the phase. The scheduler fires on weeks where
+`floor((today − anchor) / 7) mod every == 0` and the weekday matches.
+
+`every` is a plain integer (whole weeks). No duration suffix is used.
+
+```
+# Payroll run every other Friday
+type   = week_interval
+days   = fri
+time   = 08:00
+every  = 2
+anchor = 2026-01-02
+
+# Every 3 weeks on Monday and Thursday
+type   = week_interval
+days   = mon, thu
+time   = 10:00
+every  = 3
+anchor = 2026-01-05
+```
+
+### `active_from` / `active_until` (optional modifiers)
+
+Any rule block except `exclude` may carry these keys to restrict the date range during which
+the rule is active. Outside the declared window the rule is ignored entirely — it is not
+evaluated and does not contribute to launches.
+
+Two forms are accepted for each key:
+
+| Form | Example | Meaning |
+|------|---------|---------|
+| Full ISO date | `2026-04-01` | One-time boundary |
+| Month-day | `04-01` | Recurring annual boundary (same date every calendar year) |
+
+Both forms may be mixed on the same rule. An `MM-DD` `active_until` that is numerically
+earlier than `active_from` correctly wraps across the year boundary
+(e.g. `active_from = 11-01, active_until = 02-28` means November through February).
+
+```
+# Run every 30 min during business hours, but only in summer (annual, recurring)
+type         = interval
+days         = weekdays
+start        = 08:00
+end          = 17:00
+every        = 30m
+active_from  = 04-01
+active_until = 09-30
+
+# One-time seasonal window
+type         = fixed
+days         = daily
+time         = 06:00
+active_from  = 2026-11-01
+active_until = 2027-02-28
 ```
 
 ### `once`
 
-Fire exactly once at a specified date and time. `TimeScheduler` marks the rule as consumed
-after it fires. The entry remains in the file but is not re-evaluated on subsequent runs.
-Restarting the service does not re-fire it.
+Fire exactly once at a specified date and time.
 
 ```
 type     = once
@@ -245,6 +382,15 @@ start = 08:00
 end   = 17:00
 every = 30m
 
+# Same interval but only during summer months (annual window)
+type         = interval
+days         = weekdays
+start        = 06:00
+end          = 08:00
+every        = 30m
+active_from  = 04-01
+active_until = 09-30
+
 # Fixed times on selected days
 type = fixed
 days = mon, wed, fri
@@ -270,6 +416,36 @@ weekday = fri
 nth     = last
 period  = month
 time    = 16:00
+
+# Second-to-last Friday of each month
+type    = nth_weekday
+weekday = fri
+nth     = last-1
+period  = month
+time    = 09:00
+
+# 15th of every month
+type = monthly_date
+day  = 15
+time = 08:00
+
+# Last business day of each month
+type = monthly_date
+day  = last_business
+time = 17:00
+
+# Semi-annual — 1st of January and July
+type   = monthly_date
+day    = 1
+time   = 09:00
+months = jan, jul
+
+# Payroll run every other Friday
+type   = week_interval
+days   = fri
+time   = 08:00
+every  = 2
+anchor = 2026-01-02
 
 # One-off
 type     = once
@@ -311,14 +487,23 @@ the added surface area. Jobs that require rule-specific exclusions use separate 
 `1h30m` notation was considered and rejected. It requires a two-token parser. `90m` is
 unambiguous and equally readable.
 
+### Week-interval via duration suffix on `interval`
+
+A `w` suffix on `every` (e.g. `every = 2w`) inside the existing `interval` type was
+considered. Rejected: `interval` is inherently day-scoped — it owns `start` and `end`
+time-of-day window keys. Mixing day-level and week-level semantics inside one type obscures
+both. A separate `week_interval` type keeps each rule's contract self-contained.
+
 ---
 
 ## Consequences
 
 - `TimeScheduler.exe` consumes this format. The parser must handle: blank-line-delimited
-  rule blocks, the four rule types, the day expression syntax (abbreviations, ranges, lists,
-  keywords), duration suffixes, the `..` range operator in `dates` values, and `once`
-  consumed-state tracking.
+  rule blocks, the seven rule types, the day expression syntax (abbreviations, ranges, lists,
+  keywords), month expression syntax (same rules), duration suffixes, the `..` range operator
+  in `dates` values, `once` consumed-state tracking, `last_business` backward-scan logic,
+  week-parity arithmetic for `week_interval`, and `active_from`/`active_until` window
+  filtering on any rule.
 - The file naming convention and storage location (per-job file vs. platform registry) are
   **not decided here**. That is a `TimeScheduler` implementation concern and will be
   addressed when the orchestrator is built.

@@ -1637,6 +1637,20 @@
       "summary": "Documents WindowsCredential and ImpersonatedProcess — Windows identity utilities extracted from JOSYN.Commons.Helpers."
     },
     {
+      "name": "JOSYN.Commons.Schedule",
+      "repo": "josyn-commons",
+      "path": "josyn-commons-schedule/JOSYN.Commons.Schedule/README.md",
+      "folder-context": "josyn-commons-schedule",
+      "created": "2026-06-19T13:11:09+02:00",
+      "touched": "2026-06-19T13:11:09+02:00",
+      "type": "component-architecture",
+      "perspective": [
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Documents the INI-based time-schedule parser, serializer, and semantic validator; implements the schedule definition language from ADR-026."
+    },
+    {
       "name": "josyn-jap",
       "repo": "josyn-jap",
       "path": "README.md",
