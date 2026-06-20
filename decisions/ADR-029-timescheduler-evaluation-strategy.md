@@ -1,7 +1,7 @@
 # ADR-029 — TimeScheduler Evaluation Strategy: Tolerance Window and Fired-Slot Log
 
 **Date:** 2026-06-20
-**Status:** Draft
+**Status:** Accepted
 
 ---
 

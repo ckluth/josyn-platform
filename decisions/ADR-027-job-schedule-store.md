@@ -1,7 +1,7 @@
 # ADR-027 — JobSchedule Store: Scheduling Configuration for Registered Jobs
 
 **Date:** 2026-06-19
-**Status:** Draft
+**Status:** Accepted
 
 ---
 
@@ -225,12 +225,9 @@ without schema migrations.
    `(JobName, ArgumentRecordName, SlotTime)` where `SlotTime` equals the `once` rule's
    `FireAt` value deduplicates the rule across all ticks. No separate table or column needed.
 
-2. **Argument record definition** — `ArgumentRecordName` is an opaque string in this ADR.
-   The definition of what an argument record is, how it is stored in the database (extending
-   the job registry with 0-to-n named INI-payload rows per job), and how `TimeScheduler`
-   resolves a name to a payload is deferred to a separate ADR. That ADR is a prerequisite
-   for a fully operational `TimeScheduler`; this ADR can be implemented in parallel up to
-   the point of the actual session launch.
+2. **Argument record definition** ✅ **Closed by ADR-028.** `josyn.ArgumentRecords` table;
+   `IArgumentRecord` / `ArgumentRecord` in `JOSYN.Backend.JobRegistry`; `IJobRegistry.GetArgument()`
+   resolves a name to a payload at runtime.
 
 3. **Write operations** — this ADR defines only the read interface (`GetAll`). Adding,
    updating, and removing `JobSchedule` records (via a CLI tool or admin UI) requires a

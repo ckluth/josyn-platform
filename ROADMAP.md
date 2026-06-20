@@ -21,7 +21,7 @@ The platform is being built incrementally, with a working round-trip already in 
 |---|------|--------|
 | M1 | Foundation & core concepts | ✅ Done |
 | M2 | Working round-trip — first Contoso job on a deployed system | ✅ Done |
-| M3 | Scheduling — listener, ticker, time-based triggers | ⬜ Upcoming |
+| M3 | Scheduling — listener, ticker, time-based triggers | 🔄 In Progress |
 | M4 | Full job lifecycle — migration, workflow support | ⬜ Upcoming |
 | M5 | Production-ready platform | ⬜ Upcoming |
 
@@ -43,6 +43,11 @@ The platform is being built incrementally, with a working round-trip already in 
 - `josyn-contoso` — demo job in place; Contoso IdentityAdapter stub EXE replaces old ALC-based adapter
 - Working end-to-end round-trip: a Contoso job spawned, executed, and reported by a deployed system
 - Database in place
+- `JOSYN.Backend.Ticker` — periodic process launcher; invokes registered orchestrators at configured intervals (ADR-024)
+- `JOSYN.Commons.Schedule` — schedule definition language parser and evaluator; `ScheduleParser`, `ScheduleEvaluator`; all six rule types (ADR-026)
+- `JOSYN.Backend.JobScheduleStore` — `IJobScheduleStore`, `IJobScheduleEntryRecord`, `IFiredSlotStore`; `josyn.JobSchedules`, `josyn.JobScheduleEntries`, `josyn.FiredSlots` tables (ADR-027, ADR-029)
+- `JOSYN.Backend.JobRegistry` extended with `ArgumentRecords`; `IArgumentRecord`, `IJobRegistry.GetArgument()`; `josyn.ArgumentRecords` table (ADR-028)
+- `JOSYN.Backend.TimeScheduler` — full tolerance-window + fired-slot-log scheduling algorithm; at-most-once delivery (ADR-027, ADR-028, ADR-029)
 
 ---
 
@@ -56,9 +61,8 @@ The platform is being built incrementally, with a working round-trip already in 
 
 ## What's next
 
+- Complete M3: implement `JOSYN.Backend.Listener` (the remaining piece; then M3 is done)
 - Complete the solution architecture documentation
-- Implement listener and ticker
-- Time-based scheduling
 - Run AI enrichment pass on the documentation index
 
 ---

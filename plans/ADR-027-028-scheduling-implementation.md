@@ -90,41 +90,57 @@ Key decisions:
 
 ---
 
-## What is still missing / next steps
+---
 
-### 1. Implement ADR-029 evaluation strategy ← **natural continuation point**
+## What was done — continued (2026-06-20, session 2)
 
-The `ScheduleEvaluator` and `TimeScheduler` currently use the old exact-match approach.
-ADR-029 must now be implemented end-to-end:
+### ADR-029 implemented end-to-end ✅
 
 **a. Schema** (`josyn-backend/db/`)
-- Add `ToleranceMinutes INT NULL` to `josyn.JobScheduleEntries` in `bootstrap-local-dev.sql`
-- Add `josyn.FiredSlots` table to `bootstrap-local-dev.sql`
-- Update `schema.md` to reflect both changes
+- `bootstrap-local-dev.sql`: `[ToleranceMinutes] INT NULL` added to `josyn.JobScheduleEntries`;
+  new `josyn.FiredSlots` table (PK: `JobName + ArgumentRecordName + SlotTime`).
+- `schema.md`: `josyn.JobScheduleEntries` updated (column + ADR reference corrected);
+  new `josyn.FiredSlots` section added; FK map updated.
 
-**b. `JOSYN.Backend.JobScheduleStore`** (`josyn-backend/josyn-backend-job-schedule-store/`)
-- Add `ToleranceMinutes int?` to `IJobScheduleEntryRecord` and `JobScheduleEntryRecord`
-- Add `IFiredSlotStore` / `SqlFiredSlotStore`:
-  - `TryInsert(jobName, argumentRecordName, slotTime) → bool` — inserts if not exists; returns false if duplicate
-  - `Prune(cutoff) → void` — deletes rows where `SlotTime < cutoff`
-- Rebuild and repack
+**b. `JOSYN.Backend.JobScheduleStore`** — rebuilt and repacked ✅
+- `IJobScheduleEntryRecord` / `JobScheduleEntryRecord` / `JobScheduleEntryEntity` / `DbContext` mapping:
+  `int? ToleranceMinutes` added throughout.
+- `SqlJobScheduleStore.ToRecord()`: maps `ToleranceMinutes` from entity.
+- New `Db/FiredSlotEntity.cs` — EF entity for `josyn.FiredSlots`.
+- New `Db/FiredSlotStoreDbContext.cs` — dedicated EF context for the fired-slot log.
+- New `Contracts/IFiredSlotStore.cs` — `TryInsert(...) → Result<bool>`, `Prune(cutoff) → Result`.
+- New `SqlFiredSlotStore.cs` — uses `ExecuteSql` (FormattableString) with a `WHERE NOT EXISTS`
+  guard for at-most-once insertion; `Prune` deletes by `SlotTime < cutoff`.
 
-**c. `JOSYN.Backend.TimeScheduler`** (`josyn-backend/josyn-backend-time-scheduler/`)
-- Replace current `IsDue()` one-liner with the full ADR-029 algorithm:
-  - Resolve T for the entry
-  - Step backward from `now` in 1-minute increments through `[now − T, now]`
-  - Call `ScheduleEvaluator.IsDue()` per candidate until a hit is found → this is S
-  - Call `SqlFiredSlotStore.TryInsert(jobName, argName, S)`
-  - Launch only if `TryInsert` returns true
-- Add prune call at the top of each invocation
+**c. `JOSYN.Backend.TimeScheduler`** — builds clean, 0 warnings ✅
+- `IsDue()` stub removed; full ADR-029 algorithm in place:
+  - `TruncateToMinute(DateTime)` — `now` is always minute-precision.
+  - `PruneFiredSlots()` — called once per invocation before schedule processing.
+  - `ProcessEntry()` — `FindLatestSlot` → `TryInsert` → launch; returns 1/0/-1.
+  - `FindLatestSlot()` — step-backward loop through `[now − T, now]`.
+  - `DefaultToleranceMinutes = 1`.
+
+**d. `josyn-toolbox/deploy/deploy-maintainer.ps1`** ✅
+- Step 5b comment updated: ADR-029 added to reference list.
+
+**e. `josyn-toolbox/josyn-db-viewer/get-db-reports.ps1`** ✅
+- `$entryTable` query: `ToleranceMinutes` added to SELECT.
+- `$entryIndexByKey` index added (for FiredSlots → ScheduleEntry cross-links).
+- `$firedSlotTable` query added.
+- JobScheduleEntries overview + details: `ToleranceMinutes` column rendered.
+- New `fired-slots.md` report section: overview table + per-slot detail blocks with
+  cross-links to job-registry, argument-records, and job-schedule-entries.
+- README index: `josyn.FiredSlots` row added.
 
 ---
 
-### 2. `once`-rule consumed state — closed by ADR-029
+## What is still missing / next steps
 
-ADR-029 open question 3 resolves this: `josyn.FiredSlots` is already the consumed-state
-record for `once` rules. No separate table or ADR needed. Close ADR-027 open question when
-ADR-029 is accepted.
+### 1. ~~Implement ADR-029 evaluation strategy~~ ✅ Done (session 2)
+
+---
+
+### 2. ~~`once`-rule consumed state — closed by ADR-029~~ ✅ Already done (ADR-027 OQ1 updated in session 1)
 
 ---
 
@@ -152,3 +168,11 @@ CLI sub-command.
 Any developer who had the old `bootstrap-local-dev.sql` applied must drop and re-run it to
 pick up the `ToleranceMinutes` column and the `josyn.FiredSlots` table.
 PoC phase — drop-and-recreate is the agreed strategy.
+
+---
+
+### 6. ~~`josyn-toolbox/deploy` — update ADR reference comment~~ ✅ Done (session 2)
+
+---
+
+### 7. ~~`josyn-toolbox/josyn-db-viewer` — add FiredSlots, update Entries~~ ✅ Done (session 2)

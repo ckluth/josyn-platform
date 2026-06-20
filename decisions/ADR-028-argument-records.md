@@ -1,7 +1,7 @@
 # ADR-028 — ArgumentRecord: Named Argument Payloads in the Job Registry
 
 **Date:** 2026-06-19
-**Status:** Draft
+**Status:** Accepted
 **Extends:** ADR-007B-02 (JobRegistry)
 
 ---

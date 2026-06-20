@@ -28,6 +28,11 @@ Backend-specific architectural decisions are recorded in the consolidated
 | [ADR-020](../../decisions/ADR-020-company-adapter-model.md) | Company Adapter Model (Out-of-Process) |
 | [ADR-021](../../decisions/ADR-021-impersonated-process-launch.md) | Impersonated Process Launch for job.exe |
 | [ADR-022](../../decisions/ADR-022-interactive-job-launch.md) | Headless / Interactive Distinction for job.exe Launch |
+| [ADR-024](../../decisions/ADR-024-ticker.md) | The Ticker: Periodic Process Launcher |
+| [ADR-026](../../decisions/ADR-026-schedule-definition-language.md) | Schedule Definition Language |
+| [ADR-027](../../decisions/ADR-027-job-schedule-store.md) | JobSchedule Store |
+| [ADR-028](../../decisions/ADR-028-argument-records.md) | ArgumentRecord: Named Argument Payloads in the Job Registry |
+| [ADR-029](../../decisions/ADR-029-timescheduler-evaluation-strategy.md) | TimeScheduler Evaluation Strategy: Tolerance Window and Fired-Slot Log |
 
 ---
 
@@ -102,6 +107,9 @@ sandbox prototype per ADR-006B-01. (The sandbox is now called `josyn-playground`
 and `FileBootstrapConfig` (reads `josyn.bootstrap.ini`), per ADR-006B-02.
 `JOSYN.Backend.Contracts` is a Category A NuGet package; provides `SessionBrokerConstants`, `SessionLaunchRequest`, `SessionStartSpec`, `ExecutionStatus`, and `IJobSessionRecord` — the shared contracts consumed by `SessionLauncher` and `SessionBroker` (consolidates what was previously `SessionLauncherContract`, ADR-017B-01).
 `JOSYN.Backend.SessionLauncher` is a Category A NuGet package; provides `ISessionLauncher` / `SessionLauncher` — the orchestrator-side thin launcher (ADR-017B-01).
+`JOSYN.Backend.JobScheduleStore` is a Category A NuGet package; provides `IJobScheduleStore`, `IJobScheduleEntryRecord`, `IFiredSlotStore`, `SqlJobScheduleStore`, `SqlFiredSlotStore` — scheduling configuration and fired-slot deduplication log (ADR-027, ADR-029).
+`JOSYN.Backend.JobRegistry` extended with `ArgumentRecords`: `IArgumentRecord` / `ArgumentRecord`, `IJobRegistry.GetArgument()` — resolves named INI payloads for scheduled launches (ADR-028).
+`JOSYN.Backend.TimeScheduler` is a Ticker-target EXE; implements the full tolerance-window + fired-slot-log evaluation algorithm — at-most-once session launch per scheduled slot (ADR-027, ADR-028, ADR-029).
 
 ```
 josyn-backend/
@@ -161,9 +169,16 @@ josyn-backend/
 ├── josyn-backend-cli/                          ← Pattern B sub-folder (EXE)
 │   ├── JOSYN.Backend.CLI.slnx
 │   └── .local-build/
-├── josyn-backend-time-scheduler/               ← Pattern B sub-folder
+├── josyn-backend-time-scheduler/               ← Pattern B sub-folder (EXE)
 │   ├── JOSYN.Backend.TimeScheduler.slnx
 │   └── .local-build/
+├── josyn-backend-job-schedule-store/           ← Pattern B sub-folder
+│   ├── nuget.config
+│   ├── JOSYN.Backend.JobScheduleStore.slnx
+│   ├── .local-build/                           ← build + pack scripts
+│   └── JOSYN.Backend.JobScheduleStore/        ← IJobScheduleStore, IFiredSlotStore,
+│                                               │  SqlJobScheduleStore, SqlFiredSlotStore,
+│                                               │  Db/ (EF entities + DbContexts)
 └── josyn-backend-workflow-runner/              ← Pattern B sub-folder
     ├── WorkflowRunner.slnx
     └── .local-build/
@@ -177,15 +192,17 @@ When migrated, `josyn-backend` will contain the JOSYN-native replacements for al
 
 | Future component | Replaces | Notes |
 |------------------|----------|-------|
-| `JOSYN.Backend.TriggerAgent` | `JobSystem.TriggerAgent` | Polls for scheduled executions |
-| `JOSYN.Backend.Scheduling` | `JobSystem.Scheduling` | Time-scheduling logic |
+| `JOSYN.Backend.TriggerAgent` | `JobSystem.TriggerAgent` | Polls for scheduled executions — **superseded by `TimeScheduler` + `JobScheduleStore`** |
+| `JOSYN.Backend.Scheduling` | `JobSystem.Scheduling` | Time-scheduling logic — **superseded by `JOSYN.Commons.Schedule` (ADR-026) + `TimeScheduler` (ADR-029)** |
 | `JOSYN.Backend.SessionStore` ✅ | `JobSystem.Database` | **Done** — EF Core, SQL Server, `josyn` schema |
 | `JOSYN.Backend.BootstrapConfig` ✅ | *(new)* | **Done** — `IBootstrapConfig` contract + `FileBootstrapConfig` (file-based INI); provides runtime connection strings and paths (ADR-006B-02) |
 | `JOSYN.Backend.SessionStarter` ❌ | `JobSystem.SessionStarter` | **Removed** — replaced by `JOSYN.Backend.Contracts` + `SessionLauncher` (ADR-017B-01) |
 | `JOSYN.Backend.Contracts` ✅ | *(new)* | **Done** — `SessionBrokerConstants`, `SessionLaunchRequest`, `SessionStartSpec`, `ExecutionStatus`, `IJobSessionRecord`; shared contracts for `SessionLauncher` and `SessionBroker` (ADR-017B-01) |
 | `JOSYN.Backend.SessionLauncher` ✅ | `JobSystem.SessionStarter` | **Done** — `ISessionLauncher`; validates job, resolves `TechnicalUserName`, serializes to temp file, spawns `SessionBroker.exe JOSYN-START @<path>` (ADR-017B-01) |
-| `JOSYN.Backend.JobRegistry` ✅ | *(replaces implicit company config DB entries)* | **Done** — `IJobRegistry`; `josyn.JobRegistrations` table; per ADR-007B-02 |
+| `JOSYN.Backend.JobRegistry` ✅ | *(replaces implicit company config DB entries)* | **Done** — `IJobRegistry`; `josyn.JobRegistrations` table; extended with `ArgumentRecords` (ADR-028); per ADR-007B-02 |
 | `JOSYN.Backend.ErrorHandler` ✅ | *(new)* | **Done** — `IErrorHandler`, `SqlErrorHandler`, `josyn.ErrorStore`; per ADR-011B-01 |
+| `JOSYN.Backend.JobScheduleStore` ✅ | *(new)* | **Done** — `IJobScheduleStore`, `IFiredSlotStore`; `josyn.JobSchedules`, `josyn.JobScheduleEntries`, `josyn.FiredSlots`; per ADR-027, ADR-029 |
+| `JOSYN.Backend.TimeScheduler` ✅ | `JobSystem.TriggerAgent` | **Done** — Ticker-target EXE; tolerance-window + fired-slot-log algorithm; at-most-once delivery; per ADR-027, ADR-028, ADR-029 |
 | `JOSYN.Backend.JobRepository` | `JobSystem.JobRepository` | Resolves job.exe path from job name |
 | `JOSYN.Backend.Service` | `JobSystem.Service` | Windows service host |
 | `JOSYN.Backend.WorkflowAdapter` | `JobSystem.WorkflowAdapter` | Workflow integration |
@@ -241,8 +258,8 @@ josyn-backend-bootstrap-config\.local-build\build.cmd ← builds BootstrapConfig
 josyn-backend-job-registry\.local-build\build.cmd    ← builds JobRegistry only
 ```
 
-`pack.cmd` at the repo root packs `Contracts`, `SessionStore`, `ConfigStore`, `BootstrapConfig`, `JobRegistry`, `SessionLauncher`, and `ErrorHandler` to the shared `local-packages/` feed (sibling directory to this repo).
-`Ticker`, `Listener`, `CLI`, and the EXE-only subfolders are not packed.
+`pack.cmd` at the repo root packs `Contracts`, `SessionStore`, `ConfigStore`, `BootstrapConfig`, `JobRegistry`, `SessionLauncher`, `ErrorHandler`, and `JobScheduleStore` to the shared `local-packages/` feed (sibling directory to this repo).
+`Ticker`, `Listener`, `CLI`, `TimeScheduler`, and the other EXE-only subfolders are not packed.
 
 License: MIT | Company: HAEVG AG | Target: net10.0
 
@@ -254,6 +271,8 @@ License: MIT | Company: HAEVG AG | Target: net10.0
 
 - No test project for `JOSYN.Backend.SessionStore` — known gap, not a violation.
 - No test project for `JOSYN.Backend.GlobalConfig` (`BootstrapConfig`) — known gap, not a violation.
+- No test project for `JOSYN.Backend.JobScheduleStore` — known gap, not a violation.
+- No test project for `JOSYN.Backend.TimeScheduler` — known gap, not a violation. The evaluation logic it exercises (`ScheduleEvaluator`) is covered by `JOSYN.Commons.Schedule.Test`.
 - `HardcodedGlobalConfig` uses compile-time developer-machine constants — superseded by `FileBootstrapConfig`; no longer present.
 - `SessionStarter` has been removed — no orphaned-row concern applies (ADR-017B-01).
 - The planned components (`TriggerAgent`, `Scheduling`, etc.) do not exist yet — expected.
