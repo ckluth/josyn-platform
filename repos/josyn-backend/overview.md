@@ -162,7 +162,7 @@ josyn-backend/
 │   ├── JOSYN.Backend.CLI.slnx
 │   └── .local-build/
 ├── josyn-backend-time-scheduler/               ← Pattern B sub-folder
-│   ├── TimeScheduler.slnx
+│   ├── JOSYN.Backend.TimeScheduler.slnx
 │   └── .local-build/
 └── josyn-backend-workflow-runner/              ← Pattern B sub-folder
     ├── WorkflowRunner.slnx

@@ -68,6 +68,8 @@ The platform is being built incrementally, with a working round-trip already in 
 - Workflow support (multi-step jobs)
 - Migration path from old jobs to the new platform
 - Many `josyn-job-host` features beyond arguments/result basics
+- Schema versioning and migration strategy (Flyway, DbUp, or equivalent) —
+  define when the first shared persistent environment is established
 
 ---
 
