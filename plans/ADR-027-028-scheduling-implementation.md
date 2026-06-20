@@ -59,49 +59,72 @@ inline JSONC in `josyn.JobScheduleEntries`, not a file on disk.
 
 ---
 
-## What is still missing / deferred
+## What was done — continued (2026-06-20)
 
-### 1. `ScheduleEvaluator` — the `IsDue()` implementation ← **natural continuation point**
+### `ScheduleEvaluator` — implemented ✅
 
-The most important remaining piece. Lives in `JOSYN.Commons.Schedule`.
+`JOSYN.Commons.Schedule` — two new files:
+- `Evaluation/ScheduleEvaluator.cs` — entry point `bool IsDue(ScheduleDefinition, DateTime)`,
+  exclusion collection, active-window check (including ADR-026 annual year-boundary wrap)
+- `Evaluation/ScheduleEvaluator.Rules.cs` — all six rule evaluators: `fixed`, `interval`,
+  `monthly_date` (numeric / last / last_business), `nth_weekday` (month / quarter / year;
+  numeric / last / last-N ordinals), `week_interval`, `once`
 
-Needs to evaluate `DateTime.Now` against a parsed `ScheduleDefinition` and return `true`
-if any rule is currently satisfied (and no `exclude` rule blocks it).
+`JOSYN.Commons.Schedule.Test` — `ScheduleEvaluatorTests.cs`: 40 new tests.
+All 140 tests in the suite pass. Package repacked to local feed.
 
-Must handle all 7 rule types:
+`JOSYN.Backend.TimeScheduler` — `IsDue()` stub replaced: parse `entry.ScheduleDefinition`
+via `ScheduleParser.Parse()`, then call `ScheduleEvaluator.IsDue()`. Builds clean.
 
-| Rule type | Key complexity |
-|-----------|----------------|
-| `interval` | Sliding window: `start + N × every` within `[start, end]`, correct day match |
-| `fixed` | Exact `HH:mm` match on correct day |
-| `nth_weekday` | Nth occurrence of weekday in month/quarter/year; `"last"` / `"last-N"` variants |
-| `monthly_date` | Calendar day; `"last"` and `"last_business"` (scan backward, skip weekends + excludes) |
-| `week_interval` | Phase-relative: `floor((today − anchor) / 7) mod everyWeeks == 0` |
-| `once` | Exact `YYYY-MM-DD HH:mm` match; consumed-state persistence TBD |
-| `exclude` | Blocklist applied after all other rules; always wins |
+### ADR-029 — authored ✅
 
-Plus `activeFrom` / `activeUntil` window modifiers on every bounded rule.
+`decisions/ADR-029-timescheduler-evaluation-strategy.md` (Draft).
 
-**Suggested approach:** a new `ScheduleEvaluator` static class in `JOSYN.Commons.Schedule`,
-with a single entry point `bool IsDue(ScheduleDefinition definition, DateTime now)`.
-`TimeScheduler.IsDue()` stub becomes a one-liner calling it.
-
-**ADR needed?** Probably not — it is a pure implementation of ADR-026 semantics.
-A plan file (like this one) is sufficient.
+Supersedes the exact-minute-match approach with a tolerance window + fired-slot log strategy.
+Key decisions:
+- **T** (tolerance, per `JobScheduleEntry`, nullable — default 1 minute)
+- **Fired-slot log** (`josyn.FiredSlots`) deduplicates across ticks; PK = `(JobName, ArgumentRecordName, SlotTime)`
+- **Latest-candidate-only** simplification: step backward from `now`, fire the first hit in `[now − T, now]`
+- **At-most-once** semantics: log entry written before launch; failed launch is not retried within T
+- **Constraint**: T must be < shortest `every` period of any `interval` rule in the same entry
 
 ---
 
-### 2. `once`-rule consumed state
+## What is still missing / next steps
 
-Where is the "fired" flag persisted for a `once` rule? ADR-026 and ADR-027 both defer this.
+### 1. Implement ADR-029 evaluation strategy ← **natural continuation point**
 
-Options:
-- A sidecar table `josyn.OnceRuleFired (JobName, ArgumentRecordName, OnceDatetime)`
-- A `ConsumedAt` column on `josyn.JobScheduleEntries` (nullable — only used by `once` entries)
-- Written back into the `ScheduleDefinition` JSONC (mutating stored content — not clean)
+The `ScheduleEvaluator` and `TimeScheduler` currently use the old exact-match approach.
+ADR-029 must now be implemented end-to-end:
 
-**Recommendation when revisited:** sidecar table. Clean separation, no schema mutation,
-queryable. Decide in a new ADR-027B-01.
+**a. Schema** (`josyn-backend/db/`)
+- Add `ToleranceMinutes INT NULL` to `josyn.JobScheduleEntries` in `bootstrap-local-dev.sql`
+- Add `josyn.FiredSlots` table to `bootstrap-local-dev.sql`
+- Update `schema.md` to reflect both changes
+
+**b. `JOSYN.Backend.JobScheduleStore`** (`josyn-backend/josyn-backend-job-schedule-store/`)
+- Add `ToleranceMinutes int?` to `IJobScheduleEntryRecord` and `JobScheduleEntryRecord`
+- Add `IFiredSlotStore` / `SqlFiredSlotStore`:
+  - `TryInsert(jobName, argumentRecordName, slotTime) → bool` — inserts if not exists; returns false if duplicate
+  - `Prune(cutoff) → void` — deletes rows where `SlotTime < cutoff`
+- Rebuild and repack
+
+**c. `JOSYN.Backend.TimeScheduler`** (`josyn-backend/josyn-backend-time-scheduler/`)
+- Replace current `IsDue()` one-liner with the full ADR-029 algorithm:
+  - Resolve T for the entry
+  - Step backward from `now` in 1-minute increments through `[now − T, now]`
+  - Call `ScheduleEvaluator.IsDue()` per candidate until a hit is found → this is S
+  - Call `SqlFiredSlotStore.TryInsert(jobName, argName, S)`
+  - Launch only if `TryInsert` returns true
+- Add prune call at the top of each invocation
+
+---
+
+### 2. `once`-rule consumed state — closed by ADR-029
+
+ADR-029 open question 3 resolves this: `josyn.FiredSlots` is already the consumed-state
+record for `once` rules. No separate table or ADR needed. Close ADR-027 open question when
+ADR-029 is accepted.
 
 ---
 
@@ -127,23 +150,5 @@ CLI sub-command.
 ### 5. DB — re-bootstrap required
 
 Any developer who had the old `bootstrap-local-dev.sql` applied must drop and re-run it to
-get the three new tables. PoC phase — drop-and-recreate is the agreed strategy.
-
----
-
-## Natural continuation point
-
-**Start with the `ScheduleEvaluator`** in `JOSYN.Commons.Schedule`.
-
-Order of implementation within the evaluator:
-1. `activeFrom` / `activeUntil` window check (shared by all bounded rules)
-2. `exclude` rule — build the date blocklist first (needed by `last_business`)
-3. `fixed` — simplest rule, good starting point
-4. `interval`
-5. `monthly_date` (including `last_business`)
-6. `nth_weekday`
-7. `week_interval`
-8. `once` (defer consumed-state; fire every tick until consumed-state is implemented)
-
-Once the evaluator exists, replace the `IsDue()` stub in `TimeScheduler` with the real call.
-At that point, the end-to-end time-based session launch is complete.
+pick up the `ToleranceMinutes` column and the `josyn.FiredSlots` table.
+PoC phase — drop-and-recreate is the agreed strategy.

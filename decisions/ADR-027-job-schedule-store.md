@@ -220,10 +220,10 @@ without schema migrations.
 
 ## Open questions
 
-1. **`once`-rule consumed state** — ADR-026 deferred where the "consumed" flag for a `once`
-   rule is persisted. This ADR does not resolve it. One option: a sidecar column or separate
-   table keyed by `(JobName, ArgumentRecordName, OnceRuleDatetime)`. Deferred to
-   `TimeScheduler` implementation.
+1. **`once`-rule consumed state** ✅ **Closed by ADR-029.** `josyn.FiredSlots`
+   (introduced in ADR-029) serves as the consumed-state record. The PK
+   `(JobName, ArgumentRecordName, SlotTime)` where `SlotTime` equals the `once` rule's
+   `FireAt` value deduplicates the rule across all ticks. No separate table or column needed.
 
 2. **Argument record definition** — `ArgumentRecordName` is an opaque string in this ADR.
    The definition of what an argument record is, how it is stored in the database (extending
