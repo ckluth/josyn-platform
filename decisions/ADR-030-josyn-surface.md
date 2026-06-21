@@ -1,13 +1,14 @@
 # ADR-030 — josyn-surface: The Human Window into a Headless Platform
 
 **Date:** 2026-06-20
-**Status:** Proposed
+**Status:** Accepted (2026-06-21)
 
-> This ADR is in **proposal state**. It captures a shared vision, a role and use-case
-> catalogue, an agreed set of high-level directional decisions, and the open questions that
-> remain. It is deliberately coarse: it fixes *direction*, not *design*. Nothing here is
-> implemented, and several load-bearing questions (see § Open Questions) are still open.
-> The name `josyn-surface` is provisional — a working title until a better one is chosen.
+> Accepted 2026-06-21 after maintainer review, together with its delivery-strategy follow-up
+> ADR-031. This ADR captures a shared vision, a role and use-case catalogue, an agreed set of
+> high-level directional decisions, and the open questions that remain. It is deliberately
+> coarse: it fixes *direction*, not *design*. The one remaining open loop is the *name* of the
+> cross-machine layer; `josyn-surface` itself is provisional — a working title until a better
+> one is chosen.
 
 ---
 
@@ -372,13 +373,14 @@ the agent to the Listener's presence and liveness.
 
 ## Status & Next Steps
 
-This ADR is **Proposed**. Acceptance requires maintainer review. All six sub-questions raised
-during analysis are now resolved: **SQ-1** (agent *is* the API), **SQ-2** (distinct sibling,
+This ADR is **Accepted** (2026-06-21, maintainer review). All six sub-questions raised
+during analysis are resolved: **SQ-1** (agent *is* the API), **SQ-2** (distinct sibling,
 platform-resident), **SQ-3** (aggregator-side config file → store), **SQ-4** (HTTPS/REST, distinct
 from JIP), **SQ-5** (shell is an idiomatic-web exception zone; backbone holds the line), **SQ-6**
 (agent calls `SessionLauncher` directly). The one remaining item is the **name** for the
 cross-machine layer (a placeholder until chosen) — a naming task, not an open architectural
-question. The proposal is ready for maintainer review and, on acceptance, promotion to *Accepted*.
+question. Delivery method is settled by the follow-up **ADR-031**; implementation begins with its
+scoped MVP-1.
 
 ---
 
@@ -430,5 +432,5 @@ config file**. The Listener stays a thin orchestrator and is *not* the agent.
 4. Update **`ROADMAP.md`**, **`docs/docs-index.json`**, and **`repos/josyn-backend/overview.md`**
    (the new agent EXE) — currently untouched, correct while this is a proposal.
 
-**Promotion.** When the maintainer accepts, flip `Status: Proposed` → `Accepted` and proceed with
-the work list above. Until then, no files outside this ADR have been changed.
+**Promotion.** Accepted 2026-06-21 (with ADR-031). Implementation proceeds via ADR-031's scoped
+MVP-1; the work list above is the broader backlog beyond that first increment.

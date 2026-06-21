@@ -24,6 +24,7 @@ The platform is being built incrementally, with a working round-trip already in 
 | M3 | Scheduling — listener, ticker, time-based triggers | 🔄 In Progress |
 | M4 | Full job lifecycle — migration, workflow support | ⬜ Upcoming |
 | M5 | Production-ready platform | ⬜ Upcoming |
+| M6 | josyn-surface — human window onto the headless platform (ADR-030/031) | 🔄 Starting (MVP-1) |
 
 ---
 
@@ -56,6 +57,10 @@ The platform is being built incrementally, with a working round-trip already in 
 - Backend CLI — first implementation done, must evolve
 - Solution architecture documentation — large sections are still placeholders
 - Documentation index tooling (`docs-index-builder`, AI enrichment pass pending)
+- `josyn-surface` (M6) — ADR-030 (vision/direction) and ADR-031 (delivery strategy) accepted
+  2026-06-21. Starting MVP-1: a read-only reporting precursor — local CLI + `ISurfaceAgent` seam
+  + throwaway `FakeAgent` over the DEV DB, replacing the `get-session-report` / `get-error-report`
+  capabilities. New sibling repo `josyn-surface` (Pattern A).
 
 ---
 
@@ -64,6 +69,9 @@ The platform is being built incrementally, with a working round-trip already in 
 - Complete M3: implement `JOSYN.Backend.Listener` (the remaining piece; then M3 is done)
 - Complete the solution architecture documentation
 - Run AI enrichment pass on the documentation index
+- `josyn-surface` MVP-1 → MVP-2: first command (`RetriggerSession`), gated on a minimal
+  platform-resident agent EXE in `josyn-backend` (ADR-031 DS-5); then REST transport
+  (`HttpAgent`) replacing `FakeAgent`.
 
 ---
 
