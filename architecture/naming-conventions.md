@@ -7,6 +7,9 @@
 | **Platform** | The entire JOSYN ecosystem | Umbrella term — all repos, all layers |
 | **Backend** | The scheduler and session-orchestration layer | `josyn-backend` repo, `JOSYN.Backend.*` namespace |
 | **JAP** | The JAP protocol contracts layer — defines the session protocol shared between the two worlds | `josyn-jap` repo, `JOSYN.Jap.*` namespace |
+| **JRP** | The JRP protocol contracts layer — the **cross-machine** (Remote) HTTPS/REST protocol; distinct from JIP (Interprocess, machine-bound) (ADR-033) | `josyn-jrp` repo, `JOSYN.Jrp.*` namespace (`Launch`, `Surface`) |
+| **Gateway** | The platform-resident, per-machine EXE that hosts JRP, reads local stores, and owns `start-session` (ADR-032/033) | `josyn-backend` repo, `JOSYN.Backend.Gateway` |
+| **Surface** | The **optional**, human-facing edge **clients** (CLI, web, session client) — the consumer side of JRP (ADR-030/033) | `josyn-surface` repo, `JOSYN.Surface.*` namespace |
 | **Session Broker** | The per-session boundary EXE — brokers between the backend world and the job developer's world | `josyn-session-broker` repo, `JOSYN.SessionBroker` namespace |
 | **Foundation** | Cross-cutting infrastructure primitives | `josyn-foundation` repo, `JOSYN.Foundation.*` namespace |
 | **Job Host** | The job execution runtime | `josyn-job-host` repo, `JOSYN.JobHost` namespace |
@@ -24,11 +27,13 @@
 ```
 josyn-foundation        ← infrastructure primitives
 josyn-jap               ← JAP protocol contracts (contracts-only; no EXE)
+josyn-jrp               ← JRP protocol contracts (cross-machine; contracts-only; no EXE) (ADR-033)
 josyn-job-host          ← job execution runtime  
 josyn-session-broker    ← per-session boundary EXE (brokers between the two worlds)
 josyn-backend           ← scheduler and session-orchestration layer; NuGet library packages
 josyn-commons           ← generic utility helpers — domain-agnostic, open for growth
 josyn-adapter-contracts ← JIP protocol contracts for company adapter EXEs (ADR-023)
+josyn-surface           ← optional human-facing edge clients (CLI/web/session) (ADR-030/033)
 josyn-platform          ← this repo; architecture + decisions + docs
 ```
 
@@ -55,6 +60,9 @@ JOSYN
 │       └── Jip                    ← JIP convention layer
 ├── Jap                            ← josyn-jap (contracts only — no EXE)
 │   └── Contract                   ← IJosynApplicationProtocol, ErrorReport
+├── Jrp                            ← josyn-jrp (contracts only — no EXE) (ADR-033)
+│   ├── Launch                     ← start-session request/response (core, stable)
+│   └── Surface                    ← read queries + control commands (churning)
 ├── Adapter                        ← josyn-adapter-contracts (ADR-023)
 │   ├── ConfigurationAdapter
 │   │   └── Contract               ← IConfigurationAdapter
@@ -64,7 +72,8 @@ JOSYN
 ├── JobHost                        ← josyn-job-host (two-segment — consumer-facing API, see ADR-001)
 │   └── Attributes                 ← [JobEntryPoint], [BeforeJobEntryPoint], etc.
 ├── Backend                        ← josyn-backend
-│   └── SessionStarter             ← session lifecycle rendezvous (stub)
+│   ├── SessionStarter             ← session lifecycle rendezvous (stub)
+│   └── Gateway                    ← per-machine JRP host; owns start-session (ADR-032/033)
 └── Commons                        ← josyn-commons (utility satellite — never referenced by Foundation)
     └── ...                        ← packages added as helpers accumulate
 ```
@@ -84,6 +93,7 @@ Assembly names match their namespace root exactly:
 | `JOSYN.Foundation.PropertyBag` | `JOSYN.Foundation.PropertyBag` | josyn-foundation |
 | `JOSYN.Foundation.JIP` | `JOSYN.Foundation.JIP` / `JOSYN.Foundation.JIP.Jip` | josyn-foundation |
 | `JOSYN.Jap.Contract` | `JOSYN.Jap.Contract` | josyn-jap |
+| `JOSYN.Jrp.Launch` / `JOSYN.Jrp.Surface` | `JOSYN.Jrp.*` | josyn-jrp (ADR-033) |
 | `JOSYN.SessionBroker` | `JOSYN.SessionBroker` | josyn-session-broker (ADR-025) |
 | `JOSYN.JobHost` | `JOSYN.JobHost` | josyn-job-host |
 | `JOSYN.Backend.SessionStarter` | `JOSYN.Backend.SessionStarter` | josyn-backend |

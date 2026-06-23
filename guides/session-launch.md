@@ -22,8 +22,8 @@ is `JAPServer`'s concern.
 flowchart TD
     subgraph Orchestrators["Orchestrators (thin launchers)"]
         CLI["CLI\nrun-job DemoJob args.ini"]
-        REST["REST listener\n(future)"]
-        TimeSched["TimeScheduler\n(future)"]
+        SurfaceAgent["Surface Agent\nstart-session verb (ADR-032)"]
+        TimeSched["TimeScheduler"]
         WfRunner["WorkflowRunner\n(future)"]
     end
 
@@ -47,7 +47,7 @@ flowchart TD
     end
 
     CLI -->|SessionStartRequest| L1
-    REST -->|SessionStartRequest| L1
+    SurfaceAgent -->|SessionStartRequest| L1
     TimeSched -->|SessionStartRequest| L1
     WfRunner -->|SessionStartRequest| L1
     L1 --> L2 --> L3 --> L4 --> L5
@@ -103,7 +103,7 @@ The rule: `SessionStartRequest.Arguments` is **always base64-encoded**.
 This is a transport-boundary concern only. It is invisible to `job.exe` and to anything
 reading the `SessionStore` database directly.
 
-The same rule applies to future orchestrators: a REST listener will receive arguments as
-a base64 string in its JSON body — it populates `Arguments` directly, without re-encoding.
-The contract is uniform across all orchestrators regardless of how they received the
-arguments.
+The same rule applies to future orchestrators: the surface agent's `start-session` verb
+(ADR-032) receives arguments as a base64 string in its JSON body — it populates `Arguments`
+directly, without re-encoding. The contract is uniform across all orchestrators regardless of
+how they received the arguments.

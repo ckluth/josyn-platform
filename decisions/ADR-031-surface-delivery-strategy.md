@@ -3,6 +3,14 @@
 **Date:** 2026-06-21
 **Status:** Accepted (2026-06-21)
 
+> **Correction (ADR-033, 2026-06-23):** The "intended durable" Query/Command records this ADR
+> places in `JOSYN.Surface.Contracts` relocate to the new contracts-only repo **`josyn-jrp`**
+> (`JOSYN.Jrp.Launch` + `JOSYN.Jrp.Surface`); the DS-2 seam invariants now belong to **JRP**. The
+> "minimal real platform-resident agent" of DS-5 is named **`JOSYN.Backend.Gateway`** (platform,
+> mandatory). The **client-side** seam `ISurfaceAgent` and its `FakeAgent`/`HttpAgent` transports
+> stay in `josyn-surface`; the future `HttpAgent` is simply a **JRP client** to the Gateway. The
+> DS-4 dev-DB exception is unchanged and still temporary. No behaviour changes. See ADR-033.
+
 > This ADR is a **follow-up to ADR-030** ("josyn-surface: The Human Window into a Headless
 > Platform"). ADR-030 fixed *direction* — what the surface is for, who it serves, and twenty
 > directional decisions. It deliberately left *how to build it* open. This ADR fills exactly that

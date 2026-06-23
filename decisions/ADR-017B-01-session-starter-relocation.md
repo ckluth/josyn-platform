@@ -1,3 +1,7 @@
+> **Correction (ADR-032, 2026-06-23):** `listener` is removed from the platform's planned
+> orchestrator set. No standalone `JOSYN.Backend.Listener` EXE is built. Network-initiated
+> session launch is a verb on the surface agent's REST API. See ADR-032.
+
 # ADR-017B-01 — Session-Starter Relocation into JAPServer
 
 **Date:** 2026-06-12
@@ -21,7 +25,7 @@ An orchestrator calls `ISessionStarter.StartSession(jobTypeName, arguments)`, wh
 3. Persists a session record to `SessionStore`.
 4. Spawns `JAPServer.exe JOSYN-IPC <guid>`.
 
-Four orchestrator executables are planned: `listener`, `ticker`, `cli`, and `workflow-runner`.
+Three orchestrator executables are planned: `ticker`, `cli`, and `workflow-runner`.
 Under the current model each of them would consume `SessionStarter`, making every orchestrator
 responsible for session persistence, concurrency control, and process spawning — concerns
 that have nothing to do with *when* or *why* a job starts.
@@ -152,10 +156,9 @@ a single-line value that INI handles correctly.
 is a deliberate limitation. Base64 at the transport boundary is the explicit contract.
 
 **Consistency across orchestrators:**
-REST-based orchestrators (e.g. the planned `listener`) will naturally receive arguments as
-a base64 string in their JSON request body — the REST transport convention. Having
-`Arguments` always be base64 means every orchestrator encodes the same way, regardless of
-how it received the arguments.
+The surface agent's `start-session` verb (ADR-032) will receive arguments as a base64 string
+in its JSON request body — the REST transport convention. Having `Arguments` always be base64
+means every orchestrator encodes the same way, regardless of how it received the arguments.
 
 **Encoding boundary:**
 - **Orchestrators encode** before populating `SessionStartRequest.Arguments`.
@@ -242,7 +245,7 @@ the old package is removed.
 
 - Orchestrators have no session-lifecycle code. Each is reduced to: construct a
   `SessionStartRequest`, serialise it, and spawn `JAPServer.exe JOSYN-START <payload>`.
-- All four planned orchestrators (`listener`, `ticker`, `cli`, `workflow-runner`) share
+- All three planned orchestrators (`ticker`, `cli`, `workflow-runner`) share
   an identical spawning contract — there is nothing orchestrator-specific in the
   session-start path.
 - `JOSYN.Jap.JAPServer` acquires a new dependency (`JOSYN.Commons.Helpers`) and grows

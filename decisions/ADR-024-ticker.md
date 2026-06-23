@@ -1,3 +1,7 @@
+> **Correction (ADR-032, 2026-06-23):** `Listener` is removed from the platform's orchestrator
+> set. No standalone `JOSYN.Backend.Listener` EXE is built. Network-initiated session launch
+> (`start-session`) is a verb on the surface agent's REST API (ADR-030 D-16/D-19). See ADR-032.
+
 # ADR-024 — The Ticker: Periodic Process Launcher
 
 **Date:** 2026-06-18
@@ -11,7 +15,7 @@
 covers two distinct responsibilities that, until now, were not separated clearly:
 
 1. **Session orchestration** — deciding to start a job session and handing it off to
-   `SessionLauncher`. This is the role of *orchestrators* (ADR-017B-01): `CLI`, `Listener`,
+   `SessionLauncher`. This is the role of *orchestrators* (ADR-017B-01): `CLI`,
    and the as-yet-unbuilt time-based and workflow-based launchers.
 
 2. **Periodic invocation** — waking up on a timer and deciding *which orchestrators to run*.
@@ -47,7 +51,7 @@ The Ticker does neither.
 
 | Term | Definition |
 |---|---|
-| **Orchestrator** | Thin session launcher — constructs `SessionStartRequest`, calls `SessionLauncher`. Examples: `CLI`, `Listener`, `TimeScheduler`, `WorkflowRunner`. |
+| **Orchestrator** | Thin session launcher — constructs `SessionStartRequest`, calls `SessionLauncher`. Examples: `CLI`, `TimeScheduler`, `WorkflowRunner`. |
 | **Ticker** | Periodic process launcher — fires orchestrators on a configurable timer schedule. Has no session knowledge, no `SessionLauncher` reference, no job knowledge. |
 
 `TimeScheduler.exe` and `WorkflowRunner.exe` are **orchestrators**, not sub-orchestrators.
@@ -175,8 +179,6 @@ $BackendRoot\
             WorkflowRunner.exe
         CLI\
             JOSYN.Backend.CLI.exe
-        Listener\
-            JOSYN.Backend.Listener.exe (future)
     JAPServer\
         JOSYN.Jap.JAPServer.exe
     Adapters\

@@ -1,3 +1,18 @@
+> **Correction (ADR-032, 2026-06-23):** Several references in this ADR to "the Listener stays
+> a thin orchestrator" (D-17, SQ-2, D-19, Relation to Other ADRs, Continuation Brief) are
+> superseded. No standalone `JOSYN.Backend.Listener` EXE is built. `start-session` is a verb
+> on the surface agent's REST API. Individual spots are annotated inline below. See ADR-032.
+
+> **Correction (ADR-033, 2026-06-23):** This ADR's D-3/D-17 **straddle** ("external tooling" vs.
+> "platform-resident agent" — the admitted *"josyn-surface as a product straddles the boundary"*)
+> is **resolved**, not merely refined. "josyn-surface" is now **three** distinct concerns:
+> **(1)** the per-machine agent is renamed **`JOSYN.Backend.Gateway`** — a *platform*, mandatory
+> component (no longer "surface"); **(2)** the cross-machine layer D-16 left unnamed is named
+> **JRP — JOSYN Remote Protocol**, with contracts in a new contracts-only repo **`josyn-jrp`**
+> (`JOSYN.Jrp.Launch` + `JOSYN.Jrp.Surface`) — this **closes the one remaining open naming loop
+> (SQ-4)**; **(3)** only the *optional* edge clients keep the name "surface" (`josyn-surface`).
+> Affected spots are annotated inline below. See ADR-033.
+
 # ADR-030 — josyn-surface: The Human Window into a Headless Platform
 
 **Date:** 2026-06-20
@@ -184,7 +199,7 @@ detailed design.
 |---|----------|----------|
 | D-1 | Product shape | **Family of thin shells over a shared backbone**, not one monolithic app. |
 | D-2 | Read vs. write ownership | Surface owns **both**, but **write is a separate, deliberate shell** — not blended into the reporting view. |
-| D-3 | Platform component vs. external | **External tooling** — alongside the platform (like the toolbox), not part of the runtime. *(Refined by D-17: this applies to the shells + aggregator; the per-machine agent is a platform-resident component.)* |
+| D-3 | Platform component vs. external | **External tooling** — alongside the platform (like the toolbox), not part of the runtime. *(Refined by D-17: this applies to the shells + aggregator; the per-machine agent is a platform-resident component.)* *(ADR-033: the straddle is dissolved — the per-machine agent is **platform** (renamed `JOSYN.Backend.Gateway`); only the **clients** are external. Three concerns, no straddle.)* |
 | D-4 | Topology | **Central aggregator** — one surface reaches all machines. |
 | D-5 | Control channel | A **resident agent / API on each machine** executes control actions locally. |
 | D-6 | Cross-environment view | **Single pane of glass** across prod / int / dev. |
@@ -197,10 +212,10 @@ detailed design.
 | D-13 | Repo | **Its own repo: `josyn-surface`.** |
 | D-14 | Live updates | **Poll / refresh now; design for push later.** |
 | D-15 | Machine discovery | A **central registry of machines / environments** the aggregator reads. |
-| D-16 | Cross-machine transport (resolves SQ-4) | A **separate cross-machine layer** — an **HTTPS / REST API** exposed by each per-machine agent. **Wholly distinct from JIP**: distinct name, distinct contract, distinct concerns. JIP remains same-machine IPC and is untouched. |
-| D-17 | Per-machine agent identity & placement (resolves SQ-2) | The per-machine agent is a **distinct sibling EXE**, **not** the evolved Listener — the Listener stays a thin orchestrator. The agent is a **platform component, resident in `josyn-backend`** (it reads platform stores and spawns platform sessions). This **refines D-3**: only the shells + aggregator are "external"; the agent sits on the platform side. |
+| D-16 | Cross-machine transport (resolves SQ-4) | A **separate cross-machine layer** — an **HTTPS / REST API** exposed by each per-machine agent. **Wholly distinct from JIP**: distinct name, distinct contract, distinct concerns. JIP remains same-machine IPC and is untouched. *(ADR-033: this cross-machine layer is named **JRP — JOSYN Remote Protocol** (vs JIP = Interprocess); contracts live in `josyn-jrp` as `JOSYN.Jrp.Launch` + `JOSYN.Jrp.Surface`. Closes SQ-4's naming loop.)* |
+| D-17 | Per-machine agent identity & placement (resolves SQ-2) | The per-machine agent is a **distinct sibling EXE**, **not** the evolved Listener — the Listener stays a thin orchestrator. *(The Listener is retired — see ADR-032. The agent is the sole network launch path.)* The agent is a **platform component, resident in `josyn-backend`** (it reads platform stores and spawns platform sessions). This **refines D-3**: only the shells + aggregator are "external"; the agent sits on the platform side. *(ADR-033: the agent is renamed **`JOSYN.Backend.Gateway`** and is unambiguously **platform** — the D-3/D-17 straddle is dissolved into three concerns.)* |
 | D-18 | Machine/environment registry (resolves SQ-3) | A **central config file** on the aggregator side (honest about the bootstrap chicken-and-egg; matches ADR-010's flat-INI-per-installation spirit), **evolving toward a dedicated registry store** if metadata richness grows. **Not** one environment's ConfigStore (would silently re-couple environments). |
-| D-19 | Launch-control verb (resolves SQ-6) | The agent **acts as its own orchestrator** for trigger / re-trigger: it constructs a `SessionStartRequest` and calls **`SessionLauncher` directly** — the sanctioned reuse point (ADR-017B-01). One hop, no dependency on the Listener being deployed. "Orchestrator" is a role the agent plays for one verb, not its identity. |
+| D-19 | Launch-control verb (resolves SQ-6) | The agent **acts as its own orchestrator** for trigger / re-trigger: it constructs a `SessionStartRequest` and calls **`SessionLauncher` directly** — the sanctioned reuse point (ADR-017B-01). One hop, no dependency on the Listener being deployed. *(The Listener is retired — ADR-032. The agent is the sole network launch path; this decision stands unchanged.)* "Orchestrator" is a role the agent plays for one verb, not its identity. |
 | D-20 | Functional-first scope in the shell (resolves SQ-5) | The **web shell and REST host are an accepted idiomatic-web exception zone** (DI, stateful components, lifecycle); the **backbone and agent domain/access logic hold full functional-first discipline** (C-3). The non-negotiable is a **stated boundary**: presentation/hosting = idiomatic web; domain/access logic = functional-first C#. |
 
 ---
@@ -230,7 +245,7 @@ The decisions compose into a three-tier shape:
    └────┬────┘         └─────────┘         └─────────┘
         │  launch control reuses the orchestrator path
         ▼
-   SessionLauncher  /  Listener   (distinct thin orchestrator — D-17)
+   SessionLauncher  *(Listener retired — ADR-032; agent is the sole network launch path)*
 ```
 
 **Three durable components:**
@@ -238,8 +253,8 @@ The decisions compose into a three-tier shape:
 1. **The per-machine surface agent** — a **platform-resident** EXE in `josyn-backend` (D-17),
    the trusted endpoint on each machine. Exposes the cross-machine HTTPS/REST API (D-16): reads
    the local DB and bootstrap INI, and performs control. For session-launch control it **reuses
-   the orchestrator path** rather than reinventing it. It is a **distinct sibling** of the
-   Listener — the Listener stays a thin orchestrator (D-17).
+   the orchestrator path** rather than reinventing it. *(The Listener is retired — ADR-032; the
+   agent is the sole network launch path.)*
 
 2. **The backbone** — typed access plus cross-machine aggregation; the durable shared
    investment beneath all shells. **External** (in the `josyn-surface` repo).
@@ -263,12 +278,17 @@ resolved before design, not silently during it.
 The per-machine agent (D-5) and the API layer (D-8) look like a single component. Confirm they
 are unified, or articulate why they should be separated.
 
-### SQ-2 — Agent vs. Listener ✅ Closed (see D-17)
+### SQ-2 — Agent vs. Listener ✅ Closed (see D-17) — *further superseded by ADR-032*
 
-**Decision:** the per-machine agent is a **distinct sibling EXE**, **not** the evolved Listener.
+**Decision (original):** the per-machine agent is a **distinct sibling EXE**, **not** the evolved Listener.
 The Listener stays a thin orchestrator (receive start-job request → `SessionLauncher`). The agent
 is a **platform-resident component in `josyn-backend`** — it reads the platform stores and spawns
 platform sessions, so it belongs on the platform side, not in the external `josyn-surface` repo.
+
+> **Superseded (ADR-032, 2026-06-23):** The Listener is not built at all. The agent is not
+> "distinct from the Listener" — it is the sole network launch path. The rationale below about
+> not collapsing concerns into the Listener is retained for context but the conclusion changes:
+> `start-session` folds into the agent as one verb.
 
 This **refines D-3** without reversing it: the **shells + central aggregator** are external
 tooling (the `josyn-surface` repo); the **per-machine agent** is a platform component. josyn-surface
@@ -277,7 +297,8 @@ as a *product* straddles the boundary — external consumers talking to a platfo
 Rationale: folding the agent's broad surface (read across all stores + admin writes across
 registry/schedule/config + launch control) into the Listener would overload a deliberately-thin
 orchestrator — the exact "collapse two concerns into one executable" mistake ADR-024 warns against.
-Keeping them separate finishes M3's Listener as scoped and isolates the surface agent's concerns.
+~~Keeping them separate finishes M3's Listener as scoped and isolates the surface agent's concerns.~~
+*(The Listener is retired — M3 is complete without it; the agent is the sole network launch path.)*
 
 For **launch control** (trigger / re-trigger), the agent does not reinvent session-launch mechanics;
 it reuses the orchestrator path — see SQ-6 for the remaining sub-decision.
@@ -292,6 +313,11 @@ analysis), which would secretly re-couple environments the platform works to kee
 the aggregator depend on one machine being up.
 
 ### SQ-4 — Cross-machine transport ✅ Closed (see D-16)
+
+> **Naming closed (ADR-033):** the cross-machine layer is named **JRP — JOSYN Remote Protocol**
+> (the `R`emote counterpart to JIP's `I`nterprocess). Its contracts live in the contracts-only repo
+> **`josyn-jrp`** (`JOSYN.Jrp.Launch`, `JOSYN.Jrp.Surface`), and it is hosted by
+> **`JOSYN.Backend.Gateway`**. The placeholder below ("its own name") is now resolved.
 
 **Decision:** the surface reaches each machine over a **separate cross-machine layer** — an
 **HTTPS / REST API** exposed by the per-machine agent — that is **wholly distinct from JIP**.
@@ -347,8 +373,8 @@ primitive precisely so any orchestrator can call it without duplicating session 
 one hop, self-contained, and independent of whether a Listener is deployed on the machine. The mild
 cost — the agent "becomes an orchestrator" — is acceptable: orchestrator = "constructs
 `SessionStartRequest`, calls `SessionLauncher`," a role the agent plays for one verb, not its
-identity. Rejected: delegating to the Listener's REST endpoint, which adds a second hop and couples
-the agent to the Listener's presence and liveness.
+identity. *(The Listener is retired — ADR-032. The "delegate to Listener" option is moot; the
+agent's direct `SessionLauncher` call is now the only network-launch path.)*
 
 ---
 
@@ -379,7 +405,8 @@ platform-resident), **SQ-3** (aggregator-side config file → store), **SQ-4** (
 from JIP), **SQ-5** (shell is an idiomatic-web exception zone; backbone holds the line), **SQ-6**
 (agent calls `SessionLauncher` directly). The one remaining item is the **name** for the
 cross-machine layer (a placeholder until chosen) — a naming task, not an open architectural
-question. Delivery method is settled by the follow-up **ADR-031**; implementation begins with its
+question. *(Closed by ADR-033: the layer is **JRP — JOSYN Remote Protocol**, hosted by
+`JOSYN.Backend.Gateway`, contracts in `josyn-jrp`.)* Delivery method is settled by the follow-up **ADR-031**; implementation begins with its
 scoped MVP-1.
 
 ---
@@ -390,8 +417,10 @@ scoped MVP-1.
   scheduling data the surface visualises and manages.
 - **ADR-025 (SessionBroker)** and the session/error stores produce the runtime data the surface
   reports on.
-- The planned **`JOSYN.Backend.Listener`** (roadmap M3) stays a **thin orchestrator** and is
-  *not* the per-machine agent (D-17). The agent is a distinct, platform-resident sibling EXE.
+- The planned **`JOSYN.Backend.Listener`** (roadmap M3) ~~stays a **thin orchestrator** and is
+  *not* the per-machine agent (D-17). The agent is a distinct, platform-resident sibling EXE.~~
+  *(Retired — ADR-032. No standalone Listener is built. `start-session` is a verb on the agent's
+  REST API.)*
 - **ADR-010 (Environment separation)** underpins the environment-as-first-class-axis requirement
   (FR-16, NFR-3).
 
@@ -420,11 +449,12 @@ aggregator — all in a new **`josyn-surface`** repo — reach, over **HTTPS/RES
 a **platform-resident per-machine agent EXE** that lives in **`josyn-backend`**. The agent *is* the
 API; it reads the local stores + bootstrap INI, performs admin writes, and for trigger/re-trigger
 calls **`SessionLauncher` directly**. The aggregator learns its machines from an **aggregator-side
-config file**. The Listener stays a thin orchestrator and is *not* the agent.
+config file**. ~~The Listener stays a thin orchestrator and is *not* the agent.~~ *(Listener
+retired — ADR-032. The agent is the sole network launch path.)*
 
 **On acceptance, the work (not yet started — none of this exists):**
 1. Create the **`josyn-surface`** repo (web shell, CLI shell, central aggregator).
-2. Add the **platform-resident agent EXE** to `josyn-backend` (new Pattern-B sub-folder, sibling to Listener).
+2. Add the **platform-resident agent EXE** to `josyn-backend` (new Pattern-B sub-folder; ~~sibling to Listener~~ *(Listener retired — ADR-032)*). 
 3. Write the follow-up ADRs this proposal spawns:
    - the **cross-machine REST API contract** — *and* coin its **name** (the open loop).
    - the **auth / RBAC model** (D-9, D-10) — designed-in, deferred enforcement.

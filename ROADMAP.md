@@ -21,10 +21,10 @@ The platform is being built incrementally, with a working round-trip already in 
 |---|------|--------|
 | M1 | Foundation & core concepts | ✅ Done |
 | M2 | Working round-trip — first Contoso job on a deployed system | ✅ Done |
-| M3 | Scheduling — listener, ticker, time-based triggers | 🔄 In Progress |
+| M3 | Scheduling — ticker, time-based triggers | ✅ Done |
 | M4 | Full job lifecycle — migration, workflow support | ⬜ Upcoming |
 | M5 | Production-ready platform | ⬜ Upcoming |
-| M6 | josyn-surface — human window onto the headless platform (ADR-030/031) | 🔄 Starting (MVP-1) |
+| M6 | josyn-surface — human window onto the headless platform: JRP seam + `JOSYN.Backend.Gateway` + optional edge clients (ADR-030/031/032/033) | 🔄 Starting (MVP-1) |
 
 ---
 
@@ -58,7 +58,11 @@ The platform is being built incrementally, with a working round-trip already in 
 - Solution architecture documentation — large sections are still placeholders
 - Documentation index tooling (`docs-index-builder`, AI enrichment pass pending)
 - `josyn-surface` (M6) — ADR-030 (vision/direction) and ADR-031 (delivery strategy) accepted
-  2026-06-21. Starting MVP-1: a read-only reporting precursor — local CLI + `ISurfaceAgent` seam
+  2026-06-21. **ADR-033 (2026-06-23) re-conceptualises it as three concerns:** the cross-machine
+  seam **JRP — JOSYN Remote Protocol** (contracts repo `josyn-jrp`: `JOSYN.Jrp.Launch` +
+  `JOSYN.Jrp.Surface`); the platform-resident, mandatory per-machine host **`JOSYN.Backend.Gateway`**
+  (the renamed "surface agent", owns `start-session` per ADR-032); and the **optional** edge clients
+  in `josyn-surface`. Starting MVP-1: a read-only reporting precursor — local CLI + `ISurfaceAgent` seam
   + throwaway `FakeAgent` over the DEV DB, replacing the `get-session-report` / `get-error-report`
   capabilities. New sibling repo `josyn-surface` (Pattern A).
 
@@ -66,12 +70,12 @@ The platform is being built incrementally, with a working round-trip already in 
 
 ## What's next
 
-- Complete M3: implement `JOSYN.Backend.Listener` (the remaining piece; then M3 is done)
 - Complete the solution architecture documentation
 - Run AI enrichment pass on the documentation index
-- `josyn-surface` MVP-1 → MVP-2: first command (`RetriggerSession`), gated on a minimal
-  platform-resident agent EXE in `josyn-backend` (ADR-031 DS-5); then REST transport
-  (`HttpAgent`) replacing `FakeAgent`.
+- `josyn-surface` MVP-1 → MVP-2: first command (`RetriggerSession`), gated on the minimal
+  platform-resident **`JOSYN.Backend.Gateway`** EXE in `josyn-backend` (ADR-031 DS-5, ADR-033); then
+  JRP transport (`HttpAgent` as a JRP client to the Gateway) replacing `FakeAgent`. Extract the
+  durable wire contracts into the new `josyn-jrp` repo (`JOSYN.Jrp.Launch` + `JOSYN.Jrp.Surface`).
 
 ---
 
@@ -90,10 +94,9 @@ The platform is being built incrementally, with a working round-trip already in 
 Things that exist in the codebase but are not yet properly documented.
 Work these off before a public release.
 
-- **`josyn-backend` undocumented components** — four packages exist with no entry in
+- **`josyn-backend` undocumented components** — three packages exist with no entry in
   `repos/josyn-backend/overview.md`:
   - `JOSYN.Backend.CLI` (`josyn-backend-cli`)
-  - `JOSYN.Backend.Listener` (`josyn-backend-listener`)
   - `JOSYN.Backend.Ticker` (`josyn-backend-ticker`)
   - `JOSYN.Backend.ConfigStore` (`josyn-backend-config-store`)
   Each needs a component description, dependency list, and sanity notes entry.
