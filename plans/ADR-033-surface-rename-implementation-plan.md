@@ -1,8 +1,13 @@
 # ADR-033 Implementation Plan — Surface → (Gateway · JRP · Clients) Rename & Extraction
 
-**Date:** 2026-06-23
-**Status:** Draft plan — **gated on ADR-033 acceptance** (currently *Proposed*)
+**Date:** 2026-06-23 (Phase 1 executed 2026-06-24)
+**Status:** **In progress** — ADR-033 **Accepted**; **Phase 1 complete**, Phases 2–6 pending
 **Decision record:** [`decisions/ADR-033-surface-three-concerns.md`](../decisions/ADR-033-surface-three-concerns.md)
+
+> **Progress (2026-06-24):** ADR-033 flipped to *Accepted* (`josyn-platform@9fe13b3`). `josyn-jrp`
+> created (`josyn-jrp@3c443e9`, Pattern B) with **`JOSYN.Jrp.Launch`** and **`JOSYN.Jrp.Surface`**;
+> both pack cleanly to `local-packages`. **Phase 1 (§5) is done** — see the per-phase ☑ markers and
+> the Phase-1 outcome notes below. Next session starts at **Phase 2**.
 
 > ADR-033 *decides*; this plan *sequences the work*. It exists because the rename spans **three
 > git repos** plus the toolbox, threads a **NuGet pack/restore chain**, and turns on a **cross-repo
@@ -18,25 +23,26 @@ described. **Re-verify before acting; this snapshot may have aged.**
 
 | Repo | HEAD (at snapshot) | Tree | Relevant fact |
 |------|--------------------|------|---------------|
-| `josyn-surface` | `5870271` *wip: sync 2026-06-22* | clean | **MVP-2b is committed** with old names (`JOSYN.Surface.Contracts`, `FakeSurfaceAgent`, `CompositeSurfaceAgent`, `SurfaceCommandHandler` references). |
-| `josyn-backend` | `9217971` *wip: sync 2026-06-21* | clean | Surface-agent source **is committed and tracked** (commit `9217971`): `josyn-backend-surface-agent/` with `SurfaceCommandHandler.cs`, `ChangeJobArgumentCommand.cs`, `ISurfaceCommandHandler.cs`, `.csproj`, `.local-build/*`. (Note: `wip: sync` commit dates are unreliable — verified via path-scoped `git ls-files`, not by date.) |
-| `josyn-toolbox` | `6e09a96` *wip: sync 2026-06-22* | 2 unrelated mods | Surface deploy tooling (`deploy-surface.ps1`, `launch-surface.cmd`, `surface.cmd`) appears committed. In the rename ripple zone. |
-| `josyn-jrp` | — | — | **Does not exist.** Must be created. |
-| `josyn-platform` | `2fbe420` | clean | ADR-033 + cross-refs committed (this repo). |
+| `josyn-surface` | `5870271` *wip: sync 2026-06-22* | clean | **MVP-2b is committed** with old names (`JOSYN.Surface.Contracts`, `FakeSurfaceAgent`, `CompositeSurfaceAgent`, `SurfaceCommandHandler` references). **Phase 2 target — untouched as of 2026-06-24.** |
+| `josyn-backend` | `9217971` *wip: sync 2026-06-21* | clean | Surface-agent source **is committed and tracked** (commit `9217971`): `josyn-backend-surface-agent/` with `SurfaceCommandHandler.cs`, `ChangeJobArgumentCommand.cs`, `ISurfaceCommandHandler.cs`, `.csproj`, `.local-build/*`. **Phase 3 target — untouched as of 2026-06-24.** (Note: `wip: sync` commit dates are unreliable — verified via path-scoped `git ls-files`, not by date.) |
+| `josyn-toolbox` | `586b022` *wip: sync 2026-06-23* | clean | Surface deploy tooling (`deploy-surface.ps1`, `launch-surface.cmd`, `surface.cmd`) appears committed. In the rename ripple zone (Phase 5). |
+| `josyn-jrp` | `3c443e9` *(created 2026-06-24)* | clean | **CREATED in Phase 1.** Pattern B; `josyn-jrp-launch/` (`JOSYN.Jrp.Launch`) + `josyn-jrp-surface/` (`JOSYN.Jrp.Surface`). Both pack cleanly to `local-packages`. |
+| `josyn-platform` | `9fe13b3` | clean | ADR-033 **Accepted** (flipped from Proposed in `9fe13b3`); cross-refs committed (this repo). |
 
 ---
 
 ## 2. Preconditions (Phase 0 — do not skip)
 
-- **P-0 — Acceptance.** ADR-033 is **Accepted**. Until then, this plan is read-only reference.
+- **P-0 — Acceptance. ☑ RESOLVED (2026-06-24).** ADR-033 is **Accepted** (`josyn-platform@9fe13b3`).
 - **P-1 — Re-verify the working snapshot (§1) is still current.** The renames assume
   `josyn-backend-surface-agent/` is present and committed (verified 2026-06-23, commit `9217971`) and
   that `josyn-surface` MVP-2b is committed. Re-confirm with path-scoped `git ls-files` / `git status`
-  in each repo before starting — not by commit date (the `wip: sync` timestamps are unreliable).
-- **P-2 — Confirm `josyn-jrp` repo conventions.** Decide Pattern A vs B
-  (`architecture/repo-structure-conventions.md`), `.local-build` layout
-  (`architecture/local-build.md`: `clean.cmd` + `pack.cmd`), `nuget.config` local-feed path, target
-  framework, and the **version string to copy from `josyn-jap`** (AGENTS.md §8 — never invent or bump).
+  in each repo before starting Phase 2/3 — not by commit date (the `wip: sync` timestamps are unreliable).
+- **P-2 — `josyn-jrp` repo conventions. ☑ RESOLVED (2026-06-24).** Decided and applied:
+  **Pattern B** (two sub-solutions `josyn-jrp-launch`, `josyn-jrp-surface`, mirroring `josyn-jap`);
+  `.local-build` with batch-level orchestrator at root + single-target `clean.cmd`/`build.cmd`/`pack.cmd`
+  per sub-solution; `nuget.config` local feed `..\..\local-packages`; TFM **`net10.0`**; **version
+  `1.0.0-preview01`** copied from `josyn-jap` (not invented/bumped, AGENTS.md §8).
 
 ---
 
@@ -76,16 +82,38 @@ changed.
 
 ## 5. Work breakdown (phased, ordered)
 
-### Phase 1 — Create `josyn-jrp` (contracts only, no EXE)
-1. Scaffold the repo per P-2 (Pattern, `.local-build/clean.cmd` + `pack.cmd`, `nuget.config`,
-   version copied from `josyn-jap`).
-2. Create **`JOSYN.Jrp.Launch`**: the `start-session` request/response records (job name, base64
+### Phase 1 — Create `josyn-jrp` (contracts only, no EXE) — ☑ COMPLETE (2026-06-24)
+1. ☑ Scaffold the repo per P-2 (Pattern B, `.local-build/clean.cmd` + `pack.cmd`, `nuget.config`,
+   version `1.0.0-preview01` copied from `josyn-jap`).
+2. ☑ Create **`JOSYN.Jrp.Launch`**: the `start-session` request/response records (job name, base64
    args, allocated session GUID). Small, stable, transport-safe, identity-bearing (ADR-031 DS-2
    invariants: async-shaped use, wire-safe, actor/target/correlation fields, named error taxonomy).
-3. Create **`JOSYN.Jrp.Surface`**: the read queries + control commands currently in
+3. ☑ Create **`JOSYN.Jrp.Surface`**: the read queries + control commands currently in
    `JOSYN.Surface.Contracts` (`ChangeJobArgument`, `ArgumentChangeOutcome` DTO, session/argument/
    schedule read records). **No DB shape may appear here** (ADR-031 DS-4).
-4. `clean` → `pack` both. Verify `.nupkg`s land in the local feed.
+4. ☑ `clean` → `pack` both. Verified `.nupkg`s land in `local-packages`
+   (`JOSYN.Jrp.Launch.1.0.0-preview01.nupkg`, `JOSYN.Jrp.Surface.1.0.0-preview01.nupkg`).
+
+> **Phase-1 outcome notes (what was actually built — read before Phase 2):**
+> - **`JOSYN.Jrp.Launch`** holds: `JrpTarget` (the renamed `SurfaceTarget`), `JrpErrorCategory`
+>   (the renamed `SurfaceErrorCategory`), `StartSessionRequest`, `StartSessionResponse`.
+>   `JrpErrorCategory` was placed **here, not in `.Surface`**, so both contract families share one
+>   error vocabulary; a launch-only consumer still gets the taxonomy without the dashboard contract.
+>   References `JOSYN.Jap.Contract` only.
+> - **`JOSYN.Jrp.Surface`** holds: `ChangeJobArgument` (in `Commands/`), the 5 queries (in `Queries/`,
+>   sub-namespace `JOSYN.Jrp.Surface.Queries`), the 7 DTOs (in `Dtos/`: `ArgumentChangeOutcome`,
+>   `ArgumentSummary`, `ErrorDetail`, `JobArguments`, `JobSchedule`, `RegisteredJobSummary`,
+>   `ScheduleEntrySummary`, `SessionSummary`), and `JrpError` (the renamed `SurfaceError` factory,
+>   now producing `JrpErrorCategory`-prefixed messages). References `JOSYN.Jrp.Launch`,
+>   `JOSYN.Foundation.ResultPattern`, `JOSYN.Backend.Contracts` (for `ExecutionStatus`).
+> - **Name map for Phase 2/3 rewiring** — surface clients must repoint to these:
+>   `SurfaceTarget`→`JrpTarget`, `SurfaceError`→`JrpError`, `SurfaceErrorCategory`→`JrpErrorCategory`,
+>   namespace `JOSYN.Surface.Contracts`→`JOSYN.Jrp.Surface` (+ `JOSYN.Jrp.Surface.Queries` for queries,
+>   `JOSYN.Jrp.Surface.Commands` for `ChangeJobArgument`) and `JOSYN.Jrp.Launch` for `JrpTarget`.
+> - **No test project** was created (the contracts are pure records, mirroring `josyn-jap`'s
+>   `JOSYN.Jap.Contract` which also ships test-less). Behavioural coverage stays in `josyn-surface`'s
+>   existing test project, which Phase 2 repoints onto `JOSYN.Jrp.*`.
+> - `ISurfaceAgent` was **not** touched — it stays a client seam in `josyn-surface` (Q2, §3, deferred).
 
 ### Phase 2 — Relocate wire contracts off `josyn-surface` / backend onto `josyn-jrp`
 5. In `josyn-surface`: delete the relocated records from `JOSYN.Surface.Contracts`; add a package
@@ -123,16 +151,16 @@ changed.
 
 ## 6. Definition of Done
 
-- [ ] **P-1 resolved and recorded** (backend surface-agent source located/committed/reconstructed).
-- [ ] `josyn-jrp` exists; `JOSYN.Jrp.Launch` + `JOSYN.Jrp.Surface` pack cleanly; version matches the
-      `josyn-jap` convention (not bumped).
-- [ ] No `JOSYN.Surface.Contracts` wire records remain; clients consume `JOSYN.Jrp.*`.
+- [x] **P-1 resolved and recorded** — backend surface-agent source located & committed (`9217971`).
+- [x] `josyn-jrp` exists; `JOSYN.Jrp.Launch` + `JOSYN.Jrp.Surface` pack cleanly; version matches the
+      `josyn-jap` convention (`1.0.0-preview01`, not bumped).
+- [ ] No `JOSYN.Surface.Contracts` wire records remain; clients consume `JOSYN.Jrp.*`. *(Phase 2)*
 - [ ] `JOSYN.Backend.Gateway` builds; `SurfaceCommandHandler` lives inside it; **no backend type
-      crosses `ISurfaceAgent`/JRP**; **no DB shape in `JOSYN.Jrp.*`**.
+      crosses `ISurfaceAgent`/JRP**; **no DB shape in `JOSYN.Jrp.*`**. *(Phase 3 — JRP side already clean)*
 - [ ] Full chain builds in order `jrp → backend → surface → toolbox` from a **cleared** NuGet cache.
 - [ ] All **six CLI verbs** pass from the deployed EXE; `bootstrap.ini` connection sneak still resolves.
 - [ ] `FakeSurfaceAgent` / `CompositeSurfaceAgent` / DS-4 exception unchanged in behaviour.
-- [ ] Platform docs (Phase 6) updated; ADR-033 flipped to **Accepted** (or its plan-reference noted).
+- [ ] Platform docs (Phase 6) updated; ADR-033 flipped to **Accepted** ✅ *(done 2026-06-24)* — docs pending.
 
 ---
 
@@ -161,8 +189,10 @@ changed.
 
 ## 9. Continuation note
 
-This is a **mechanical rename + one repo extraction**, not a feature change. The backend
-surface-agent source is confirmed present and committed (§1, commit `9217971`), so the "reconstruct"
-risk does not apply — Phase 3 is a straight rename. The only genuinely open variable is **P-1's
-re-verification** (snapshot may age between now and the follow-up session). Everything else is bounded
-by the DoD checklist above. Nothing here begins before ADR-033 is Accepted.
+This is a **mechanical rename + one repo extraction**, not a feature change. **Phase 1 is done**
+(`josyn-jrp` created, both packages pack cleanly, ADR-033 Accepted). The next session **starts at
+Phase 2**: gut the wire records from `JOSYN.Surface.Contracts` and repoint the surface clients +
+tests onto `JOSYN.Jrp.*` using the **name map in the Phase-1 outcome notes** (§5). The backend
+surface-agent source is confirmed present and committed (§1, commit `9217971`), so Phase 3 is a
+straight rename. Re-verify **P-1** (snapshot may age) before touching `josyn-surface`/`josyn-backend`.
+Everything else is bounded by the DoD checklist above.
