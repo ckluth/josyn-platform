@@ -1,7 +1,7 @@
 # ADR-033 — josyn-surface is Three Concerns: the JRP Gateway, JRP Contracts, and Edge Clients
 
 **Date:** 2026-06-23
-**Status:** Proposed
+**Status:** Accepted
 
 > This ADR does not add a feature. It **re-conceptualises** what "josyn-surface" *is*. ADR-030
 > defined the surface as a single product that, by its own admission, *"straddles the boundary"*
