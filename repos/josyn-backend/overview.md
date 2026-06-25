@@ -182,6 +182,11 @@ josyn-backend/
 └── josyn-backend-workflow-runner/              ← Pattern B sub-folder
     ├── WorkflowRunner.slnx
     └── .local-build/
+└── josyn-backend-gateway/                      ← Pattern B sub-folder
+    ├── nuget.config
+    ├── JOSYN.Backend.Gateway.slnx
+    ├── .local-build/                           ← solution-local clean + build + pack scripts
+    └── JOSYN.Backend.Gateway/                 ← GatewayCommandHandler, IGatewayCommandHandler
 ```
 
 ---
@@ -203,6 +208,7 @@ When migrated, `josyn-backend` will contain the JOSYN-native replacements for al
 | `JOSYN.Backend.ErrorHandler` ✅ | *(new)* | **Done** — `IErrorHandler`, `SqlErrorHandler`, `josyn.ErrorStore`; per ADR-011B-01 |
 | `JOSYN.Backend.JobScheduleStore` ✅ | *(new)* | **Done** — `IJobScheduleStore`, `IFiredSlotStore`; `josyn.JobSchedules`, `josyn.JobScheduleEntries`, `josyn.FiredSlots`; per ADR-027, ADR-029 |
 | `JOSYN.Backend.TimeScheduler` ✅ | `JobSystem.TriggerAgent` | **Done** — Ticker-target EXE; tolerance-window + fired-slot-log algorithm; at-most-once delivery; per ADR-027, ADR-028, ADR-029 |
+| `JOSYN.Backend.Gateway` ✅ | *(new)* | **Done** — `IGatewayCommandHandler`, `GatewayCommandHandler`; platform-resident write handler for the JRP surface concern; bridges `JOSYN.Jrp.Surface.ChangeJobArgument` to `IJobArgumentWriter`; maps backend outcome to `JOSYN.Jrp.Surface.ArgumentChangeOutcome` internally — no backend type crosses JRP (ADR-033) |
 | `JOSYN.Backend.JobRepository` | `JobSystem.JobRepository` | Resolves job.exe path from job name |
 | `JOSYN.Backend.Service` | `JobSystem.Service` | Windows service host |
 | `JOSYN.Backend.WorkflowAdapter` | `JobSystem.WorkflowAdapter` | Workflow integration |
@@ -241,6 +247,12 @@ When migrated, `josyn-backend` will contain the JOSYN-native replacements for al
 <PackageReference Include="JOSYN.Foundation.PropertyBag"           Version="1.0.0-preview01"/>
 <PackageReference Include="JOSYN.Foundation.ResultPattern"         Version="1.0.0-preview01"/>
 
+<!-- JOSYN.Backend.Gateway: ResultPattern + Jrp.Launch + Jrp.Surface + JobRegistry -->
+<PackageReference Include="JOSYN.Foundation.ResultPattern"  Version="1.0.0-preview01"/>
+<PackageReference Include="JOSYN.Jrp.Launch"               Version="1.0.0-preview01"/>
+<PackageReference Include="JOSYN.Jrp.Surface"              Version="1.0.0-preview01"/>
+<PackageReference Include="JOSYN.Backend.JobRegistry"      Version="1.0.0-preview01"/>
+
 ```
 
 Runtime spawn relationships (not NuGet dependencies):
@@ -258,7 +270,7 @@ josyn-backend-bootstrap-config\.local-build\build.cmd ← builds BootstrapConfig
 josyn-backend-job-registry\.local-build\build.cmd    ← builds JobRegistry only
 ```
 
-`pack.cmd` at the repo root packs `Contracts`, `SessionStore`, `ConfigStore`, `BootstrapConfig`, `JobRegistry`, `SessionLauncher`, `ErrorHandler`, and `JobScheduleStore` to the shared `local-packages/` feed (sibling directory to this repo).
+`pack.cmd` at the repo root packs `Contracts`, `SessionStore`, `ConfigStore`, `BootstrapConfig`, `JobRegistry`, `SessionLauncher`, `ErrorHandler`, `JobScheduleStore`, and `Gateway` to the shared `local-packages/` feed (sibling directory to this repo).
 `Ticker`, `Listener`, `CLI`, `TimeScheduler`, and the other EXE-only subfolders are not packed.
 
 License: MIT | Company: HAEVG AG | Target: net10.0

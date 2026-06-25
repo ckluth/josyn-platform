@@ -583,6 +583,21 @@
       "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
+      "name": "josyn-jrp",
+      "repo": "josyn-platform",
+      "path": "repos/josyn-jrp.md",
+      "folder-context": "repos",
+      "created": "2026-06-25T10:49:00+02:00",
+      "touched": "2026-06-25T10:49:00+02:00",
+      "type": "repo-summary",
+      "perspective": [
+        "maintainer-architect",
+        "maintainer-developer"
+      ],
+      "state": "settled",
+      "summary": "Summarizes the JRP contract repo: JOSYN.Jrp.Launch (session-launch types, error taxonomy) and JOSYN.Jrp.Surface (read queries, write commands, DTOs for the surface concern)."
+    },
+    {
       "name": "josyn-job-host",
       "repo": "josyn-platform",
       "path": "repos/josyn-job-host.md",
