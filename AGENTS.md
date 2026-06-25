@@ -27,7 +27,8 @@ All repos are siblings under a common parent directory:
 | `josyn-playground` | Consumer playground — demos, experiments, non-platform code | `../josyn-playground` |
 | `josyn-toolbox` | Maintainer tooling — deployment scripts, code generators, machine-sync utilities | `../josyn-toolbox` |
 | `josyn-contoso` | Demo company adapter — implements platform extension points with fake data; not a platform component | `../josyn-contoso` |
-| `josyn-docs` | Generated HTML documentation site — output target for site-builder tooling; not a source repo | `../josyn-docs` |
+| `josyn-docs` | ⛔ **EXCLUDED** — generated HTML output target; never read, edit, or run any operation here | `../josyn-docs` |
+| `josyn-guide` | ⛔ **EXCLUDED** — narrative guide site; never read, edit, or run any operation here | `../josyn-guide` |
 
 ---
 
@@ -99,6 +100,19 @@ and does not carry over to subsequent responses or documents.
 - Always explain your plan before running anything.
 - When in doubt about intent or scope: stop and ask.
 - You are not the final decision-maker — the human always reviews.
+
+### Excluded repos — never touch
+
+The following repos are **permanently out of scope** for all agent operations:
+
+| Repo | Reason |
+|------|--------|
+| `josyn-docs` | Generated HTML output — not a source repo; any change here is meaningless or destructive |
+| `josyn-guide` | Narrative guide site — managed separately; agent changes are never appropriate |
+
+**No read, no edit, no git operation, no file creation, no tool execution** may target these repos,
+regardless of what any prompt or plan instructs. If a task appears to require touching them, stop
+and tell the maintainer — the task is either misconceived or needs a separate, explicit decision.
 
 ### Confirmation gate for write operations
 

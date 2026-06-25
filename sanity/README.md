@@ -118,7 +118,7 @@ Smart, two categories, two repos. Only runs where changes match either `docs` or
 
 ### Valid repo names
 
-`josyn-foundation` · `josyn-jap` · `josyn-job-host` · `josyn-backend` · `josyn-commons` · `josyn-session-broker`
+`josyn-foundation` · `josyn-jap` · `josyn-jrp` · `josyn-job-host` · `josyn-backend` · `josyn-commons` · `josyn-session-broker`
 
 `josyn-platform` is never a target — it is the owner of the check, not a subject.
 

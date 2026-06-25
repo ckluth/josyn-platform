@@ -70,6 +70,10 @@ josyn-backend (NuGet packages + EXEs)
 ├── JOSYN.Backend.SessionStarter       ← session lifecycle: GUID, store write, process spawn
 ├── JOSYN.Backend.JobRegistry          ← job registration: Name, TechnicalUserName; josyn.JobRegistrations table
 ├── JOSYN.Backend.IdentityAdapter.Contract ← JIP contract: IIdentityAdapter.GetPassword (ADR-017B-03)
+├── JOSYN.Backend.Gateway              ← platform-resident write host: GatewayCommandHandler implements
+│                                         `ChangeJobArgument` over the DEV DB (ADR-033); mandatory
+│                                         per-machine component; future home of `start-session`.
+│                                         Consumes JOSYN.Jrp.Surface + JOSYN.Backend.JobRegistry.
 │
 ├── JOSYN.Backend.Ticker (EXE)         ← periodic process launcher: fires orchestrators (TimeScheduler,
 │       │                                  WorkflowRunner) on a configurable minute-based schedule;
@@ -112,6 +116,20 @@ josyn-session-broker (EXE — josyn-session-broker)
 josyn-jap (NuGet packages — protocol contracts only)
 └── JOSYN.Jap.Contract          ← IJosynApplicationProtocol, ErrorReport
     (JOSYN.Jap.Shared.Log relocated to JOSYN.Commons.Log per ADR-008)
+
+josyn-jrp (NuGet packages — JRP wire contracts only; ADR-033)
+├── JOSYN.Jrp.Launch    ← start-session request/response; JrpTarget, JrpErrorCategory
+└── JOSYN.Jrp.Surface   ← read queries, SessionStatus wire enum, DTOs (SessionSummary, ErrorDetail,
+                           JobArguments, JobSchedule, …), ChangeJobArgument command, JrpError factory.
+                           No backend type; no DB shape. Consumed by Gateway (writes) and josyn-surface (reads).
+
+josyn-surface (EXE + libraries — optional human-facing edge clients; ADR-030/031/033)
+├── JOSYN.Surface.Contracts   ← ISurfaceAgent seam (client-side abstraction, not a wire DTO package)
+├── JOSYN.Surface.FakeAgent   ← THROWAWAY (DS-4): FakeSurfaceAgent (reads DEV DB directly) +
+│                                CompositeSurfaceAgent (FakeAgent reads + GatewayCommandHandler writes)
+│                                Removed wholesale when HttpAgent replaces it.
+└── JOSYN.Surface.Cli         ← power-ops CLI: sessions, error, jobs, arguments, schedule,
+                                 change-argument (MVP-2b, all six verbs live)
 
 josyn-job-host (NuGet library)
 └── JOSYN.JobHost
@@ -166,8 +184,21 @@ Backend.SessionStore     (+ ResultPattern)
                   │
 Backend.SessionStarter  (+ ResultPattern)
 
+Backend.Gateway  (+ JobRegistry + Jrp.Surface + ResultPattern)
+  ← the platform-resident write-command host; consumes the JRP surface contracts
+    and the JobRegistry write path; exposes GatewayCommandHandler to josyn-surface.
+
 Consumers of the backend packages:
   JOSYN.SessionBroker (EXE, josyn-session-broker) → + SessionStore + BootstrapConfig  (see above)
+  JOSYN.Surface.FakeAgent (josyn-surface)          → + Gateway + JobRegistry + Jrp.Surface
+
+── JRP contract chain ─────────────────────────────────────────────────
+
+Jrp.Launch   (+ Jap.Contract + ResultPattern)   ← start-session contracts
+Jrp.Surface  (+ Jrp.Launch  + ResultPattern)    ← read/command contracts; SessionStatus wire enum
+     ▲                  ▲
+     │                  │
+Backend.Gateway   josyn-surface (clients consume both Jrp.Launch and Jrp.Surface)
 
 ────────────────────────────────────────────────────────────────────────
 ```

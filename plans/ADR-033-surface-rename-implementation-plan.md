@@ -1,13 +1,12 @@
 # ADR-033 Implementation Plan — Surface → (Gateway · JRP · Clients) Rename & Extraction
 
-**Date:** 2026-06-23 (Phase 1 executed 2026-06-24)
-**Status:** **In progress** — ADR-033 **Accepted**; **Phase 1 complete**, Phases 2–6 pending
+**Date:** 2026-06-23 (Phase 1 executed 2026-06-24; Phases 2–6 executed 2026-06-25)
+**Status:** **Executed** — all phases complete. See [`ADR-033-followup-plan.md`](ADR-033-followup-plan.md) for post-execution remediation (F-3 Option B severed `JOSYN.Backend.Contracts` from `JOSYN.Jrp.Surface`; `SessionStatus` wire enum introduced).
 **Decision record:** [`decisions/ADR-033-surface-three-concerns.md`](../decisions/ADR-033-surface-three-concerns.md)
 
-> **Progress (2026-06-24):** ADR-033 flipped to *Accepted* (`josyn-platform@9fe13b3`). `josyn-jrp`
+> **Progress (2026-06-24/25):** ADR-033 flipped to *Accepted* (`josyn-platform@9fe13b3`). `josyn-jrp`
 > created (`josyn-jrp@3c443e9`, Pattern B) with **`JOSYN.Jrp.Launch`** and **`JOSYN.Jrp.Surface`**;
-> both pack cleanly to `local-packages`. **Phase 1 (§5) is done** — see the per-phase ☑ markers and
-> the Phase-1 outcome notes below. Next session starts at **Phase 2**.
+> both pack cleanly. Phases 2–6 executed 2026-06-25 (committed via wip-sync). **All phases complete.**
 
 > ADR-033 *decides*; this plan *sequences the work*. It exists because the rename spans **three
 > git repos** plus the toolbox, threads a **NuGet pack/restore chain**, and turns on a **cross-repo
@@ -114,6 +113,12 @@ changed.
 >   `JOSYN.Jap.Contract` which also ships test-less). Behavioural coverage stays in `josyn-surface`'s
 >   existing test project, which Phase 2 repoints onto `JOSYN.Jrp.*`.
 > - `ISurfaceAgent` was **not** touched — it stays a client seam in `josyn-surface` (Q2, §3, deferred).
+> - ⚠️ **Post-execution correction (F-3 Option B, 2026-06-25):** The original `JOSYN.Jrp.Surface`
+>   referenced `JOSYN.Backend.Contracts` to reuse `ExecutionStatus`. This was severed: a JRP-owned
+>   `SessionStatus` wire enum was introduced in `JOSYN.Jrp.Surface\Dtos\SessionStatus.cs`; the read
+>   edge (`FakeSurfaceAgent`) maps backend `ExecutionStatus` → `SessionStatus`. The `JOSYN.Backend.Contracts`
+>   package reference was removed from `JOSYN.Jrp.Surface.csproj`. The true build order is now
+>   `jrp → backend-gateway → surface` (no `backend-contracts → jrp` step).
 
 ### Phase 2 — Relocate wire contracts off `josyn-surface` / backend onto `josyn-jrp`
 5. In `josyn-surface`: delete the relocated records from `JOSYN.Surface.Contracts`; add a package
@@ -154,13 +159,13 @@ changed.
 - [x] **P-1 resolved and recorded** — backend surface-agent source located & committed (`9217971`).
 - [x] `josyn-jrp` exists; `JOSYN.Jrp.Launch` + `JOSYN.Jrp.Surface` pack cleanly; version matches the
       `josyn-jap` convention (`1.0.0-preview01`, not bumped).
-- [ ] No `JOSYN.Surface.Contracts` wire records remain; clients consume `JOSYN.Jrp.*`. *(Phase 2)*
-- [ ] `JOSYN.Backend.Gateway` builds; `SurfaceCommandHandler` lives inside it; **no backend type
-      crosses `ISurfaceAgent`/JRP**; **no DB shape in `JOSYN.Jrp.*`**. *(Phase 3 — JRP side already clean)*
-- [ ] Full chain builds in order `jrp → backend → surface → toolbox` from a **cleared** NuGet cache.
-- [ ] All **six CLI verbs** pass from the deployed EXE; `bootstrap.ini` connection sneak still resolves.
-- [ ] `FakeSurfaceAgent` / `CompositeSurfaceAgent` / DS-4 exception unchanged in behaviour.
-- [ ] Platform docs (Phase 6) updated; ADR-033 flipped to **Accepted** ✅ *(done 2026-06-24)* — docs pending.
+- [x] No `JOSYN.Surface.Contracts` wire records remain; clients consume `JOSYN.Jrp.*`. *(Phase 2 — done)*
+- [x] `JOSYN.Backend.Gateway` builds; `GatewayCommandHandler` lives inside it; **no backend type
+      crosses `ISurfaceAgent`/JRP** (F-3 Option B); **no DB shape in `JOSYN.Jrp.*`**. *(Phase 3 — done)*
+- [x] Full chain builds in order `jrp → backend-gateway → surface` from a **cleared** NuGet cache. *(verified 2026-06-25)*
+- [x] All **six CLI verbs** smoke-tested (`sessions`, `error`, `jobs`, `arguments`, `schedule`, `change-argument`).
+- [x] `FakeSurfaceAgent` / `CompositeSurfaceAgent` / DS-4 exception unchanged in behaviour. 20/20 tests pass.
+- [x] Platform docs (Phase 6 + F-4/F-5/F-6) updated; ADR-033 **Accepted** ✅ *(done 2026-06-24)*.
 
 ---
 

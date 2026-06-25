@@ -956,6 +956,22 @@
       "enriched-at": "2026-06-07T10:26:00Z"
     },
     {
+      "name": "Sanity State — josyn-jrp",
+      "repo": "josyn-platform",
+      "path": "sanity/current-state/josyn-jrp.md",
+      "folder-context": "sanity",
+      "created": "2026-06-25T11:50:00+02:00",
+      "touched": "2026-06-25T11:50:00+02:00",
+      "type": "reference",
+      "perspective": [
+        "maintainer-developer",
+        "agent"
+      ],
+      "state": "thinking",
+      "summary": "Placeholder for josyn-jrp sanity status; records the expected contracts-only shape until the first formal pass is run.",
+      "enriched-at": "2026-06-25T11:50:00+02:00"
+    },
+    {
       "name": "Sanity State — josyn-job-host",
       "repo": "josyn-platform",
       "path": "sanity/current-state/josyn-job-host.md",

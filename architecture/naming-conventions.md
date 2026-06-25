@@ -8,7 +8,7 @@
 | **Backend** | The scheduler and session-orchestration layer | `josyn-backend` repo, `JOSYN.Backend.*` namespace |
 | **JAP** | The JAP protocol contracts layer — defines the session protocol shared between the two worlds | `josyn-jap` repo, `JOSYN.Jap.*` namespace |
 | **JRP** | The JRP protocol contracts layer — the **cross-machine** (Remote) HTTPS/REST protocol; distinct from JIP (Interprocess, machine-bound) (ADR-033) | `josyn-jrp` repo, `JOSYN.Jrp.*` namespace (`Launch`, `Surface`) |
-| **Gateway** | The platform-resident, per-machine EXE that hosts JRP, reads local stores, and owns `start-session` (ADR-032/033) | `josyn-backend` repo, `JOSYN.Backend.Gateway` |
+| **Gateway** | The platform-resident, per-machine **command library** that implements JRP write commands and owns `start-session` (ADR-032/033). Currently a library (`JOSYN.Backend.Gateway`); a Gateway EXE/service host is deferred to the `HttpAgent`/`SessionClient` phase. | `josyn-backend` repo, `JOSYN.Backend.Gateway` |
 | **Surface** | The **optional**, human-facing edge **clients** (CLI, web, session client) — the consumer side of JRP (ADR-030/033) | `josyn-surface` repo, `JOSYN.Surface.*` namespace |
 | **Session Broker** | The per-session boundary EXE — brokers between the backend world and the job developer's world | `josyn-session-broker` repo, `JOSYN.SessionBroker` namespace |
 | **Foundation** | Cross-cutting infrastructure primitives | `josyn-foundation` repo, `JOSYN.Foundation.*` namespace |
@@ -73,7 +73,7 @@ JOSYN
 │   └── Attributes                 ← [JobEntryPoint], [BeforeJobEntryPoint], etc.
 ├── Backend                        ← josyn-backend
 │   ├── SessionStarter             ← session lifecycle rendezvous (stub)
-│   └── Gateway                    ← per-machine JRP host; owns start-session (ADR-032/033)
+│   └── Gateway                    ← platform-resident command library; GatewayCommandHandler owns write path (ADR-032/033); EXE host deferred
 └── Commons                        ← josyn-commons (utility satellite — never referenced by Foundation)
     └── ...                        ← packages added as helpers accumulate
 ```

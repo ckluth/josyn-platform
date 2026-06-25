@@ -6,6 +6,7 @@
 |------|------|-------|-----------|-------------|-----------|-------------|
 | josyn-foundation | ✅ | ✅ | ✅ | ✅ | ✅ | 2026-05-31T12:10 UTC |
 | josyn-jap | — | — | — | ✅ | ✅ | 2026-05-31T12:49 UTC |
+| josyn-jrp | — | — | — | — | — | never |
 | josyn-job-host | — | — | — | — | — | never |
 | josyn-backend | — | — | — | — | — | never |
 | josyn-commons | — | — | — | — | — | never |
