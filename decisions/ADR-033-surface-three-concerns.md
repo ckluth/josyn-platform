@@ -115,7 +115,7 @@ distinct concerns. JIP/JAP remain same-machine IPC and are untouched.
 
 | Package | Concern | Lifecycle |
 |---------|---------|-----------|
-| **`JOSYN.Jrp.Launch`** | `start-session` request/response (job name, base64 args, allocated GUID) | **Small, stable, core/orchestration.** Exists for its own sake; a launch consumer needs nothing else. |
+| **`JOSYN.Jrp.Launch`** | `start-session` request/acknowledgement (job name, base64 args) | **Small, stable, core/orchestration.** Exists for its own sake; a launch consumer needs nothing else. |
 | **`JOSYN.Jrp.Surface`** | read queries + control commands (the dashboard verbs) | **Churning, surface-facing.** Evolves with the human window. |
 
 This is the key refinement the listener-kill demanded: the Gateway has **two contract surfaces with
@@ -273,6 +273,13 @@ leave it.
   repo. `josyn-jrp` follows the same pattern.
 - **ADR-017B-01 (SessionLauncher relocation) / ADR-019 / ADR-029** — supply the inner launch mechanism
   the Gateway reuses for `start-session`; unaffected.
+- **ADR-034 (JRP HTTP binding)** — child. Defines this ADR's T-2 "HTTPS/REST" binding: selects the
+  Gateway host stack (ASP.NET Core Minimal API, OpenAPI, Scalar) and confirms `josyn-jrp` as the sole
+  contract authority, concretising the T-3 `HttpAgent` as a hand-written JRP client (no generated SDK).
+- **ADR-035 (JRP addressing, topology, bootstrap)** — child. Gives operational meaning to the
+  `JrpTarget` this ADR introduced: information verbs are environment-scoped (`Machine` inert),
+  `start-session` is node-specific, the per-environment server list is platform-owned and env-local,
+  and clients bootstrap via a naming-convention + DNS seed. Honours T-1's no-coordinator peer model.
 - **JIP / JAP** — untouched. JRP is a third, cross-machine protocol; it does not extend or rename them.
 
 ---

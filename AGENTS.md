@@ -147,9 +147,12 @@ No content is duplicated here. Read the canonical source when a topic requires d
 | Per-repo summaries (packages, assemblies, current state) | `repos/` |
 | Sanity check protocol, inference algorithm, execution steps | `sanity/README.md` |
 | Project status, milestones, what's done and what's next | `ROADMAP.md` |
-| docs-index vocabulary (type, perspective, state closed lists) | `architecture/docs-index-vocabulary.md` |
-| Master documentation index (all repos, all docs) | `docs/docs-index.json` |
-| AI enrichment prompt for docs-index | `docs/enrich-docs-index-prompt.md` |
+
+> **Deprecated — `docs/docs-index.json` and its tooling are an outdated concept. Do not read,
+> update, backfill, or register anything in it.** This includes `docs/docs-index.json`,
+> `docs/enrich-docs-index-prompt.md`, and `architecture/docs-index-vocabulary.md`. The master-index
+> idea has been retired; new ADRs and docs are **not** registered there. Ignore it in all sessions
+> and do not treat its staleness as a gap to fix.
 
 ---
 
