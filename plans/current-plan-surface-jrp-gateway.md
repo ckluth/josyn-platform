@@ -1,13 +1,46 @@
 # Current Plan — Surface / JRP / Gateway
 
-> **Purpose.** A single public hand-off for the "surface → JRP → Gateway host" work stream.
+> **Purpose.** A single public hand-off for the "surface → JRP → Gateway host → HttpAgent" work stream.
 > It names every existing reference, then states **what is done, what is left, and what is next**,
 > so any future session can continue cold without reconstructing context.
 >
-> **Last updated:** 2026-06-26
-> **Active work item:** Part C item #1 of the ADR-033 follow-up — the **JRP Gateway host EXE**.
+> **Last updated:** 2026-06-30
+> **Active work item:** MVP-3 — `HttpAgent` (retire `FakeAgent`/`CompositeSurfaceAgent`)
 
 ---
+
+## 0. Cold-start brief
+
+> Read this block first in a new session. Everything below provides deeper detail.
+
+**State of play (2026-06-30).** The JRP Gateway Host is complete and committed.
+
+- `JOSYN.Backend.Gateway.Host` (`josyn-backend-gateway-host`) serves all 7 JRP verbs over
+  HTTP/REST on ASP.NET Core Minimal API. Smoke-tested against DEV DB. Committed to `josyn-backend`
+  (commit `2204164`). Docs updated in `josyn-platform` (commit `f6b2a84`).
+- `FileBootstrapConfig` extended with optional `RuntimeEnvironment?` + `GatewayListenUrl?`;
+  repacked at the same version.
+
+**What is left.** One work stream remains open: **MVP-3 — `HttpAgent`**.
+
+- Retire `JOSYN.Surface.FakeAgent` and `CompositeSurfaceAgent` (DS-4 throwaway, ADR-031 DS-5).
+- Implement `JOSYN.Surface.HttpAgent` — a real `ISurfaceAgent` backed by an `HttpClient` that
+  serialises `JOSYN.Jrp.*` records over the network to the Gateway Host (ADR-034 D-6: hand-written,
+  no Kiota, no generated DTOs).
+- Add `JOSYN.Surface.SessionClient` — a thin client that binds `JOSYN.Jrp.Launch` only
+  (for launch-only consumers who don't need the surface reads).
+- Add `CreateJobArgument` verb (not yet in the JRP contract — needs `josyn-jrp` update first).
+- MVP-3 schedule writes (deferred — decide scope when HttpAgent baseline is working).
+
+**The one hard prerequisite for HttpAgent:** the Gateway Host must be reachable from the surface
+client machine. In dev, that means adding `RuntimeEnvironment=DEV` and `GatewayListenUrl` to the
+deployed `josyn.bootstrap.ini` and starting the host. No code changes needed for this.
+
+**Blocker (still open):** job-registry placement gap — the registry records *that* a job is
+registered, not *on which servers it is installed*. `start-session` candidate resolution (ADR-035
+D-4/D-5) cannot be served until placement exists. The execution endpoint itself works (single-node
+launch with Machine self-check is live). The placement gap is tracked as separate, later work.
+
 
 ## 1. Reference map (all documents on this topic)
 
