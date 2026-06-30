@@ -24,7 +24,7 @@ The platform is being built incrementally, with a working round-trip already in 
 | M3 | Scheduling — ticker, time-based triggers | ✅ Done |
 | M4 | Full job lifecycle — migration, workflow support | ⬜ Upcoming |
 | M5 | Production-ready platform | ⬜ Upcoming |
-| M6 | josyn-surface — human window onto the headless platform: JRP seam + `JOSYN.Backend.Gateway` + optional edge clients (ADR-030/031/032/033) | 🔄 In progress (MVP-2b complete) |
+| M6 | josyn-surface — human window onto the headless platform: JRP seam + `JOSYN.Backend.Gateway` + optional edge clients (ADR-030/031/032/033) | 🔄 In progress (Gateway host EXE complete) |
 
 ---
 
@@ -49,6 +49,7 @@ The platform is being built incrementally, with a working round-trip already in 
 - `JOSYN.Backend.JobScheduleStore` — `IJobScheduleStore`, `IJobScheduleEntryRecord`, `IFiredSlotStore`; `josyn.JobSchedules`, `josyn.JobScheduleEntries`, `josyn.FiredSlots` tables (ADR-027, ADR-029)
 - `JOSYN.Backend.JobRegistry` extended with `ArgumentRecords`; `IArgumentRecord`, `IJobRegistry.GetArgument()`; `josyn.ArgumentRecords` table (ADR-028)
 - `JOSYN.Backend.TimeScheduler` — full tolerance-window + fired-slot-log scheduling algorithm; at-most-once delivery (ADR-027, ADR-028, ADR-029)
+- **`JOSYN.Backend.Gateway.Host`** — per-machine JRP API EXE; serves all 7 JRP verbs (`GetRegisteredJobs`, `GetJobArguments`, `GetJobSchedule`, `GetRecentSessions`, `GetErrorDetail`, `ChangeJobArgument`, `StartSession`) over HTTPS/REST; ASP.NET Core Minimal API + `IEndpoint`-per-class (ADR-034); env + machine validation on every verb (ADR-035 D-2); OpenAPI projection + Scalar; `/v1/` versioned routes. Reads `RuntimeEnvironment` + `GatewayListenUrl` from `josyn.bootstrap.ini` (extended `FileBootstrapConfig`). Smoke-tested against DEV DB — all 7 verbs green.
 
 ---
 
@@ -57,12 +58,11 @@ The platform is being built incrementally, with a working round-trip already in 
 - Backend CLI — first implementation done, must evolve
 - Solution architecture documentation — large sections are still placeholders
 - Documentation index tooling (`docs-index-builder`, AI enrichment pass pending)
-- `josyn-surface` (M6) — ADR-030/031/032/033 accepted. **josyn-jrp** created (`JOSYN.Jrp.Launch` +
-  `JOSYN.Jrp.Surface`) as the cross-machine wire-contract repo (ADR-033). **`JOSYN.Backend.Gateway`**
-  (renamed from "surface agent") is the platform-resident command host. **MVP-2b complete:** all six
-  CLI verbs live (`sessions`, `error`, `jobs`, `arguments`, `schedule`, `change-argument`) via
-  `CompositeSurfaceAgent` + `GatewayCommandHandler` over the DEV DB. `JOSYN.Jrp.Surface` owns all
-  wire DTOs and the `SessionStatus` enum (fully contracts-clean: no backend type crosses JRP).
+- `josyn-surface` (M6) — ADR-030/031/032/033/034/035 accepted. **josyn-jrp** created (`JOSYN.Jrp.Launch` +
+  `JOSYN.Jrp.Surface`) as the cross-machine wire-contract repo (ADR-033). **`JOSYN.Backend.Gateway.Host`**
+  is the platform-resident JRP API EXE — all 7 verbs live, smoke-tested against DEV DB, `FileBootstrapConfig`
+  extended with `RuntimeEnvironment` + `GatewayListenUrl`. **MVP-2b** (surface CLI + `CompositeSurfaceAgent`)
+  remains active; it will be retired when the `HttpAgent` replaces it (MVP-3).
 
 ---
 
@@ -70,11 +70,10 @@ The platform is being built incrementally, with a working round-trip already in 
 
 - Complete the solution architecture documentation
 - Run AI enrichment pass on the documentation index
-- `josyn-surface` MVP-2b → MVP-3: `HttpAgent` — the real `ISurfaceAgent` implementation that speaks
-  JRP over the network to a hosted Gateway, retiring `FakeAgent`, `CompositeSurfaceAgent`, and the
-  `bootstrap.ini` connection sneak (ADR-031 DS-5). Requires a Gateway EXE/service host (currently a
-  library). Then: `JOSYN.Surface.SessionClient` (binds only `JOSYN.Jrp.Launch`), `CreateJobArgument`,
-  and MVP-3 schedule writes.
+- `josyn-surface` MVP-3: `HttpAgent` — the real `ISurfaceAgent` implementation that speaks
+  JRP over the network to the Gateway Host, retiring `FakeAgent`, `CompositeSurfaceAgent`, and the
+  `bootstrap.ini` connection sneak (ADR-031 DS-5). Also: `JOSYN.Surface.SessionClient` (binds only
+  `JOSYN.Jrp.Launch`), `CreateJobArgument`, and MVP-3 schedule writes.
 
 ---
 

@@ -70,10 +70,22 @@ josyn-backend (NuGet packages + EXEs)
 ├── JOSYN.Backend.SessionStarter       ← session lifecycle: GUID, store write, process spawn
 ├── JOSYN.Backend.JobRegistry          ← job registration: Name, TechnicalUserName; josyn.JobRegistrations table
 ├── JOSYN.Backend.IdentityAdapter.Contract ← JIP contract: IIdentityAdapter.GetPassword (ADR-017B-03)
-├── JOSYN.Backend.Gateway              ← platform-resident write host: GatewayCommandHandler implements
-│                                         `ChangeJobArgument` over the DEV DB (ADR-033); mandatory
-│                                         per-machine component; future home of `start-session`.
+├── JOSYN.Backend.Gateway              ← platform-resident write library: GatewayCommandHandler implements
+│                                         `ChangeJobArgument` over the DB (ADR-033); consumed by the Gateway Host.
 │                                         Consumes JOSYN.Jrp.Surface + JOSYN.Backend.JobRegistry.
+│
+├── JOSYN.Backend.Gateway.Host (EXE)   ← per-machine JRP API host (ADR-033/034/035): serves all JRP verbs over
+│       │                                  HTTPS/REST on ASP.NET Core Minimal API; OpenAPI projection + Scalar;
+│       │                                  versioned routes (/v1/...); reads from real backend stores.
+│       │                                  Deployed to $BackendRoot\GatewayHost\
+│       ├── GatewayStartup.cs              ← startup config record (connection string, backendRoot, env, listenUrl)
+│       ├── HostFactory.cs                 ← WebApplication wiring: AddApiVersioning, AddOpenApi, MapEndpoints
+│       ├── EndpointRegistry.cs            ← explicit static endpoint list (ADR-034 D-2: no reflection scan)
+│       ├── IEndpoint.cs                   ← one verb = one IEndpoint implementation
+│       ├── JrpHttpResult.cs               ← Result<T> → IResult mapper; JrpErrorCategory → HTTP status (D-7)
+│       ├── TargetValidation.cs            ← env + machine validation helpers (ADR-035 D-2)
+│       ├── Get*Handler.cs / StartSessionHandler.cs  ← business logic handlers (one per verb)
+│       └── Get*Endpoint.cs / ChangeJobArgumentEndpoint.cs / StartSessionEndpoint.cs  ← HTTP endpoint wrappers
 │
 ├── JOSYN.Backend.Ticker (EXE)         ← periodic process launcher: fires orchestrators (TimeScheduler,
 │       │                                  WorkflowRunner) on a configurable minute-based schedule;
@@ -90,7 +102,6 @@ josyn-backend (NuGet packages + EXEs)
     ├── JOSYN.Backend.Scheduling       ← replaces JobSystem.Scheduling
     ├── JOSYN.Backend.Service          ← replaces JobSystem.Service (Windows service host)
     ├── JOSYN.Backend.WorkflowAdapter  ← replaces JobSystem.WorkflowAdapter
-    ├── listener-service (EXE)         ← future: receives "start job" requests
     └── cli-exe          (EXE)         ← future: operator CLI
 
 josyn-foundation (NuGet packages)
@@ -185,8 +196,14 @@ Backend.SessionStore     (+ ResultPattern)
 Backend.SessionStarter  (+ ResultPattern)
 
 Backend.Gateway  (+ JobRegistry + Jrp.Surface + ResultPattern)
-  ← the platform-resident write-command host; consumes the JRP surface contracts
-    and the JobRegistry write path; exposes GatewayCommandHandler to josyn-surface.
+  ← the platform-resident write-command library; consumed by the Gateway Host.
+
+Backend.Gateway.Host  (EXE — + Gateway + all read-store packages + Jrp.Launch + Jrp.Surface
+                               + BootstrapConfig + SessionLauncher + AspNetCore + Scalar)
+  ← serves all JRP verbs over HTTPS/REST; reads env + machine from josyn.bootstrap.ini;
+    two verb planes (ADR-035 D-1):
+    · env-scoped data verbs (5 reads + ChangeJobArgument): any Gateway answers identically
+    · node-specific execution verb (start-session): Machine must == this host's hostname
 
 Consumers of the backend packages:
   JOSYN.SessionBroker (EXE, josyn-session-broker) → + SessionStore + BootstrapConfig  (see above)

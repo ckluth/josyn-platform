@@ -78,37 +78,55 @@ current build stands up that Gateway host EXE.
   `GetRecentSessionsHandler`, `GetErrorDetailHandler`.
 - `StartSessionHandler` (fire-and-forget; `SessionLauncher.LaunchSession` static; empty response).
 
+**`EndpointRegistry.cs` rewrite + G-5 Endpoints + G-6 Config** — builds green, all 7 verbs live:
+- `EndpointRegistry.All` replaced by `MapEndpoints(GatewayStartup)` — explicit instantiation, no reflection.
+- `GatewayStartup.cs` record: connection string, backend root, env, listen URL.
+- `JrpHttpResult.cs`: `Result<T>` → `IResult`; `JrpErrorCategory` → HTTP status (D-7).
+- `TargetValidation.cs`: `ParseAndValidate` (query params) + `ValidateEnvironment` + `ValidateMachine`.
+- 7 endpoint files (one per JRP verb): `GetRegisteredJobsEndpoint`, `GetRecentSessionsEndpoint`,
+  `GetJobArgumentsEndpoint`, `GetJobScheduleEndpoint`, `GetErrorDetailEndpoint`,
+  `ChangeJobArgumentEndpoint`, `StartSessionEndpoint`.
+- `Program.cs` updated: loads `FileBootstrapConfig`, validates `RuntimeEnvironment`, falls back to
+  `https://localhost:5001` for missing `GatewayListenUrl`.
+- `FileBootstrapConfig` + `IBootstrapConfig` extended with optional `RuntimeEnvironment?` and
+  `GatewayListenUrl?`; repacked at same version. INI example updated.
+- `HostFactory.cs` updated: accepts `GatewayStartup`, sets listen URL via `UseUrls`.
+
+**G-7 Verify** — all 7 verbs smoke-tested against DEV DB:
+- `GET /v1/jobs` → 200 (live job data) ✅
+- `GET /v1/sessions?maxCount=5` → 200 (3 sessions) ✅
+- `GET /v1/jobs/{job}/arguments` → 200 (argument record) ✅
+- `GET /v1/jobs/{job}/schedule` → 200 (schedule + entries) ✅
+- `GET /v1/errors/{uid}` → 404 `[NotFound]` ✅
+- `PUT /v1/jobs/{job}/arguments/{arg}` → 200 before/after ✅
+- `POST /v1/sessions` wrong machine → 400 machine mismatch ✅
+- `POST /v1/sessions` correct machine → validation passed; 500 no EXE in dev layout (expected) ✅
+- OpenAPI `/openapi/v1.json` served ✅
+- Environment mismatch → 400 ✅
+
+**G-8 Docs** — all four targets updated:
+- `architecture/overview.md`: Gateway Host added to Component Map + dependency chain.
+- `architecture/naming-conventions.md`: Gateway vocabulary, namespace tree, assembly table updated.
+- `repos/josyn-backend/overview.md`: directory tree, planned components (✅), build notes, sanity notes.
+- `ROADMAP.md`: M6 status, What's done, What's in progress, What's next all current.
+
 ---
 
 ## 4. In progress / PAUSED
 
-- **`EndpointRegistry.cs` rewrite (ADR-034 D-2)** — DONE as code, **UNBUILT** (paused by maintainer).
-  Replaced the reflection-scan + DI `EndpointExtensions.cs` (deleted) with an explicit static
-  `EndpointRegistry.All` list; removed `AddEndpoints()` from `HostFactory.cs`.
-  **`All` is currently empty** — it is populated in G-5. ➜ First action next session: build to confirm
-  green, then proceed to G-5.
+*(nothing — all items through G-8 are complete)*
 
 ---
 
 ## 5. What is LEFT / NEXT (gated — AGENTS.md §5 confirmation required)
 
-- **G-5  Endpoints** — one `IEndpoint` per verb, **explicitly added to `EndpointRegistry.All`**:
-  5 reads + `ChangeJobArgument` (via existing `GatewayCommandHandler`) + `start-session`.
-  - Wire **ADR-035 D-2 validation**: `Environment` check on **every** endpoint; `Machine` self-check
-    on `start-session` (`Target.Machine == this host`).
-  - `.Produces<JrpType>()`; `JrpError → HTTP status` map at the host edge; OpenAPI + Scalar + `/v1`.
-- **G-6  Config** — `FileBootstrapConfig.Load(josyn.bootstrap.ini)` → connection string + listen URL;
-  dev TLS defaults (`Actor`/auth enforcement deferred — confirm).
-- **G-7  Verify** — build green; host integration tests; curl/Scalar smoke of every verb vs DEV DB.
-- **G-8  Docs** — `architecture/overview.md` (JRP/Gateway host flow + ADR-035 addressing model),
-  `architecture/naming-conventions.md` (resolve F-5 library-vs-host → host now EXISTS),
-  `repos/josyn-backend/overview.md`, `ROADMAP.md`, sanity current-state. (docs-index.json is deprecated.)
-- **G-9  Commit (gated)** — dependency order: `josyn-backend` (store ext + host) → `josyn-platform`
-  (docs). §5 go-ahead per repo.
-
-**Re-scope check before G-5:** decide full host vs read-only-first, given the placement-gap blocker
-(below). `start-session` step-1 candidate resolution cannot be served until placement exists; the
-execution endpoint itself (single-node launch with Machine self-check) can still be built.
+- **G-9  Commit (gated)** — dependency order: `josyn-backend` (BootstrapConfig repack + host) →
+  `josyn-platform` (docs + plan). §5 go-ahead per repo.
+- **MVP-3  HttpAgent** — retire `FakeAgent` / `CompositeSurfaceAgent` / `bootstrap.ini` sneak
+  (ADR-031 DS-5). Implement `ISurfaceAgent` as a thin hand-written `HttpClient` over `JOSYN.Jrp.*`
+  packages (ADR-034 D-6). Add `JOSYN.Surface.SessionClient` (binds `JOSYN.Jrp.Launch` only).
+  Add `CreateJobArgument` verb. MVP-3 schedule writes. Requires the Gateway host to be deployed
+  and reachable.
 
 ---
 

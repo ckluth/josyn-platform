@@ -187,6 +187,17 @@ josyn-backend/
     ├── JOSYN.Backend.Gateway.slnx
     ├── .local-build/                           ← solution-local clean + build + pack scripts
     └── JOSYN.Backend.Gateway/                 ← GatewayCommandHandler, IGatewayCommandHandler
+└── josyn-backend-gateway-host/                 ← Pattern B sub-folder (EXE — not packed)
+    ├── nuget.config
+    ├── JOSYN.Backend.Gateway.Host.slnx
+    ├── .local-build/                           ← solution-local clean + build scripts
+    └── JOSYN.Backend.Gateway.Host/            ← per-machine JRP API host; serves all 7 JRP verbs
+                                               │  over HTTPS/REST (ADR-033/034/035)
+                                               ├── GatewayStartup.cs
+                                               ├── HostFactory.cs / EndpointRegistry.cs
+                                               ├── IEndpoint.cs / JrpHttpResult.cs / TargetValidation.cs
+                                               ├── Get*Handler.cs / StartSessionHandler.cs
+                                               └── *Endpoint.cs (one per JRP verb)
 ```
 
 ---
@@ -209,6 +220,7 @@ When migrated, `josyn-backend` will contain the JOSYN-native replacements for al
 | `JOSYN.Backend.JobScheduleStore` ✅ | *(new)* | **Done** — `IJobScheduleStore`, `IFiredSlotStore`; `josyn.JobSchedules`, `josyn.JobScheduleEntries`, `josyn.FiredSlots`; per ADR-027, ADR-029 |
 | `JOSYN.Backend.TimeScheduler` ✅ | `JobSystem.TriggerAgent` | **Done** — Ticker-target EXE; tolerance-window + fired-slot-log algorithm; at-most-once delivery; per ADR-027, ADR-028, ADR-029 |
 | `JOSYN.Backend.Gateway` ✅ | *(new)* | **Done** — `IGatewayCommandHandler`, `GatewayCommandHandler`; platform-resident write handler for the JRP surface concern; bridges `JOSYN.Jrp.Surface.ChangeJobArgument` to `IJobArgumentWriter`; maps backend outcome to `JOSYN.Jrp.Surface.ArgumentChangeOutcome` internally — no backend type crosses JRP (ADR-033) |
+| `JOSYN.Backend.Gateway.Host` ✅ | *(new)* | **Done** — per-machine JRP API EXE; serves all 7 JRP verbs over HTTPS/REST on ASP.NET Core Minimal API; OpenAPI projection + Scalar; `/v1/` versioned routes; env + machine validation on every verb (ADR-033/034/035) |
 | `JOSYN.Backend.JobRepository` | `JobSystem.JobRepository` | Resolves job.exe path from job name |
 | `JOSYN.Backend.Service` | `JobSystem.Service` | Windows service host |
 | `JOSYN.Backend.WorkflowAdapter` | `JobSystem.WorkflowAdapter` | Workflow integration |
@@ -271,7 +283,7 @@ josyn-backend-job-registry\.local-build\build.cmd    ← builds JobRegistry only
 ```
 
 `pack.cmd` at the repo root packs `Contracts`, `SessionStore`, `ConfigStore`, `BootstrapConfig`, `JobRegistry`, `SessionLauncher`, `ErrorHandler`, `JobScheduleStore`, and `Gateway` to the shared `local-packages/` feed (sibling directory to this repo).
-`Ticker`, `Listener`, `CLI`, `TimeScheduler`, and the other EXE-only subfolders are not packed.
+`Ticker`, `Listener`, `CLI`, `TimeScheduler`, `Gateway.Host`, and the other EXE-only subfolders are not packed.
 
 License: MIT | Company: HAEVG AG | Target: net10.0
 
@@ -285,6 +297,8 @@ License: MIT | Company: HAEVG AG | Target: net10.0
 - No test project for `JOSYN.Backend.GlobalConfig` (`BootstrapConfig`) — known gap, not a violation.
 - No test project for `JOSYN.Backend.JobScheduleStore` — known gap, not a violation.
 - No test project for `JOSYN.Backend.TimeScheduler` — known gap, not a violation. The evaluation logic it exercises (`ScheduleEvaluator`) is covered by `JOSYN.Commons.Schedule.Test`.
+- No test project for `JOSYN.Backend.Gateway.Host` — known gap, not a violation. The host is an integration surface; G-7 smoke tests verified all 7 verbs against the DEV DB.
+- `IErrorReadStore.GetByUid(Guid)` softens the ADR-011B-01 write-only stance on `ErrorHandler` — intentional (Gateway read seam); flag for a doc note / mini-ADR at next review.
 - `HardcodedGlobalConfig` uses compile-time developer-machine constants — superseded by `FileBootstrapConfig`; no longer present.
 - `SessionStarter` has been removed — no orphaned-row concern applies (ADR-017B-01).
 - The planned components (`TriggerAgent`, `Scheduling`, etc.) do not exist yet — expected.

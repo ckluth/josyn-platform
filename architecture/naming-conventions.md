@@ -8,7 +8,7 @@
 | **Backend** | The scheduler and session-orchestration layer | `josyn-backend` repo, `JOSYN.Backend.*` namespace |
 | **JAP** | The JAP protocol contracts layer — defines the session protocol shared between the two worlds | `josyn-jap` repo, `JOSYN.Jap.*` namespace |
 | **JRP** | The JRP protocol contracts layer — the **cross-machine** (Remote) HTTPS/REST protocol; distinct from JIP (Interprocess, machine-bound) (ADR-033) | `josyn-jrp` repo, `JOSYN.Jrp.*` namespace (`Launch`, `Surface`) |
-| **Gateway** | The platform-resident, per-machine **command library** that implements JRP write commands and owns `start-session` (ADR-032/033). Currently a library (`JOSYN.Backend.Gateway`); a Gateway EXE/service host is deferred to the `HttpAgent`/`SessionClient` phase. | `josyn-backend` repo, `JOSYN.Backend.Gateway` |
+| **Gateway** | The platform-resident, per-machine **JRP host**. `JOSYN.Backend.Gateway` (library) owns the write command logic (`GatewayCommandHandler`). `JOSYN.Backend.Gateway.Host` (EXE, Pattern B, `josyn-backend-gateway-host`) serves the full JRP API over HTTPS/REST: 5 read verbs + `ChangeJobArgument` + `start-session`, each as one `IEndpoint` on ASP.NET Core Minimal API; OpenAPI projection + Scalar UI; `/v1/` versioned routes (ADR-033, ADR-034, ADR-035). | `josyn-backend` repo — library: `JOSYN.Backend.Gateway`; host EXE: `josyn-backend-gateway-host/JOSYN.Backend.Gateway.Host` |
 | **Surface** | The **optional**, human-facing edge **clients** (CLI, web, session client) — the consumer side of JRP (ADR-030/033) | `josyn-surface` repo, `JOSYN.Surface.*` namespace |
 | **Session Broker** | The per-session boundary EXE — brokers between the backend world and the job developer's world | `josyn-session-broker` repo, `JOSYN.SessionBroker` namespace |
 | **Foundation** | Cross-cutting infrastructure primitives | `josyn-foundation` repo, `JOSYN.Foundation.*` namespace |
@@ -73,7 +73,8 @@ JOSYN
 │   └── Attributes                 ← [JobEntryPoint], [BeforeJobEntryPoint], etc.
 ├── Backend                        ← josyn-backend
 │   ├── SessionStarter             ← session lifecycle rendezvous (stub)
-│   └── Gateway                    ← platform-resident command library; GatewayCommandHandler owns write path (ADR-032/033); EXE host deferred
+│   ├── Gateway                    ← platform-resident write-command library; GatewayCommandHandler owns write path (ADR-032/033)
+│   └── Gateway.Host               ← per-machine JRP host EXE (ADR-033/034/035); not packed
 └── Commons                        ← josyn-commons (utility satellite — never referenced by Foundation)
     └── ...                        ← packages added as helpers accumulate
 ```
@@ -97,6 +98,8 @@ Assembly names match their namespace root exactly:
 | `JOSYN.SessionBroker` | `JOSYN.SessionBroker` | josyn-session-broker (ADR-025) |
 | `JOSYN.JobHost` | `JOSYN.JobHost` | josyn-job-host |
 | `JOSYN.Backend.SessionStarter` | `JOSYN.Backend.SessionStarter` | josyn-backend |
+| `JOSYN.Backend.Gateway` | `JOSYN.Backend.Gateway` | josyn-backend (library — NuGet packed) |
+| `JOSYN.Backend.Gateway.Host` | `JOSYN.Backend.Gateway.Host` | josyn-backend (`josyn-backend-gateway-host`, EXE — not packed) |
 | *(TBD)* | `JOSYN.Commons.*` | josyn-commons |
 
 ---
